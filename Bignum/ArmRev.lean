@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Guilherme Lima. All rights reserved.
+Copyright (c) 2026 Guilherme Lima. All Rights Reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Author: Guilherme Lima
 -/
@@ -10,15 +10,11 @@ module
 
 set_option autoImplicit false
 
-namespace BigNum.ArmRev
+namespace Bignum.ArmRev
 
-/---
-Observable micro-architectural (uarch) events.
-
-Events that can be observed by a side-channel attacker depending on the
-inputs of an instruction.
+/--
+Micro-architectural (uarch) events.
 -/
-
 inductive UArchEvent where
   | EventLoad (addr : UInt64) (byte_length : Nat)
   | EventStore (addr : UInt64) (byte_length : Nat)
@@ -97,7 +93,7 @@ theorem XZR_zero (s : State) : s.XZR = 0 := by
 
 /-- Main integer registers. -/
 def XREG (s : State) (n : Nat) : UInt64 :=
-  if n.ble 31 then s.registers n else s.XZR
+  if n ≤ 31 then s.registers n else s.XZR
 
 theorem XREG_eq_zero_of_n_gt_31 (s : State) (n : Nat) :
     n > 31 → s.XREG n = 0 := by
@@ -179,4 +175,4 @@ def WSP (s : State) : UInt32 := s.WREG 31
 
 end State
 
-end BigNum.ArmRev
+end Bignum.ArmRev
