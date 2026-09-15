@@ -436,6 +436,10 @@ theorem invert_condition (c : Condition) :
     c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
   cases c <;> simp [ofBitVec, toBitVec, invert]
 
+theorem invert_condition_involutive (c : Condition) :
+    c.invert.invert = c := by
+  cases c <;> simp [invert_condition, ofBitVec, toBitVec]
+
 end Condition
 
 def State.condition (s : State) : Condition → Bool
