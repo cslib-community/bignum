@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Guilherme Lima. All Rights Reserved.
+Copyright (c) 2026 Guilherme Lima. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Author: Guilherme Lima
 -/
@@ -87,18 +87,25 @@ def VF (s : State) : Bool :=
 def XZR (_ : State) : BitVec 64 :=
   0
 
-@[simp]
+def WZR (s : State) : BitVec 32 :=
+  s.XZR.truncate 32
+
+/-- Generic version of XZR. -/
+def ZR (_ : State) {n : Nat} : BitVec n :=
+  0
+
 theorem XZR_zero (s : State) : s.XZR = 0 := by
+  rfl
+
+theorem WZR_zero (s : State) : s.WZR = 0 := by
+  rfl
+
+theorem ZR_zero (s : State) {n : Nat} : s.ZR = 0#n := by
   rfl
 
 /-- Main integer registers. -/
 def XREG (s : State) (n : Nat) : BitVec 64 :=
-  if n ≤ 31 then s.registers n else s.XZR
-
-theorem XREG_eq_zero_of_n_gt_31 (s : State) (n : Nat) :
-    n > 31 → s.XREG n = 0 := by
-  simp [XREG]; intro h _
-  have _ := Nat.not_le_of_gt h; contradiction
+  if n ≤ 30 then s.registers n else s.XZR
 
 def X0  (s : State) : BitVec 64 := s.XREG 0
 def X1  (s : State) : BitVec 64 := s.XREG 1
@@ -132,9 +139,12 @@ def X28 (s : State) : BitVec 64 := s.XREG 28
 def X29 (s : State) : BitVec 64 := s.XREG 29
 def X30 (s : State) : BitVec 64 := s.XREG 30
 
+theorem XREG31_zero (s : State) : s.XREG 31 = 0 := by
+  rfl
+
 /-- Stack pointer. --/
 def SP (s : State) : BitVec 64 :=
-  s.XREG 31
+  s.registers 31
 
 /-- 32-bit versions of the main registers. -/
 def WREG (s : State) (n : Nat) : BitVec 32 :=
@@ -171,7 +181,12 @@ def W27 (s : State) : BitVec 32 := s.WREG 27
 def W28 (s : State) : BitVec 32 := s.WREG 28
 def W29 (s : State) : BitVec 32 := s.WREG 29
 def W30 (s : State) : BitVec 32 := s.WREG 30
-def WSP (s : State) : BitVec 32 := s.WREG 31
+
+theorem WREG31_zero (s : State) : s.WREG 31 = 0 := by
+  rfl
+
+def WSP (s : State) : BitVec 32 :=
+  s.SP.truncate 32
 
 end State
 
@@ -194,14 +209,192 @@ instance : ToString ShiftType where
 
 namespace ShiftType
 
-def shift {n : Nat} (bv : BitVec n) (st : ShiftType) (sa : BitVec 6) :
+def shift (st : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
     BitVec n :=
   match st with
-    | .LSL => bv.shiftLeft sa.toNat
-    | .LSR => bv.ushiftRight sa.toNat
-    | .ASR => bv.sshiftRight sa.toNat
-    | .ROR => bv.rotateRight sa.toNat
+  | .LSL => bv.shiftLeft sa.toNat
+  | .LSR => bv.ushiftRight sa.toNat
+  | .ASR => bv.sshiftRight sa.toNat
+  | .ROR => bv.rotateRight sa.toNat
 
 end ShiftType
+
+/--
+Extended register operands.
+-/
+inductive ExtendedType where
+  | UXTB
+  | UXTH
+  | UXTW
+  | UXTX
+  | SXTH
+  | SXTW
+  | SXTX
+deriving DecidableEq, Repr
+
+namespace State
+
+/-- The main SIMD registers. -/
+def QREG (s : State) (n : Nat) : BitVec 128 :=
+  s.simdregisters n
+
+def DREG (s : State) (n : Nat) : BitVec 64 :=
+  (s.QREG n).truncate 64
+
+def SREG (s : State) (n : Nat) : BitVec 32 :=
+  (s.DREG n).truncate 32
+
+def HREG (s : State) (n : Nat) : BitVec 16 :=
+  (s.SREG n).truncate 16
+
+def BREG (s : State) (n : Nat) : BitVec 8 :=
+  (s.HREG n).truncate 8
+
+def Q0  (s : State) : BitVec 128 := s.QREG 0
+def Q1  (s : State) : BitVec 128 := s.QREG 1
+def Q2  (s : State) : BitVec 128 := s.QREG 2
+def Q3  (s : State) : BitVec 128 := s.QREG 3
+def Q4  (s : State) : BitVec 128 := s.QREG 4
+def Q5  (s : State) : BitVec 128 := s.QREG 5
+def Q6  (s : State) : BitVec 128 := s.QREG 6
+def Q7  (s : State) : BitVec 128 := s.QREG 7
+def Q8  (s : State) : BitVec 128 := s.QREG 8
+def Q9  (s : State) : BitVec 128 := s.QREG 9
+def Q10 (s : State) : BitVec 128 := s.QREG 10
+def Q11 (s : State) : BitVec 128 := s.QREG 11
+def Q12 (s : State) : BitVec 128 := s.QREG 12
+def Q13 (s : State) : BitVec 128 := s.QREG 13
+def Q14 (s : State) : BitVec 128 := s.QREG 14
+def Q15 (s : State) : BitVec 128 := s.QREG 15
+def Q16 (s : State) : BitVec 128 := s.QREG 16
+def Q17 (s : State) : BitVec 128 := s.QREG 17
+def Q18 (s : State) : BitVec 128 := s.QREG 18
+def Q19 (s : State) : BitVec 128 := s.QREG 19
+def Q20 (s : State) : BitVec 128 := s.QREG 20
+def Q21 (s : State) : BitVec 128 := s.QREG 21
+def Q22 (s : State) : BitVec 128 := s.QREG 22
+def Q23 (s : State) : BitVec 128 := s.QREG 23
+def Q24 (s : State) : BitVec 128 := s.QREG 24
+def Q25 (s : State) : BitVec 128 := s.QREG 25
+def Q26 (s : State) : BitVec 128 := s.QREG 26
+def Q27 (s : State) : BitVec 128 := s.QREG 27
+def Q28 (s : State) : BitVec 128 := s.QREG 28
+def Q29 (s : State) : BitVec 128 := s.QREG 29
+def Q30 (s : State) : BitVec 128 := s.QREG 30
+def Q31 (s : State) : BitVec 128 := s.QREG 31
+
+def D0  (s : State) : BitVec 64 := s.DREG 0
+def D1  (s : State) : BitVec 64 := s.DREG 1
+def D2  (s : State) : BitVec 64 := s.DREG 2
+def D3  (s : State) : BitVec 64 := s.DREG 3
+def D4  (s : State) : BitVec 64 := s.DREG 4
+def D5  (s : State) : BitVec 64 := s.DREG 5
+def D6  (s : State) : BitVec 64 := s.DREG 6
+def D7  (s : State) : BitVec 64 := s.DREG 7
+def D8  (s : State) : BitVec 64 := s.DREG 8
+def D9  (s : State) : BitVec 64 := s.DREG 9
+def D10 (s : State) : BitVec 64 := s.DREG 10
+def D11 (s : State) : BitVec 64 := s.DREG 11
+def D12 (s : State) : BitVec 64 := s.DREG 12
+def D13 (s : State) : BitVec 64 := s.DREG 13
+def D14 (s : State) : BitVec 64 := s.DREG 14
+def D15 (s : State) : BitVec 64 := s.DREG 15
+def D16 (s : State) : BitVec 64 := s.DREG 16
+def D17 (s : State) : BitVec 64 := s.DREG 17
+def D18 (s : State) : BitVec 64 := s.DREG 18
+def D19 (s : State) : BitVec 64 := s.DREG 19
+def D20 (s : State) : BitVec 64 := s.DREG 20
+def D21 (s : State) : BitVec 64 := s.DREG 21
+def D22 (s : State) : BitVec 64 := s.DREG 22
+def D23 (s : State) : BitVec 64 := s.DREG 23
+def D24 (s : State) : BitVec 64 := s.DREG 24
+def D25 (s : State) : BitVec 64 := s.DREG 25
+def D26 (s : State) : BitVec 64 := s.DREG 26
+def D27 (s : State) : BitVec 64 := s.DREG 27
+def D28 (s : State) : BitVec 64 := s.DREG 28
+def D29 (s : State) : BitVec 64 := s.DREG 29
+def D30 (s : State) : BitVec 64 := s.DREG 30
+def D31 (s : State) : BitVec 64 := s.DREG 31
+
+theorem zero_register (s : State) {n : Nat} :
+    s.ZR = 0#n ∧ s.XZR = 0 ∧ s.XREG 31 = 0 ∧ s.WZR = 0 ∧ s.WREG 31 = 0 := by
+  simp [s.ZR_zero, s.XZR_zero, s.XREG31_zero, s.WZR_zero, s.WREG31_zero]
+
+theorem XZR_ZR (s : State) : s.XZR = s.ZR := by
+  rewrite [s.XZR_zero, s.ZR_zero]; rfl
+
+theorem WZR_ZR (s : State) : s.WZR = s.ZR := by
+  rewrite [s.WZR_zero, s.ZR_zero]; rfl
+
+end State
+
+/--
+Condition codes.
+-/
+
+inductive Condition where
+  /-- Equal. -/
+  | EQ
+  /-- Not equal. -/
+  | NE
+  /-- Carry set. -/
+  | CS
+  /-- Carry set (alias). -/
+  | HS
+  /-- Carry clear. -/
+  | CC
+  /-- Carry clear (alias). -/
+  | LO
+  /-- Minus, negative. -/
+  | MI
+  /-- Plus, positive or zero. -/
+  | PL
+  /-- Overflow. -/
+  | VS
+  /-- No overflow. -/
+  | VC
+  /-- Unsigned higher. -/
+  | HI
+  /-- Unsigned lower or same. -/
+  | LS
+  /-- Signed greater than or equal. -/
+  | GE
+  /-- Signed less than. -/
+  | LT
+  /-- Signed greater than. -/
+  | GT
+  /-- Signed less than or equal. -/
+  | LE
+  /-- Always. -/
+  | AL
+  /-- Always. -/
+  | NV
+deriving DecidableEq, Repr
+
+namespace Condition
+
+def value (c : Condition) : BitVec 4 :=
+  match c with
+  | EQ => 0b0000
+  | NE => 0b0001
+  | CS => 0b0010
+  | HS => 0b0010
+  | CC => 0b0011
+  | LO => 0b0011
+  | MI => 0b0100
+  | PL => 0b0101
+  | VS => 0b0110
+  | VC => 0b0111
+  | HI => 0b1000
+  | LS => 0b1001
+  | GE => 0b1010
+  | LT => 0b1011
+  | GT => 0b1100
+  | LE => 0b1101
+  | AL => 0b1110
+  | NV => 0b1111
+
+end Condition
+
 
 end Bignum.ArmRev
