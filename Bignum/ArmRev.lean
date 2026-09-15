@@ -3,8 +3,9 @@ Copyright (c) 2026 Guilherme Lima. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Author: Guilherme Lima
 -/
-
 module
+
+public import Bignum.BitVec
 
 @[expose] public section
 
@@ -36,7 +37,7 @@ structure State where
   /-- NZCV flags. -/
   flags : BitVec 4
 
-  /-- Byte-addressable memory with 64-bit address space. -/
+  /-- Byte-addressable memory with a 64-bit address space. -/
   memory : BitVec 64 -> BitVec 8
 
   /-- Observable uarch events. -/
@@ -339,12 +340,8 @@ inductive Condition where
   | NE
   /-- Carry set. -/
   | CS
-  /-- Carry set (alias). -/
-  | HS
   /-- Carry clear. -/
   | CC
-  /-- Carry clear (alias). -/
-  | LO
   /-- Minus, negative. -/
   | MI
   /-- Plus, positive or zero. -/
@@ -369,18 +366,21 @@ inductive Condition where
   | AL
   /-- Always. -/
   | NV
-deriving DecidableEq, Repr
+deriving DecidableEq, Inhabited, Repr
 
 namespace Condition
 
-def value (c : Condition) : BitVec 4 :=
-  match c with
+/-- Alias for CS (carry set). -/
+abbrev HS := CS
+
+/-- Alias for CC (carry clear). -/
+abbrev LO := CC
+
+def toBitVec :  Condition → BitVec 4
   | EQ => 0b0000
   | NE => 0b0001
   | CS => 0b0010
-  | HS => 0b0010
   | CC => 0b0011
-  | LO => 0b0011
   | MI => 0b0100
   | PL => 0b0101
   | VS => 0b0110
@@ -394,7 +394,66 @@ def value (c : Condition) : BitVec 4 :=
   | AL => 0b1110
   | NV => 0b1111
 
+def ofBitVec (bv : BitVec 4) : Condition :=
+  match_bv bv with
+  | [0000] => EQ
+  | [0001] => NE
+  | [0010] => CS
+  | [0011] => CC
+  | [0100] => MI
+  | [0101] => PL
+  | [0110] => VS
+  | [0111] => VC
+  | [1000] => HI
+  | [1001] => LS
+  | [1010] => GE
+  | [1011] => LT
+  | [1100] => GT
+  | [1101] => LE
+  | [1110] => AL
+  | [1111] => NV
+  | _ => panic! s!"should not get here"
+
+def invert : Condition → Condition
+  | EQ => NE
+  | NE => EQ
+  | CS => CC
+  | CC => CS
+  | MI => PL
+  | PL => MI
+  | VS => VC
+  | VC => VS
+  | HI => LS
+  | LS => HI
+  | GE => LT
+  | LT => GE
+  | GT => LE
+  | LE => GT
+  | AL => NV
+  | NV => AL
+
+theorem invert_condition (c : Condition) :
+    c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
+  cases c <;> simp [ofBitVec, toBitVec, invert]
+
 end Condition
 
+def State.condition (s : State) : Condition → Bool
+  | .EQ => s.ZF
+  | .NE => !s.ZF
+  | .CS => s.CF
+  | .CC => !s.CF
+  | .MI => s.NF
+  | .PL => !s.NF
+  | .VS => s.VF
+  | .VC => !s.VF
+  | .HI => s.CF && !s.ZF
+  | .LS => !(s.CF && !s.ZF)
+  | .GE => s.NF == s.VF
+  | .LT => !(s.NF == s.VF)
+  | .GT => !s.ZF && (s.NF == s.VF)
+  | .LE => !(!s.ZF && (s.NF == s.VF))
+  | .AL => true
+  | .NV => true
 
 end Bignum.ArmRev
