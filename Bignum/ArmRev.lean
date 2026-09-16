@@ -412,7 +412,7 @@ def ofBitVec (bv : BitVec 4) : Condition :=
   | [1101] => LE
   | [1110] => AL
   | [1111] => NV
-  | _ => panic! s!"should not get here"
+  | _ => panic! "should not get here"
 
 def invert : Condition → Condition
   | EQ => NE
