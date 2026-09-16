@@ -6,6 +6,7 @@ Author: Guilherme Lima
 module
 
 public import Bignum.BitVec
+public import Bignum.Component
 
 @[expose] public section
 
@@ -26,67 +27,94 @@ The ARM machine state.
 -/
 structure State where
   /-- Program counter. -/
-  PC : BitVec 64
+  _PC : BitVec 64
 
   /-- 31 general purpose registers (0-30) plus SP (register 31). -/
-  registers : BitVec 5 → BitVec 64
+  _registers : BitVec 5 → BitVec 64
 
   /-- 32 SIMD registers. -/
-  simdregisters : BitVec 5 → BitVec 128
+  _simdregisters : BitVec 5 → BitVec 128
 
   /-- NZCV flags. -/
-  flags : BitVec 4
+  _flags : BitVec 4
 
   /-- Byte-addressable memory with a 64-bit address space. -/
-  memory : BitVec 64 -> BitVec 8
+  _memory : BitVec 64 → BitVec 8
 
   /-- Observable uarch events. -/
-  events : List UArchEvent
+  _events : List UArchEvent
 
 namespace State
 
 /-- The all zeros state. -/
 def allZeros : State := {
-  PC            := 0
-  registers     := λ _ ↦ 0
-  simdregisters := λ _ ↦ 0
-  flags         := 0
-  memory        := λ _ ↦ 0
-  events        := []
+  _PC            := 0
+  _registers     := λ _ ↦ 0
+  _simdregisters := λ _ ↦ 0
+  _flags         := 0
+  _memory        := λ _ ↦ 0
+  _events        := []
 }
 
 /-- The all ones state. -/
 def allOnes : State := {
-  PC            := BitVec.allOnes 64
-  registers     := λ _ ↦ BitVec.allOnes 64
-  simdregisters := λ _ ↦ BitVec.allOnes 128
-  flags         := BitVec.allOnes 4
-  memory        := λ _ ↦ BitVec.allOnes 8,
-  events        := []
+  _PC            := BitVec.allOnes 64
+  _registers     := λ _ ↦ BitVec.allOnes 64
+  _simdregisters := λ _ ↦ BitVec.allOnes 128
+  _flags         := BitVec.allOnes 4
+  _memory        := λ _ ↦ BitVec.allOnes 8,
+  _events        := []
 }
 
 instance : Inhabited State where
   default := allZeros
 
+def PC : Component State (BitVec 64) :=
+  ⟨λ s ↦ s._PC, λ x s ↦ {s with _PC := x}⟩
+
+def registers : Component State (BitVec 5 → BitVec 64) :=
+  ⟨λ s ↦ s._registers, λ x s ↦ {s with _registers := x}⟩
+
+def simdregisters : Component State (BitVec 5 → BitVec 128) :=
+  ⟨λ s ↦ s._simdregisters, λ x s ↦ {s with _simdregisters := x}⟩
+
+def flags : Component State (BitVec 4) :=
+  ⟨λ s ↦ s._flags, λ x s ↦ {s with _flags := x}⟩
+
+def memory : Component State (BitVec 64 → BitVec 8) :=
+  ⟨λ s ↦ s._memory, λ x s ↦ {s with _memory := x}⟩
+
+def events : Component State (List UArchEvent) :=
+  ⟨λ s ↦ s._events, λ x s ↦ {s with _events := x}⟩
+
+/-- Component for a bit within a BitVec. -/
+def bitelement {w : Nat} (i : Fin w) : Component (BitVec w) Bool :=
+  ⟨λ bv ↦ bv.getLsb i, λ b bv ↦ BitVec.setLsb bv i b⟩
+
 /-- The negative condition flag. -/
-def NF (s : State) : Bool :=
-  s.flags.getLsb 3
+def NF : Component State Bool :=
+  flags :> bitelement 3
 
 /-- The zero condition flag. -/
-def ZF (s : State) : Bool :=
-  s.flags.getLsb 2
+def ZF : Component State Bool :=
+  flags :> bitelement 2
 
 /-- The carry condition flag. -/
-def CF (s : State) : Bool :=
-  s.flags.getLsb 1
+def CF : Component State Bool :=
+  flags :> bitelement 1
 
 /-- The overflow condition flag. -/
-def VF (s : State) : Bool :=
-  s.flags.getLsb 0
+def VF : Component State Bool :=
+  flags :> bitelement 0
 
 /-- The zero register: zero as source, ignored as destination. -/
-def XZR (_ : State) : BitVec 64 :=
-  0
+def XZR : Component State (BitVec 64) :=
+  Component.rvalue 0#64
+
+theorem XZR_zero : XZR = Component.rvalue 0 := by
+  rfl
+
+#exit
 
 def WZR (s : State) : BitVec 32 :=
   s.XZR.truncate 32
@@ -94,9 +122,6 @@ def WZR (s : State) : BitVec 32 :=
 /-- Generic version of XZR. -/
 def ZR (_ : State) {n : Nat} : BitVec n :=
   0
-
-theorem XZR_zero (s : State) : s.XZR = 0 := by
-  rfl
 
 theorem WZR_zero (s : State) : s.WZR = 0 := by
   rfl

@@ -6,7 +6,7 @@ Author: Guilherme Lima
 
 import Bignum.Component
 
-open Bignum.Component
+open Bignum
 
 structure A where
   x : Nat

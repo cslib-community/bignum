@@ -8,9 +8,27 @@ module
 
 import Lean
 
+@[expose] public section
+
 namespace BitVec
 
-open BitVec
+/-!
+Misc BitVec functions.
+-/
+
+/-- Set least-significant-bit at index `i` of `x` to `b`. --/
+def setLsb {w : Nat} (x : BitVec w) (i : Fin w) (b : Bool) : BitVec w :=
+  if b then x ||| (1#w <<< i.toNat) else x &&& ~~~(1#w <<< i.toNat)
+
+-- theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
+--     (setLsb x i b).getLsb j = if i = j then b else x.getLsb j := by
+--   by_cases h : i = j <;> simp [setLsb]
+--   · subst i; cases b <;> simp
+--   · sorry
+
+/-!
+Pattern matching over BitVec.
+-/
 
 /--
 Bitvector pattern component syntax category, originally written by
@@ -162,8 +180,5 @@ macro_rules
 instance (w : Nat) : Quote (BitVec w) `term where
   quote x :=
     Syntax.mkCApp ``BitVec.ofNat #[quote w, quote x.toNat]
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
 
 end BitVec

@@ -11,7 +11,7 @@ module
 
 set_option autoImplicit false
 
-namespace Bignum.Component
+namespace Bignum
 
 universe u v w w'
 
@@ -81,5 +81,12 @@ theorem read_write_compose
     (c : γ) (a : α) :
     (cp₁ :> cp₂).read ((cp₁ :> cp₂).write c a) = c := by
   rw [compose_read, compose_write, h₁, h₂]
+
+/-!
+Pseudo-components for reading only.
+-/
+
+def rvalue (b : β) : Component α β :=
+  ⟨λ _ ↦ b, λ _ a ↦ a⟩
 
 end Component
