@@ -1,7 +1,8 @@
 /-
+Copyright (c) 2026 Guilherme Lima. All rights reserved.
 Copyright (c) 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Author(s): Shilpi Goel, Siddharth Bhat, Alex Keizer
+Author(s): Shilpi Goel, Siddharth Bhat, Alex Keizer, Guilherme Lima
 -/
 
 module
@@ -20,11 +21,10 @@ Misc BitVec functions.
 def setLsb {w : Nat} (x : BitVec w) (i : Fin w) (b : Bool) : BitVec w :=
   if b then x ||| (1#w <<< i.toNat) else x &&& ~~~(1#w <<< i.toNat)
 
--- theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
---     (setLsb x i b).getLsb j = if i = j then b else x.getLsb j := by
---   by_cases h : i = j <;> simp [setLsb]
---   · subst i; cases b <;> simp
---   · sorry
+theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
+    (setLsb x i b).getLsb j = if i = j then b else x.getLsb j := by
+  unfold setLsb; cases b <;> by_cases h : i = j <;>
+  simp [h] <;> rcases Fin.lt_or_lt_of_ne h <;> lia
 
 /-!
 Pattern matching over BitVec.
