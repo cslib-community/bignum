@@ -6,7 +6,7 @@ Author: Guilherme Lima
 module
 
 public import Bignum.BitVec
-public import Bignum.Component
+public import Bignum.ComponentExtra
 
 @[expose] public section
 
@@ -87,25 +87,21 @@ def memory : Component State (BitVec 64 → BitVec 8) :=
 def events : Component State (List UArchEvent) :=
   ⟨λ s ↦ s._events, λ x s ↦ {s with _events := x}⟩
 
-/-- Component for a bit within a BitVec. -/
-def bitelement {w : Nat} (i : Fin w) : Component (BitVec w) Bool :=
-  ⟨λ bv ↦ bv.getLsb i, λ b bv ↦ BitVec.setLsb bv i b⟩
-
 /-- The negative condition flag. -/
 def NF : Component State Bool :=
-  flags :> bitelement 3
+  flags :> Component.bitelement 3
 
 /-- The zero condition flag. -/
 def ZF : Component State Bool :=
-  flags :> bitelement 2
+  flags :> Component.bitelement 2
 
 /-- The carry condition flag. -/
 def CF : Component State Bool :=
-  flags :> bitelement 1
+  flags :> Component.bitelement 1
 
 /-- The overflow condition flag. -/
 def VF : Component State Bool :=
-  flags :> bitelement 0
+  flags :> Component.bitelement 0
 
 /-- The zero register: zero as source, ignored as destination. -/
 def XZR : Component State (BitVec 64) :=
