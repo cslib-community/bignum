@@ -17,6 +17,10 @@ namespace BitVec
 Misc BitVec functions.
 -/
 
+/-- Converts BitVec to bit string. -/
+def toBitString {w : Nat} (x : BitVec w) : String :=
+  String.ofList $ (List.range w).reverse.map (λ i ↦ if x.getLsbD i then '1' else '0')
+
 /-- Set least-significant-bit at index `i` of `x` to `b`. --/
 def setLsb {w : Nat} (x : BitVec w) (i : Fin w) (b : Bool) : BitVec w :=
   if b then x ||| (1#w <<< i.toNat) else x &&& ~~~(1#w <<< i.toNat)
@@ -25,6 +29,35 @@ theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
     (setLsb x i b).getLsb j = if i = j then b else x.getLsb j := by
   unfold setLsb; cases b <;> by_cases h : i = j <;>
   simp [h] <;> rcases Fin.lt_or_lt_of_ne h <;> lia
+
+def _extractLsb'_spec {w : Nat} (start len : Nat) (x: BitVec w) : BitVec len :=
+  ((x / 2^start) % 2^len).setWidth len
+
+def overwriteLsb' {w : Nat} (start len : Nat)
+    (x : BitVec w) (y : BitVec len) : BitVec w :=
+  let mask : BitVec w := (allOnes len).setWidth w <<< start
+  (x &&& ~~~mask) ||| (y.setWidth w <<< start)
+
+def _overwriteLsb'_spec {w : Nat} (start len : Nat)
+    (x : BitVec w) (y : BitVec len) : BitVec w :=
+  2^(start + len) * (x.toNat / 2^(start + len))
+  + 2^start * (y.toNat % 2^len)
+  + x.toNat % 2^start
+
+theorem overwriteLsb'_spec {w : Nat} (start len : Nat)
+    (x : BitVec w) (y : BitVec len) :
+    overwriteLsb' start len x y = _overwriteLsb'_spec start len x y := by
+  unfold overwriteLsb' _overwriteLsb'_spec
+  sorry
+
+-- def bv := 0b10010110#8
+-- #eval bv.toBitString
+-- #eval (bv.extractLsb' 3 2)
+-- #eval (bv._extractLsb'_orig 3 2)
+-- #eval (bv.overwriteLsb' 3 2 0b01#2).toBitString
+-- #eval (bv._overwriteLsb'_spec 3 2 0b01#2).toBitString
+-- #eval (bv.overwriteLsb' 0 16 0xffff).toBitString
+-- #eval (bv._overwriteLsb'_spec 0 16 0xffff).toBitString
 
 /-!
 Pattern matching over BitVec.

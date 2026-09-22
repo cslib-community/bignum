@@ -18,4 +18,6 @@ namespace Bignum.Component
 def bitelement {w : Nat} (i : Fin w) : Component (BitVec w) Bool :=
   ⟨λ bv ↦ bv.getLsb i, λ b bv ↦ BitVec.setLsb bv i b⟩
 
+/- Component for subwords of a BitVec. -/
+
 end Bignum.Component
