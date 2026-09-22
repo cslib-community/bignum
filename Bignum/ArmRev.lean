@@ -6,7 +6,7 @@ Author: Guilherme Lima
 module
 
 public import Bignum.BitVec
-public import Bignum.ComponentExtra
+public import Bignum.Component
 
 @[expose] public section
 
