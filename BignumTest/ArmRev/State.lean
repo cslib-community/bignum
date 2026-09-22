@@ -17,72 +17,150 @@ example : ZF.read allZeros = false := by rfl
 example : CF.read allZeros = false := by rfl
 example : VF.read allZeros = false := by rfl
 
-example : XZR.read allZeros = 0#64 := by rfl
--- example : State.allZeros.X0 = 0#64 := by rfl
--- example : State.allZeros.X1 = 0#64 := by rfl
--- example : State.allZeros.X2 = 0#64 := by rfl
--- example : State.allZeros.X3 = 0#64 := by rfl
--- example : State.allZeros.X4 = 0#64 := by rfl
--- example : State.allZeros.X5 = 0#64 := by rfl
--- example : State.allZeros.X6 = 0#64 := by rfl
--- example : State.allZeros.X7 = 0#64 := by rfl
--- example : State.allZeros.X8 = 0#64 := by rfl
--- example : State.allZeros.X9 = 0#64 := by rfl
--- example : State.allZeros.X10 = 0#64 := by rfl
--- example : State.allZeros.X11 = 0#64 := by rfl
--- example : State.allZeros.X12 = 0#64 := by rfl
--- example : State.allZeros.X13 = 0#64 := by rfl
--- example : State.allZeros.X14 = 0#64 := by rfl
--- example : State.allZeros.X15 = 0#64 := by rfl
--- example : State.allZeros.X16 = 0#64 := by rfl
--- example : State.allZeros.X17 = 0#64 := by rfl
--- example : State.allZeros.X18 = 0#64 := by rfl
--- example : State.allZeros.X19 = 0#64 := by rfl
--- example : State.allZeros.X20 = 0#64 := by rfl
--- example : State.allZeros.X21 = 0#64 := by rfl
--- example : State.allZeros.X22 = 0#64 := by rfl
--- example : State.allZeros.X23 = 0#64 := by rfl
--- example : State.allZeros.X24 = 0#64 := by rfl
--- example : State.allZeros.X25 = 0#64 := by rfl
--- example : State.allZeros.X26 = 0#64 := by rfl
--- example : State.allZeros.X27 = 0#64 := by rfl
--- example : State.allZeros.X28 = 0#64 := by rfl
--- example : State.allZeros.X29 = 0#64 := by rfl
--- example : State.allZeros.X30 = 0#64 := by rfl
--- example : State.allZeros.SP = 0#64 := by rfl
+example : NF.read (NF.write true allZeros) = true := by rfl
+example : NF.read (ZF.write true allZeros) = false := by rfl
 
--- example : State.allZeros.W0 = 0#32 := by rfl
--- example : State.allZeros.W1 = 0#32 := by rfl
--- example : State.allZeros.W2 = 0#32 := by rfl
--- example : State.allZeros.W3 = 0#32 := by rfl
--- example : State.allZeros.W4 = 0#32 := by rfl
--- example : State.allZeros.W5 = 0#32 := by rfl
--- example : State.allZeros.W6 = 0#32 := by rfl
--- example : State.allZeros.W7 = 0#32 := by rfl
--- example : State.allZeros.W8 = 0#32 := by rfl
--- example : State.allZeros.W9 = 0#32 := by rfl
--- example : State.allZeros.W10 = 0#32 := by rfl
--- example : State.allZeros.W11 = 0#32 := by rfl
--- example : State.allZeros.W12 = 0#32 := by rfl
--- example : State.allZeros.W13 = 0#32 := by rfl
--- example : State.allZeros.W14 = 0#32 := by rfl
--- example : State.allZeros.W15 = 0#32 := by rfl
--- example : State.allZeros.W16 = 0#32 := by rfl
--- example : State.allZeros.W17 = 0#32 := by rfl
--- example : State.allZeros.W18 = 0#32 := by rfl
--- example : State.allZeros.W19 = 0#32 := by rfl
--- example : State.allZeros.W20 = 0#32 := by rfl
--- example : State.allZeros.W21 = 0#32 := by rfl
--- example : State.allZeros.W22 = 0#32 := by rfl
--- example : State.allZeros.W23 = 0#32 := by rfl
--- example : State.allZeros.W24 = 0#32 := by rfl
--- example : State.allZeros.W25 = 0#32 := by rfl
--- example : State.allZeros.W26 = 0#32 := by rfl
--- example : State.allZeros.W27 = 0#32 := by rfl
--- example : State.allZeros.W28 = 0#32 := by rfl
--- example : State.allZeros.W29 = 0#32 := by rfl
--- example : State.allZeros.W30 = 0#32 := by rfl
--- example : State.allZeros.WSP = 0#32 := by rfl
+example : (NF.write true allZeros)._flags = 0b1000 := by rfl
+example : (ZF.write true allZeros)._flags = 0b0100 := by rfl
+example : (CF.write true allZeros)._flags = 0b0010 := by rfl
+example : (VF.write true allZeros)._flags = 0b0001 := by rfl
+
+example : XZR.read allZeros = 0#64 := by rfl
+example : XZR.read (XZR.write 1 allZeros) = 0#64 := by rfl
+example : WZR.read allZeros = 0#32 := by rfl
+example : WZR.read (WZR.write 1 allZeros) = 0#32 := by rfl
+
+example : X0.read allZeros = 0#64 := by rfl
+example : X1.read allZeros = 0#64 := by rfl
+example : X2.read allZeros = 0#64 := by rfl
+example : X3.read allZeros = 0#64 := by rfl
+example : X4.read allZeros = 0#64 := by rfl
+example : X5.read allZeros = 0#64 := by rfl
+example : X6.read allZeros = 0#64 := by rfl
+example : X7.read allZeros = 0#64 := by rfl
+example : X8.read allZeros = 0#64 := by rfl
+example : X9.read allZeros = 0#64 := by rfl
+example : X10.read allZeros = 0#64 := by rfl
+example : X11.read allZeros = 0#64 := by rfl
+example : X12.read allZeros = 0#64 := by rfl
+example : X13.read allZeros = 0#64 := by rfl
+example : X14.read allZeros = 0#64 := by rfl
+example : X15.read allZeros = 0#64 := by rfl
+example : X16.read allZeros = 0#64 := by rfl
+example : X17.read allZeros = 0#64 := by rfl
+example : X18.read allZeros = 0#64 := by rfl
+example : X19.read allZeros = 0#64 := by rfl
+example : X20.read allZeros = 0#64 := by rfl
+example : X21.read allZeros = 0#64 := by rfl
+example : X22.read allZeros = 0#64 := by rfl
+example : X23.read allZeros = 0#64 := by rfl
+example : X24.read allZeros = 0#64 := by rfl
+example : X25.read allZeros = 0#64 := by rfl
+example : X26.read allZeros = 0#64 := by rfl
+example : X27.read allZeros = 0#64 := by rfl
+example : X28.read allZeros = 0#64 := by rfl
+example : X29.read allZeros = 0#64 := by rfl
+example : X30.read allZeros = 0#64 := by rfl
+example : SP.read allZeros = 0#64 := by rfl
+
+example : (X0.write 0xff allZeros)._registers 0 = 0xff := by rfl
+example : (X1.write 0xff allZeros)._registers 1 = 0xff := by rfl
+example : (X2.write 0xff allZeros)._registers 2 = 0xff := by rfl
+example : (X3.write 0xff allZeros)._registers 3 = 0xff := by rfl
+example : (X4.write 0xff allZeros)._registers 4 = 0xff := by rfl
+example : (X5.write 0xff allZeros)._registers 5 = 0xff := by rfl
+example : (X6.write 0xff allZeros)._registers 6 = 0xff := by rfl
+example : (X7.write 0xff allZeros)._registers 7 = 0xff := by rfl
+example : (X8.write 0xff allZeros)._registers 8 = 0xff := by rfl
+example : (X9.write 0xff allZeros)._registers 9 = 0xff := by rfl
+example : (X10.write 0xff allZeros)._registers 10 = 0xff := by rfl
+example : (X11.write 0xff allZeros)._registers 11 = 0xff := by rfl
+example : (X12.write 0xff allZeros)._registers 12 = 0xff := by rfl
+example : (X13.write 0xff allZeros)._registers 13 = 0xff := by rfl
+example : (X14.write 0xff allZeros)._registers 14 = 0xff := by rfl
+example : (X15.write 0xff allZeros)._registers 15 = 0xff := by rfl
+example : (X16.write 0xff allZeros)._registers 16 = 0xff := by rfl
+example : (X17.write 0xff allZeros)._registers 17 = 0xff := by rfl
+example : (X18.write 0xff allZeros)._registers 18 = 0xff := by rfl
+example : (X19.write 0xff allZeros)._registers 19 = 0xff := by rfl
+example : (X20.write 0xff allZeros)._registers 20 = 0xff := by rfl
+example : (X21.write 0xff allZeros)._registers 21 = 0xff := by rfl
+example : (X22.write 0xff allZeros)._registers 22 = 0xff := by rfl
+example : (X23.write 0xff allZeros)._registers 23 = 0xff := by rfl
+example : (X24.write 0xff allZeros)._registers 24 = 0xff := by rfl
+example : (X25.write 0xff allZeros)._registers 25 = 0xff := by rfl
+example : (X26.write 0xff allZeros)._registers 26 = 0xff := by rfl
+example : (X27.write 0xff allZeros)._registers 27 = 0xff := by rfl
+example : (X28.write 0xff allZeros)._registers 28 = 0xff := by rfl
+example : (X29.write 0xff allZeros)._registers 29 = 0xff := by rfl
+example : (X30.write 0xff allZeros)._registers 30 = 0xff := by rfl
+example : (SP.write 0xff allZeros)._registers 31 = 0xff := by rfl
+example : ((XREG 31).write 0xff allZeros)._registers 31 = 0x0 := by rfl
+
+-- example : W0.read allZeros = 0#32 := by rfl
+-- example : W1.read allZeros = 0#32 := by rfl
+-- example : W2.read allZeros = 0#32 := by rfl
+-- example : W3.read allZeros = 0#32 := by rfl
+-- example : W4.read allZeros = 0#32 := by rfl
+-- example : W5.read allZeros = 0#32 := by rfl
+-- example : W6.read allZeros = 0#32 := by rfl
+-- example : W7.read allZeros = 0#32 := by rfl
+-- example : W8.read allZeros = 0#32 := by rfl
+-- example : W9.read allZeros = 0#32 := by rfl
+-- example : W10.read allZeros = 0#32 := by rfl
+-- example : W11.read allZeros = 0#32 := by rfl
+-- example : W12.read allZeros = 0#32 := by rfl
+-- example : W13.read allZeros = 0#32 := by rfl
+-- example : W14.read allZeros = 0#32 := by rfl
+-- example : W15.read allZeros = 0#32 := by rfl
+-- example : W16.read allZeros = 0#32 := by rfl
+-- example : W17.read allZeros = 0#32 := by rfl
+-- example : W18.read allZeros = 0#32 := by rfl
+-- example : W19.read allZeros = 0#32 := by rfl
+-- example : W20.read allZeros = 0#32 := by rfl
+-- example : W21.read allZeros = 0#32 := by rfl
+-- example : W22.read allZeros = 0#32 := by rfl
+-- example : W23.read allZeros = 0#32 := by rfl
+-- example : W24.read allZeros = 0#32 := by rfl
+-- example : W25.read allZeros = 0#32 := by rfl
+-- example : W26.read allZeros = 0#32 := by rfl
+-- example : W27.read allZeros = 0#32 := by rfl
+-- example : W28.read allZeros = 0#32 := by rfl
+-- example : W29.read allZeros = 0#32 := by rfl
+-- example : W30.read allZeros = 0#32 := by rfl
+-- example : WSP.read allZeros = 0#32 := by rfl
+
+-- example : (W0.write 0xff allZeros)._registers 0 = 0xff := by rfl
+-- example : (W1.write 0xff allZeros)._registers 1 = 0xff := by rfl
+-- example : (W2.write 0xff allZeros)._registers 2 = 0xff := by rfl
+-- example : (W3.write 0xff allZeros)._registers 3 = 0xff := by rfl
+-- example : (W4.write 0xff allZeros)._registers 4 = 0xff := by rfl
+-- example : (W5.write 0xff allZeros)._registers 5 = 0xff := by rfl
+-- example : (W6.write 0xff allZeros)._registers 6 = 0xff := by rfl
+-- example : (W7.write 0xff allZeros)._registers 7 = 0xff := by rfl
+-- example : (W8.write 0xff allZeros)._registers 8 = 0xff := by rfl
+-- example : (W9.write 0xff allZeros)._registers 9 = 0xff := by rfl
+-- example : (W10.write 0xff allZeros)._registers 10 = 0xff := by rfl
+-- example : (W11.write 0xff allZeros)._registers 11 = 0xff := by rfl
+-- example : (W12.write 0xff allZeros)._registers 12 = 0xff := by rfl
+-- example : (W13.write 0xff allZeros)._registers 13 = 0xff := by rfl
+-- example : (W14.write 0xff allZeros)._registers 14 = 0xff := by rfl
+-- example : (W15.write 0xff allZeros)._registers 15 = 0xff := by rfl
+-- example : (W16.write 0xff allZeros)._registers 16 = 0xff := by rfl
+-- example : (W17.write 0xff allZeros)._registers 17 = 0xff := by rfl
+-- example : (W18.write 0xff allZeros)._registers 18 = 0xff := by rfl
+-- example : (W19.write 0xff allZeros)._registers 19 = 0xff := by rfl
+-- example : (W20.write 0xff allZeros)._registers 20 = 0xff := by rfl
+-- example : (W21.write 0xff allZeros)._registers 21 = 0xff := by rfl
+-- example : (W22.write 0xff allZeros)._registers 22 = 0xff := by rfl
+-- example : (W23.write 0xff allZeros)._registers 23 = 0xff := by rfl
+-- example : (W24.write 0xff allZeros)._registers 24 = 0xff := by rfl
+-- example : (W25.write 0xff allZeros)._registers 25 = 0xff := by rfl
+-- example : (W26.write 0xff allZeros)._registers 26 = 0xff := by rfl
+-- example : (W27.write 0xff allZeros)._registers 27 = 0xff := by rfl
+-- example : (W28.write 0xff allZeros)._registers 28 = 0xff := by rfl
+-- example : (W29.write 0xff allZeros)._registers 29 = 0xff := by rfl
+-- example : (W30.write 0xff allZeros)._registers 30 = 0xff := by rfl
 
 -- -- allOnes
 

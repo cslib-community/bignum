@@ -83,11 +83,16 @@ theorem read_write_compose
     (cp₁ :> cp₂).read ((cp₁ :> cp₂).write c a) = c := by
   rw [compose_read, compose_write, h₁, h₂]
 
-/-!
-Pseudo-components for reading only.
+/--
+Pseudo-component for reading a value (read-only).
 -/
-
 def rvalue (b : β) : Component α β :=
   ⟨λ _ ↦ b, λ _ a ↦ a⟩
+
+/--
+Component corresponding to a function with a BEq domain.
+-/
+def element [BEq α] (a : α) : Component (α → β) β :=
+  ⟨λ f ↦ f a, λ b f a' ↦ if a' == a then b else f a'⟩
 
 end Component

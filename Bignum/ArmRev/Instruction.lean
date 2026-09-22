@@ -111,65 +111,54 @@ def XZR : Component State (BitVec 64) :=
 def WZR : Component State (BitVec 32) :=
   XZR :> Component.bottom_32
 
-#exit
-
-
 /-- Generic version of XZR. -/
-def ZR (_ : State) {n : Nat} : BitVec n :=
-  0
-
-theorem WZR_zero (s : State) : s.WZR = 0 := by
-  rfl
-
-theorem ZR_zero (s : State) {n : Nat} : s.ZR = 0#n := by
-  rfl
+def ZR {w : Nat} : Component State (BitVec w) :=
+  Component.rvalue 0
 
 /-- Main integer registers. -/
-def XREG (s : State) (n : Nat) : BitVec 64 :=
-  if n ≤ 30 then s.registers n else s.XZR
+def XREG (n : Nat) : Component State (BitVec 64) :=
+  if n ≥ 31 then XZR else registers :> Component.element n
 
-def X0  (s : State) : BitVec 64 := s.XREG 0
-def X1  (s : State) : BitVec 64 := s.XREG 1
-def X2  (s : State) : BitVec 64 := s.XREG 2
-def X3  (s : State) : BitVec 64 := s.XREG 3
-def X4  (s : State) : BitVec 64 := s.XREG 4
-def X5  (s : State) : BitVec 64 := s.XREG 5
-def X6  (s : State) : BitVec 64 := s.XREG 6
-def X7  (s : State) : BitVec 64 := s.XREG 7
-def X8  (s : State) : BitVec 64 := s.XREG 8
-def X9  (s : State) : BitVec 64 := s.XREG 9
-def X10 (s : State) : BitVec 64 := s.XREG 10
-def X11 (s : State) : BitVec 64 := s.XREG 11
-def X12 (s : State) : BitVec 64 := s.XREG 12
-def X13 (s : State) : BitVec 64 := s.XREG 13
-def X14 (s : State) : BitVec 64 := s.XREG 14
-def X15 (s : State) : BitVec 64 := s.XREG 15
-def X16 (s : State) : BitVec 64 := s.XREG 16
-def X17 (s : State) : BitVec 64 := s.XREG 17
-def X18 (s : State) : BitVec 64 := s.XREG 18
-def X19 (s : State) : BitVec 64 := s.XREG 19
-def X20 (s : State) : BitVec 64 := s.XREG 20
-def X21 (s : State) : BitVec 64 := s.XREG 21
-def X22 (s : State) : BitVec 64 := s.XREG 22
-def X23 (s : State) : BitVec 64 := s.XREG 23
-def X24 (s : State) : BitVec 64 := s.XREG 24
-def X25 (s : State) : BitVec 64 := s.XREG 25
-def X26 (s : State) : BitVec 64 := s.XREG 26
-def X27 (s : State) : BitVec 64 := s.XREG 27
-def X28 (s : State) : BitVec 64 := s.XREG 28
-def X29 (s : State) : BitVec 64 := s.XREG 29
-def X30 (s : State) : BitVec 64 := s.XREG 30
-
-theorem XREG31_zero (s : State) : s.XREG 31 = 0 := by
-  rfl
+def X0  : Component State (BitVec 64) := XREG 0
+def X1  : Component State (BitVec 64) := XREG 1
+def X2  : Component State (BitVec 64) := XREG 2
+def X3  : Component State (BitVec 64) := XREG 3
+def X4  : Component State (BitVec 64) := XREG 4
+def X5  : Component State (BitVec 64) := XREG 5
+def X6  : Component State (BitVec 64) := XREG 6
+def X7  : Component State (BitVec 64) := XREG 7
+def X8  : Component State (BitVec 64) := XREG 8
+def X9  : Component State (BitVec 64) := XREG 9
+def X10 : Component State (BitVec 64) := XREG 10
+def X11 : Component State (BitVec 64) := XREG 11
+def X12 : Component State (BitVec 64) := XREG 12
+def X13 : Component State (BitVec 64) := XREG 13
+def X14 : Component State (BitVec 64) := XREG 14
+def X15 : Component State (BitVec 64) := XREG 15
+def X16 : Component State (BitVec 64) := XREG 16
+def X17 : Component State (BitVec 64) := XREG 17
+def X18 : Component State (BitVec 64) := XREG 18
+def X19 : Component State (BitVec 64) := XREG 19
+def X20 : Component State (BitVec 64) := XREG 20
+def X21 : Component State (BitVec 64) := XREG 21
+def X22 : Component State (BitVec 64) := XREG 22
+def X23 : Component State (BitVec 64) := XREG 23
+def X24 : Component State (BitVec 64) := XREG 24
+def X25 : Component State (BitVec 64) := XREG 25
+def X26 : Component State (BitVec 64) := XREG 26
+def X27 : Component State (BitVec 64) := XREG 27
+def X28 : Component State (BitVec 64) := XREG 28
+def X29 : Component State (BitVec 64) := XREG 29
+def X30 : Component State (BitVec 64) := XREG 30
 
 /-- Stack pointer. --/
-def SP (s : State) : BitVec 64 :=
-  s.registers 31
+def SP : Component State (BitVec 64) :=
+  registers :> Component.element 31
+
+#exit
 
 /-- 32-bit versions of the main registers. -/
-def WREG (s : State) (n : Nat) : BitVec 32 :=
-  (s.XREG n).truncate 32
+def WREG (s : State) (n : Nat) : BitVec 32 := XREG n :> Component.zerotop_32
 
 def W0  (s : State) : BitVec 32 := s.WREG 0
 def W1  (s : State) : BitVec 32 := s.WREG 1
