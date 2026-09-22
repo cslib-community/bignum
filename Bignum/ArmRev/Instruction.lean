@@ -119,41 +119,40 @@ def ZR {w : Nat} : Component State (BitVec w) :=
 def XREG (n : Nat) : Component State (BitVec 64) :=
   if n ≥ 31 then XZR else registers :> Component.element n
 
-def X0  : Component State (BitVec 64) := XREG 0
-def X1  : Component State (BitVec 64) := XREG 1
-def X2  : Component State (BitVec 64) := XREG 2
-def X3  : Component State (BitVec 64) := XREG 3
-def X4  : Component State (BitVec 64) := XREG 4
-def X5  : Component State (BitVec 64) := XREG 5
-def X6  : Component State (BitVec 64) := XREG 6
-def X7  : Component State (BitVec 64) := XREG 7
-def X8  : Component State (BitVec 64) := XREG 8
-def X9  : Component State (BitVec 64) := XREG 9
-def X10 : Component State (BitVec 64) := XREG 10
-def X11 : Component State (BitVec 64) := XREG 11
-def X12 : Component State (BitVec 64) := XREG 12
-def X13 : Component State (BitVec 64) := XREG 13
-def X14 : Component State (BitVec 64) := XREG 14
-def X15 : Component State (BitVec 64) := XREG 15
-def X16 : Component State (BitVec 64) := XREG 16
-def X17 : Component State (BitVec 64) := XREG 17
-def X18 : Component State (BitVec 64) := XREG 18
-def X19 : Component State (BitVec 64) := XREG 19
-def X20 : Component State (BitVec 64) := XREG 20
-def X21 : Component State (BitVec 64) := XREG 21
-def X22 : Component State (BitVec 64) := XREG 22
-def X23 : Component State (BitVec 64) := XREG 23
-def X24 : Component State (BitVec 64) := XREG 24
-def X25 : Component State (BitVec 64) := XREG 25
-def X26 : Component State (BitVec 64) := XREG 26
-def X27 : Component State (BitVec 64) := XREG 27
-def X28 : Component State (BitVec 64) := XREG 28
-def X29 : Component State (BitVec 64) := XREG 29
-def X30 : Component State (BitVec 64) := XREG 30
+def X0   := XREG 0
+def X1   := XREG 1
+def X2   := XREG 2
+def X3   := XREG 3
+def X4   := XREG 4
+def X5   := XREG 5
+def X6   := XREG 6
+def X7   := XREG 7
+def X8   := XREG 8
+def X9   := XREG 9
+def X10  := XREG 10
+def X11  := XREG 11
+def X12  := XREG 12
+def X13  := XREG 13
+def X14  := XREG 14
+def X15  := XREG 15
+def X16  := XREG 16
+def X17  := XREG 17
+def X18  := XREG 18
+def X19  := XREG 19
+def X20  := XREG 20
+def X21  := XREG 21
+def X22  := XREG 22
+def X23  := XREG 23
+def X24  := XREG 24
+def X25  := XREG 25
+def X26  := XREG 26
+def X27  := XREG 27
+def X28  := XREG 28
+def X29  := XREG 29
+def X30  := XREG 30
 
 /-- Stack pointer. --/
-def SP : Component State (BitVec 64) :=
-  registers :> Component.element 31
+def SP := registers :> Component.element 31
 
 #exit
 
