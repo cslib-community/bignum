@@ -5,9 +5,10 @@ Author: Guilherme Lima
 -/
 module
 
--- Ported from HOL-Light (Library/components.ml).
-
 @[expose] public section
+
+/-! # Basic components -/
+-- Ported from HOL-Light (Library/components.ml).
 
 set_option autoImplicit false
 
