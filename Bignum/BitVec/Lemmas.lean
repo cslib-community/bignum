@@ -25,25 +25,25 @@ theorem overwriteLsb'_extractLsb'_low {w : Nat} (start len : Nat)
     (x : BitVec w) (y : BitVec len) :
     (x.overwriteLsb' start len y).extractLsb' 0 start
     = x.extractLsb' 0 start := by
-  rw [overwriteLsb', setWidth_append, setWidth_append]; grind
-  -- by_cases h₁ : w ≤ start
-  -- · rw [dif_pos h₁, setWidth_extractLsb'_of_le h₁, extractLsb'_eq_self]
-  -- · rw [dif_neg h₁]
-  --   by_cases h₂ : w ≤ len + start <;> simp
-  --   · rw [dif_pos h₂]
-  --     grind
-  --   · grind
+  simp only [overwriteLsb', setWidth_append]
+  by_cases h₁ : w ≤ start <;> simp [h₁]
+  · rw [setWidth_extractLsb'_of_le h₁, extractLsb'_eq_self]
+  · by_cases h₂ : w ≤ len + start <;>
+    simp [h₂, extractLsb'_cast, extractLsb'_append_eq_ite] <;>
+    intro <;> subst start <;> simp
+
+theorem overwriteLsb'_extractLsb'_mid {w : Nat} (start len : Nat)
+    (x : BitVec w) (y : BitVec len) :
+    (x.overwriteLsb' start len y).extractLsb' start len
+    = (y.extractLsb' 0 (w - start)).setWidth len := by
+  -- TODO: Remove grind.
+  simp only [overwriteLsb', setWidth_append]; grind
 
 theorem overwriteLsb'_extractLsb'_high {w : Nat} (start len : Nat)
     (x : BitVec w) (y : BitVec len) :
     (x.overwriteLsb' start len y).extractLsb' (start + len) w
     = x.extractLsb' (start + len) w := by
-  rw [overwriteLsb', setWidth_append, setWidth_append]; grind
-
--- theorem overwriteLsb'_extractLsb'_mid {w : Nat} (start len : Nat)
---     (x : BitVec w) (y : BitVec len) :
---     (x.overwriteLsb' start len y).extractLsb' start len
---     = sorry := by
---   sorry
+  -- TODO: Remove grind.
+  simp only [overwriteLsb', setWidth_append]; grind
 
 end BitVec
