@@ -57,4 +57,23 @@ def top_16     : Component (BitVec 32) (BitVec 16)   := @tophalf 32
 def bottom_8   : Component (BitVec 16) (BitVec 8)    := @bottomhalf 16
 def top_8      : Component (BitVec 16) (BitVec 8)    := @tophalf 16
 
+/-
+Components for subwords of larger bitvectors which force a zero
+extension on writes.  Intended to mimic x86-64 and aarch64 behaviors.
+-/
+def zerotop_256 : Component (BitVec 512) (BitVec 256) :=
+  Component.through (BitVec.truncate 256) (BitVec.truncate 512)
+
+def zerotop_128 : Component (BitVec 256) (BitVec 128) :=
+  Component.through (BitVec.truncate 128) (BitVec.truncate 256)
+
+def zerotop_64 : Component (BitVec 128) (BitVec 64) :=
+  Component.through (BitVec.truncate 64) (BitVec.truncate 128)
+
+def zerotop_32 : Component (BitVec 64) (BitVec 32) :=
+  Component.through (BitVec.truncate 32) (BitVec.truncate 64)
+
+def zerotop_8 : Component (BitVec 16) (BitVec 8) :=
+  Component.through (BitVec.truncate 8) (BitVec.truncate 16)
+
 end Bignum.Component

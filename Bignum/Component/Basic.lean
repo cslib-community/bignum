@@ -95,4 +95,10 @@ Component corresponding to a function with a BEq domain.
 def element [BEq α] (a : α) : Component (α → β) β :=
   ⟨λ f ↦ f a, λ b f a' ↦ if a' == a then b else f a'⟩
 
+/--
+Component that applies a pair of functions (f,g) to a component.
+-/
+def through (f : α → β) (g : β → α) : Component α β :=
+  ⟨f, λ b _ ↦ g b⟩
+
 end Component

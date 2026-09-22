@@ -45,4 +45,8 @@ example : Component.tophalf.write 0xf bv = 0b11111011#8 := by rfl
 example : Component.tophalf.write 0xf 0#2 = 2#2 := by rfl
 example : Component.tophalf.write 0xf 0#0 = 0#0 := by rfl
 example : Component.tophalf.write 0x0 111#3 = 0b001#3 := by rfl
+example : Component.zerotop_32.read (BitVec.allOnes 64)
+          = BitVec.allOnes 32 := by rfl
+example : Component.zerotop_32.write (BitVec.allOnes 32) (BitVec.allOnes 64)
+          = 0#32 ++ (BitVec.allOnes 32) := by rfl
 end subwordNS

@@ -25,4 +25,7 @@ theorem ZR_zero (w : Nat) : @ZR w = Component.rvalue 0 := by
 theorem XREG31_zero : XREG 31 = Component.rvalue 0 := by
   rfl
 
+theorem WREG31_zero : WREG 31 = Component.rvalue 0 := by
+  rfl
+
 end Bignum.ArmRev.State

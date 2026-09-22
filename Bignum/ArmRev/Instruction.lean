@@ -154,50 +154,46 @@ def X30  := XREG 30
 /-- Stack pointer. --/
 def SP := registers :> Component.element 31
 
-#exit
-
 /-- 32-bit versions of the main registers. -/
-def WREG (s : State) (n : Nat) : BitVec 32 := XREG n :> Component.zerotop_32
+def WREG (n : Nat) : Component State (BitVec 32) :=
+  XREG n :> Component.zerotop_32
 
-def W0  (s : State) : BitVec 32 := s.WREG 0
-def W1  (s : State) : BitVec 32 := s.WREG 1
-def W2  (s : State) : BitVec 32 := s.WREG 2
-def W3  (s : State) : BitVec 32 := s.WREG 3
-def W4  (s : State) : BitVec 32 := s.WREG 4
-def W5  (s : State) : BitVec 32 := s.WREG 5
-def W6  (s : State) : BitVec 32 := s.WREG 6
-def W7  (s : State) : BitVec 32 := s.WREG 7
-def W8  (s : State) : BitVec 32 := s.WREG 8
-def W9  (s : State) : BitVec 32 := s.WREG 9
-def W10 (s : State) : BitVec 32 := s.WREG 10
-def W11 (s : State) : BitVec 32 := s.WREG 11
-def W12 (s : State) : BitVec 32 := s.WREG 12
-def W13 (s : State) : BitVec 32 := s.WREG 13
-def W14 (s : State) : BitVec 32 := s.WREG 14
-def W15 (s : State) : BitVec 32 := s.WREG 15
-def W16 (s : State) : BitVec 32 := s.WREG 16
-def W17 (s : State) : BitVec 32 := s.WREG 17
-def W18 (s : State) : BitVec 32 := s.WREG 18
-def W19 (s : State) : BitVec 32 := s.WREG 19
-def W20 (s : State) : BitVec 32 := s.WREG 20
-def W21 (s : State) : BitVec 32 := s.WREG 21
-def W22 (s : State) : BitVec 32 := s.WREG 22
-def W23 (s : State) : BitVec 32 := s.WREG 23
-def W24 (s : State) : BitVec 32 := s.WREG 24
-def W25 (s : State) : BitVec 32 := s.WREG 25
-def W26 (s : State) : BitVec 32 := s.WREG 26
-def W27 (s : State) : BitVec 32 := s.WREG 27
-def W28 (s : State) : BitVec 32 := s.WREG 28
-def W29 (s : State) : BitVec 32 := s.WREG 29
-def W30 (s : State) : BitVec 32 := s.WREG 30
-
-theorem WREG31_zero (s : State) : s.WREG 31 = 0 := by
-  rfl
-
-def WSP (s : State) : BitVec 32 :=
-  s.SP.truncate 32
+def W0   := WREG 0
+def W1   := WREG 1
+def W2   := WREG 2
+def W3   := WREG 3
+def W4   := WREG 4
+def W5   := WREG 5
+def W6   := WREG 6
+def W7   := WREG 7
+def W8   := WREG 8
+def W9   := WREG 9
+def W10  := WREG 10
+def W11  := WREG 11
+def W12  := WREG 12
+def W13  := WREG 13
+def W14  := WREG 14
+def W15  := WREG 15
+def W16  := WREG 16
+def W17  := WREG 17
+def W18  := WREG 18
+def W19  := WREG 19
+def W20  := WREG 20
+def W21  := WREG 21
+def W22  := WREG 22
+def W23  := WREG 23
+def W24  := WREG 24
+def W25  := WREG 25
+def W26  := WREG 26
+def W27  := WREG 27
+def W28  := WREG 28
+def W29  := WREG 29
+def W30  := WREG 30
+def WSP  := SP :> Component.zerotop_32
 
 end State
+
+#exit
 
 /--
 Shifted register operands.
