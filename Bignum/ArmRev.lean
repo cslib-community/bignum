@@ -107,13 +107,12 @@ def VF : Component State Bool :=
 def XZR : Component State (BitVec 64) :=
   Component.rvalue 0#64
 
-theorem XZR_zero : XZR = Component.rvalue 0 := by
-  rfl
+/-- Bottom 32-bits of the zero register, ignored as destination. -/
+def WZR : Component State (BitVec 32) :=
+  XZR :> Component.bottom_32
 
 #exit
 
-def WZR (s : State) : BitVec 32 :=
-  s.XZR.truncate 32
 
 /-- Generic version of XZR. -/
 def ZR (_ : State) {n : Nat} : BitVec n :=
