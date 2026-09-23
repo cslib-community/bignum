@@ -28,4 +28,20 @@ theorem XREG31_zero : XREG 31 = Component.rvalue 0 := by
 theorem WREG31_zero : WREG 31 = Component.rvalue 0 := by
   rfl
 
+theorem shifted_LSL_zero {w : Nat} (reg : Component State (BitVec w)) :
+    shifted .LSL 0 reg = reg := by
+  simp [shifted]
+
+theorem shifted_LSR_zero {w : Nat} (reg : Component State (BitVec w)) :
+    shifted .LSR 0 reg = reg := by
+  simp [shifted]
+
+theorem shifted_ASR_zero {w : Nat} (reg : Component State (BitVec w)) :
+    shifted .ASR 0  reg = reg := by
+  simp [shifted]
+
+theorem shifted_ROR_zero {w : Nat} (reg : Component State (BitVec w)) :
+    shifted .ROR 0  reg = reg := by
+  simp [shifted, BitVec.rotateRight_def]
+
 end Bignum.ArmRev.State

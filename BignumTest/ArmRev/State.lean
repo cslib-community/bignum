@@ -363,6 +363,21 @@ example : (WSP.write 0 S₁)._registers 31 = 0 := by rfl
 example : (WREG 31).read ((WREG 31).write 1 S₀) = 0 := by rfl
 example : (WREG 31).read ((WREG 31).write 8 S₁) = 0 := by rfl
 
--- Writing to W* overwrites the top 32-bit of X* with 0:
+-- Writing to W* should overwrite the top 32-bit of X* with 0.
 example : X0.read (W0.write (1 <<< 33) allOnes) = 0 := by rfl
 example : SP.read (WSP.write 0 allOnes) = 0 := by rfl
+
+/-! ## Shifted operands -/
+
+example : (shifted .LSL 1 X1).read (X1.write 1 S₀) = 1 <<< 1 := by rfl
+example : X1.read ((shifted .LSL 1 X1).write 1 S₀) = 1#64 := by rfl
+
+example : (shifted .LSR 63 X1).read (X1.write (1 <<< 63) S₀) = 1 := by rfl
+example : X1.read ((shifted .LSL 1 X1).write 1 S₀) = 1#64 := by rfl
+
+example : (shifted .ASR 63 X1).read (X1.write (1 <<< 63) S₀)
+          = .allOnes 64 := by rfl
+example : X1.read ((shifted .ASR 1 X1).write 2 S₀) = 2#64 := by rfl
+
+example : (shifted .ROR 1 X1).read (X1.write 1 S₀) = (1 <<< 63) := by rfl
+example : X1.read ((shifted .ROR 1 X1).write 2 S₀) = 2#64 := by rfl

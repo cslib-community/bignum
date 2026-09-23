@@ -89,35 +89,35 @@ def events : Component State (List UArchEvent) :=
 
 /-- The negative condition flag. -/
 def NF : Component State Bool :=
-  flags :> Component.bitelement 3
+  flags :> .bitelement 3
 
 /-- The zero condition flag. -/
 def ZF : Component State Bool :=
-  flags :> Component.bitelement 2
+  flags :> .bitelement 2
 
 /-- The carry condition flag. -/
 def CF : Component State Bool :=
-  flags :> Component.bitelement 1
+  flags :> .bitelement 1
 
 /-- The overflow condition flag. -/
 def VF : Component State Bool :=
-  flags :> Component.bitelement 0
+  flags :> .bitelement 0
 
 /-- The zero register: zero as source, ignored as destination. -/
 def XZR : Component State (BitVec 64) :=
-  Component.rvalue 0#64
+  .rvalue 0#64
 
 /-- Bottom 32-bits of the zero register, ignored as destination. -/
 def WZR : Component State (BitVec 32) :=
-  XZR :> Component.bottom_32
+  XZR :> .bottom_32
 
 /-- Generic version of XZR. -/
 def ZR {w : Nat} : Component State (BitVec w) :=
-  Component.rvalue 0
+  .rvalue 0
 
 /-- Main integer registers. -/
 def XREG (n : Nat) : Component State (BitVec 64) :=
-  if n ≥ 31 then XZR else registers :> Component.element n
+  if n ≥ 31 then XZR else registers :> .element n
 
 def X0   := XREG 0
 def X1   := XREG 1
@@ -152,11 +152,11 @@ def X29  := XREG 29
 def X30  := XREG 30
 
 /-- Stack pointer. -/
-def SP := registers :> Component.element 31
+def SP := registers :> .element 31
 
 /-- 32-bit versions of the main registers. -/
 def WREG (n : Nat) : Component State (BitVec 32) :=
-  XREG n :> Component.zerotop_32
+  XREG n :> .zerotop_32
 
 def W0   := WREG 0
 def W1   := WREG 1
@@ -189,7 +189,7 @@ def W27  := WREG 27
 def W28  := WREG 28
 def W29  := WREG 29
 def W30  := WREG 30
-def WSP  := SP :> Component.zerotop_32
+def WSP  := SP :> .zerotop_32
 
 end State
 
@@ -210,19 +210,30 @@ deriving DecidableEq, Repr
 instance : ToString ShiftType where
   toString a := toString (repr a)
 
-#exit
-
 namespace ShiftType
 
-def shift (st : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
+/--
+Perform the shift operation indicated by `sty` on `bv`.
+-/
+@[simp]
+def shift (sty : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
     BitVec n :=
-  match st with
+  match sty with
   | .LSL => bv.shiftLeft sa.toNat
   | .LSR => bv.ushiftRight sa.toNat
   | .ASR => bv.sshiftRight sa.toNat
   | .ROR => bv.rotateRight sa.toNat
 
 end ShiftType
+
+/--
+Shifted version of register `reg` (writes are not affected).
+-/
+def State.shifted (sty : ShiftType) (sa : Nat) {n : Nat}
+    (reg : Component State (BitVec n)) : Component State (BitVec n) :=
+  ⟨λ s ↦ sty.shift sa (Component.read reg s), Component.write reg⟩
+
+#exit
 
 /--
 Extended register operands.
