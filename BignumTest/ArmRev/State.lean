@@ -406,3 +406,310 @@ example : ((extended .SXTX X1).read
             (X1.write (1 <<< 63) S₀) : BitVec 128).toInt
           = (1 <<< 63 : BitVec 64).toInt := by rfl
 
+/-! ## Main SIMD registers -/
+
+example : ((QREG 0).read $ (DREG 0).write (.allOnes 64) S₀)
+          = (BitVec.allOnes 64).zeroExtend 128 := by rfl
+
+example : ((QREG 0).read $ (SREG 0).write (.allOnes 32) S₀)
+          = (BitVec.allOnes 32).zeroExtend 128 := by rfl
+
+example : ((QREG 0).read $ (HREG 0).write (.allOnes 16) S₀)
+          = (BitVec.allOnes 16).zeroExtend 128 := by rfl
+
+example : ((QREG 0).read $ (BREG 0).write (.allOnes 8) S₀)
+          = (BitVec.allOnes 8).zeroExtend 128 := by rfl
+
+example : Q0.read S₀  = 0#128 := by rfl
+example : Q1.read S₀  = 0#128 := by rfl
+example : Q2.read S₀  = 0#128 := by rfl
+example : Q3.read S₀  = 0#128 := by rfl
+example : Q4.read S₀  = 0#128 := by rfl
+example : Q5.read S₀  = 0#128 := by rfl
+example : Q6.read S₀  = 0#128 := by rfl
+example : Q7.read S₀  = 0#128 := by rfl
+example : Q8.read S₀  = 0#128 := by rfl
+example : Q9.read S₀  = 0#128 := by rfl
+example : Q10.read S₀ = 0#128 := by rfl
+example : Q11.read S₀ = 0#128 := by rfl
+example : Q12.read S₀ = 0#128 := by rfl
+example : Q13.read S₀ = 0#128 := by rfl
+example : Q14.read S₀ = 0#128 := by rfl
+example : Q15.read S₀ = 0#128 := by rfl
+example : Q16.read S₀ = 0#128 := by rfl
+example : Q17.read S₀ = 0#128 := by rfl
+example : Q18.read S₀ = 0#128 := by rfl
+example : Q19.read S₀ = 0#128 := by rfl
+example : Q20.read S₀ = 0#128 := by rfl
+example : Q21.read S₀ = 0#128 := by rfl
+example : Q22.read S₀ = 0#128 := by rfl
+example : Q23.read S₀ = 0#128 := by rfl
+example : Q24.read S₀ = 0#128 := by rfl
+example : Q25.read S₀ = 0#128 := by rfl
+example : Q26.read S₀ = 0#128 := by rfl
+example : Q27.read S₀ = 0#128 := by rfl
+example : Q28.read S₀ = 0#128 := by rfl
+example : Q29.read S₀ = 0#128 := by rfl
+example : Q30.read S₀ = 0#128 := by rfl
+example : Q31.read S₀ = 0#128 := by rfl
+
+example : Q0.read S₁  = .allOnes 128 := by rfl
+example : Q1.read S₁  = .allOnes 128 := by rfl
+example : Q2.read S₁  = .allOnes 128 := by rfl
+example : Q3.read S₁  = .allOnes 128 := by rfl
+example : Q4.read S₁  = .allOnes 128 := by rfl
+example : Q5.read S₁  = .allOnes 128 := by rfl
+example : Q6.read S₁  = .allOnes 128 := by rfl
+example : Q7.read S₁  = .allOnes 128 := by rfl
+example : Q8.read S₁  = .allOnes 128 := by rfl
+example : Q9.read S₁  = .allOnes 128 := by rfl
+example : Q10.read S₁ = .allOnes 128 := by rfl
+example : Q11.read S₁ = .allOnes 128 := by rfl
+example : Q12.read S₁ = .allOnes 128 := by rfl
+example : Q13.read S₁ = .allOnes 128 := by rfl
+example : Q14.read S₁ = .allOnes 128 := by rfl
+example : Q15.read S₁ = .allOnes 128 := by rfl
+example : Q16.read S₁ = .allOnes 128 := by rfl
+example : Q17.read S₁ = .allOnes 128 := by rfl
+example : Q18.read S₁ = .allOnes 128 := by rfl
+example : Q19.read S₁ = .allOnes 128 := by rfl
+example : Q20.read S₁ = .allOnes 128 := by rfl
+example : Q21.read S₁ = .allOnes 128 := by rfl
+example : Q22.read S₁ = .allOnes 128 := by rfl
+example : Q23.read S₁ = .allOnes 128 := by rfl
+example : Q24.read S₁ = .allOnes 128 := by rfl
+example : Q25.read S₁ = .allOnes 128 := by rfl
+example : Q26.read S₁ = .allOnes 128 := by rfl
+example : Q27.read S₁ = .allOnes 128 := by rfl
+example : Q28.read S₁ = .allOnes 128 := by rfl
+example : Q29.read S₁ = .allOnes 128 := by rfl
+example : Q30.read S₁ = .allOnes 128 := by rfl
+example : Q31.read S₁ = .allOnes 128 := by rfl
+
+example : (Q0.write 1 S₀)._simdregisters 0 = 1 := by rfl
+example : (Q1.write 1 S₀)._simdregisters 1 = 1 := by rfl
+example : (Q2.write 1 S₀)._simdregisters 2 = 1 := by rfl
+example : (Q3.write 1 S₀)._simdregisters 3 = 1 := by rfl
+example : (Q4.write 1 S₀)._simdregisters 4 = 1 := by rfl
+example : (Q5.write 1 S₀)._simdregisters 5 = 1 := by rfl
+example : (Q6.write 1 S₀)._simdregisters 6 = 1 := by rfl
+example : (Q7.write 1 S₀)._simdregisters 7 = 1 := by rfl
+example : (Q8.write 1 S₀)._simdregisters 8 = 1 := by rfl
+example : (Q9.write 1 S₀)._simdregisters 9 = 1 := by rfl
+example : (Q10.write 1 S₀)._simdregisters 10 = 1 := by rfl
+example : (Q11.write 1 S₀)._simdregisters 11 = 1 := by rfl
+example : (Q12.write 1 S₀)._simdregisters 12 = 1 := by rfl
+example : (Q13.write 1 S₀)._simdregisters 13 = 1 := by rfl
+example : (Q14.write 1 S₀)._simdregisters 14 = 1 := by rfl
+example : (Q15.write 1 S₀)._simdregisters 15 = 1 := by rfl
+example : (Q16.write 1 S₀)._simdregisters 16 = 1 := by rfl
+example : (Q17.write 1 S₀)._simdregisters 17 = 1 := by rfl
+example : (Q18.write 1 S₀)._simdregisters 18 = 1 := by rfl
+example : (Q19.write 1 S₀)._simdregisters 19 = 1 := by rfl
+example : (Q20.write 1 S₀)._simdregisters 20 = 1 := by rfl
+example : (Q21.write 1 S₀)._simdregisters 21 = 1 := by rfl
+example : (Q22.write 1 S₀)._simdregisters 22 = 1 := by rfl
+example : (Q23.write 1 S₀)._simdregisters 23 = 1 := by rfl
+example : (Q24.write 1 S₀)._simdregisters 24 = 1 := by rfl
+example : (Q25.write 1 S₀)._simdregisters 25 = 1 := by rfl
+example : (Q26.write 1 S₀)._simdregisters 26 = 1 := by rfl
+example : (Q27.write 1 S₀)._simdregisters 27 = 1 := by rfl
+example : (Q28.write 1 S₀)._simdregisters 28 = 1 := by rfl
+example : (Q29.write 1 S₀)._simdregisters 29 = 1 := by rfl
+example : (Q30.write 1 S₀)._simdregisters 30 = 1 := by rfl
+example : (Q31.write 1 S₀)._simdregisters 31 = 1 := by rfl
+
+example : (Q0.write 0 S₁)._simdregisters 0 = 0 := by rfl
+example : (Q1.write 0 S₁)._simdregisters 1 = 0 := by rfl
+example : (Q2.write 0 S₁)._simdregisters 2 = 0 := by rfl
+example : (Q3.write 0 S₁)._simdregisters 3 = 0 := by rfl
+example : (Q4.write 0 S₁)._simdregisters 4 = 0 := by rfl
+example : (Q5.write 0 S₁)._simdregisters 5 = 0 := by rfl
+example : (Q6.write 0 S₁)._simdregisters 6 = 0 := by rfl
+example : (Q7.write 0 S₁)._simdregisters 7 = 0 := by rfl
+example : (Q8.write 0 S₁)._simdregisters 8 = 0 := by rfl
+example : (Q9.write 0 S₁)._simdregisters 9 = 0 := by rfl
+example : (Q10.write 0 S₁)._simdregisters 10 = 0 := by rfl
+example : (Q11.write 0 S₁)._simdregisters 11 = 0 := by rfl
+example : (Q12.write 0 S₁)._simdregisters 12 = 0 := by rfl
+example : (Q13.write 0 S₁)._simdregisters 13 = 0 := by rfl
+example : (Q14.write 0 S₁)._simdregisters 14 = 0 := by rfl
+example : (Q15.write 0 S₁)._simdregisters 15 = 0 := by rfl
+example : (Q16.write 0 S₁)._simdregisters 16 = 0 := by rfl
+example : (Q17.write 0 S₁)._simdregisters 17 = 0 := by rfl
+example : (Q18.write 0 S₁)._simdregisters 18 = 0 := by rfl
+example : (Q19.write 0 S₁)._simdregisters 19 = 0 := by rfl
+example : (Q20.write 0 S₁)._simdregisters 20 = 0 := by rfl
+example : (Q21.write 0 S₁)._simdregisters 21 = 0 := by rfl
+example : (Q22.write 0 S₁)._simdregisters 22 = 0 := by rfl
+example : (Q23.write 0 S₁)._simdregisters 23 = 0 := by rfl
+example : (Q24.write 0 S₁)._simdregisters 24 = 0 := by rfl
+example : (Q25.write 0 S₁)._simdregisters 25 = 0 := by rfl
+example : (Q26.write 0 S₁)._simdregisters 26 = 0 := by rfl
+example : (Q27.write 0 S₁)._simdregisters 27 = 0 := by rfl
+example : (Q28.write 0 S₁)._simdregisters 28 = 0 := by rfl
+example : (Q29.write 0 S₁)._simdregisters 29 = 0 := by rfl
+example : (Q30.write 0 S₁)._simdregisters 30 = 0 := by rfl
+example : (Q31.write 0 S₁)._simdregisters 31 = 0 := by rfl
+
+example : (QREG 31).read ((QREG 31).write 1 S₀) = 1 := by rfl
+example : (QREG 31).read ((QREG 31).write 8 S₁) = 8 := by rfl
+
+/-! ## 32-bit versions of the main SIMD registers -/
+
+example : D0.read S₀  = 0#64 := by rfl
+example : D1.read S₀  = 0#64 := by rfl
+example : D2.read S₀  = 0#64 := by rfl
+example : D3.read S₀  = 0#64 := by rfl
+example : D4.read S₀  = 0#64 := by rfl
+example : D5.read S₀  = 0#64 := by rfl
+example : D6.read S₀  = 0#64 := by rfl
+example : D7.read S₀  = 0#64 := by rfl
+example : D8.read S₀  = 0#64 := by rfl
+example : D9.read S₀  = 0#64 := by rfl
+example : D10.read S₀ = 0#64 := by rfl
+example : D11.read S₀ = 0#64 := by rfl
+example : D12.read S₀ = 0#64 := by rfl
+example : D13.read S₀ = 0#64 := by rfl
+example : D14.read S₀ = 0#64 := by rfl
+example : D15.read S₀ = 0#64 := by rfl
+example : D16.read S₀ = 0#64 := by rfl
+example : D17.read S₀ = 0#64 := by rfl
+example : D18.read S₀ = 0#64 := by rfl
+example : D19.read S₀ = 0#64 := by rfl
+example : D20.read S₀ = 0#64 := by rfl
+example : D21.read S₀ = 0#64 := by rfl
+example : D22.read S₀ = 0#64 := by rfl
+example : D23.read S₀ = 0#64 := by rfl
+example : D24.read S₀ = 0#64 := by rfl
+example : D25.read S₀ = 0#64 := by rfl
+example : D26.read S₀ = 0#64 := by rfl
+example : D27.read S₀ = 0#64 := by rfl
+example : D28.read S₀ = 0#64 := by rfl
+example : D29.read S₀ = 0#64 := by rfl
+example : D30.read S₀ = 0#64 := by rfl
+example : D31.read S₀ = 0#64 := by rfl
+
+example : D0.read S₁  = .allOnes 64 := by rfl
+example : D1.read S₁  = .allOnes 64 := by rfl
+example : D2.read S₁  = .allOnes 64 := by rfl
+example : D3.read S₁  = .allOnes 64 := by rfl
+example : D4.read S₁  = .allOnes 64 := by rfl
+example : D5.read S₁  = .allOnes 64 := by rfl
+example : D6.read S₁  = .allOnes 64 := by rfl
+example : D7.read S₁  = .allOnes 64 := by rfl
+example : D8.read S₁  = .allOnes 64 := by rfl
+example : D9.read S₁  = .allOnes 64 := by rfl
+example : D10.read S₁ = .allOnes 64 := by rfl
+example : D11.read S₁ = .allOnes 64 := by rfl
+example : D12.read S₁ = .allOnes 64 := by rfl
+example : D13.read S₁ = .allOnes 64 := by rfl
+example : D14.read S₁ = .allOnes 64 := by rfl
+example : D15.read S₁ = .allOnes 64 := by rfl
+example : D16.read S₁ = .allOnes 64 := by rfl
+example : D17.read S₁ = .allOnes 64 := by rfl
+example : D18.read S₁ = .allOnes 64 := by rfl
+example : D19.read S₁ = .allOnes 64 := by rfl
+example : D20.read S₁ = .allOnes 64 := by rfl
+example : D21.read S₁ = .allOnes 64 := by rfl
+example : D22.read S₁ = .allOnes 64 := by rfl
+example : D23.read S₁ = .allOnes 64 := by rfl
+example : D24.read S₁ = .allOnes 64 := by rfl
+example : D25.read S₁ = .allOnes 64 := by rfl
+example : D26.read S₁ = .allOnes 64 := by rfl
+example : D27.read S₁ = .allOnes 64 := by rfl
+example : D28.read S₁ = .allOnes 64 := by rfl
+example : D29.read S₁ = .allOnes 64 := by rfl
+example : D30.read S₁ = .allOnes 64 := by rfl
+example : D31.read S₁ = .allOnes 64 := by rfl
+
+example : (D0.write 1 S₀)._simdregisters 0 = 1 := by rfl
+example : (D1.write 1 S₀)._simdregisters 1 = 1 := by rfl
+example : (D2.write 1 S₀)._simdregisters 2 = 1 := by rfl
+example : (D3.write 1 S₀)._simdregisters 3 = 1 := by rfl
+example : (D4.write 1 S₀)._simdregisters 4 = 1 := by rfl
+example : (D5.write 1 S₀)._simdregisters 5 = 1 := by rfl
+example : (D6.write 1 S₀)._simdregisters 6 = 1 := by rfl
+example : (D7.write 1 S₀)._simdregisters 7 = 1 := by rfl
+example : (D8.write 1 S₀)._simdregisters 8 = 1 := by rfl
+example : (D9.write 1 S₀)._simdregisters 9 = 1 := by rfl
+example : (D10.write 1 S₀)._simdregisters 10 = 1 := by rfl
+example : (D11.write 1 S₀)._simdregisters 11 = 1 := by rfl
+example : (D12.write 1 S₀)._simdregisters 12 = 1 := by rfl
+example : (D13.write 1 S₀)._simdregisters 13 = 1 := by rfl
+example : (D14.write 1 S₀)._simdregisters 14 = 1 := by rfl
+example : (D15.write 1 S₀)._simdregisters 15 = 1 := by rfl
+example : (D16.write 1 S₀)._simdregisters 16 = 1 := by rfl
+example : (D17.write 1 S₀)._simdregisters 17 = 1 := by rfl
+example : (D18.write 1 S₀)._simdregisters 18 = 1 := by rfl
+example : (D19.write 1 S₀)._simdregisters 19 = 1 := by rfl
+example : (D20.write 1 S₀)._simdregisters 20 = 1 := by rfl
+example : (D21.write 1 S₀)._simdregisters 21 = 1 := by rfl
+example : (D22.write 1 S₀)._simdregisters 22 = 1 := by rfl
+example : (D23.write 1 S₀)._simdregisters 23 = 1 := by rfl
+example : (D24.write 1 S₀)._simdregisters 24 = 1 := by rfl
+example : (D25.write 1 S₀)._simdregisters 25 = 1 := by rfl
+example : (D26.write 1 S₀)._simdregisters 26 = 1 := by rfl
+example : (D27.write 1 S₀)._simdregisters 27 = 1 := by rfl
+example : (D28.write 1 S₀)._simdregisters 28 = 1 := by rfl
+example : (D29.write 1 S₀)._simdregisters 29 = 1 := by rfl
+example : (D30.write 1 S₀)._simdregisters 30 = 1 := by rfl
+example : (D31.write 1 S₀)._simdregisters 31 = 1 := by rfl
+
+example : (D0.write 0 S₁)._simdregisters 0 = 0 := by rfl
+example : (D1.write 0 S₁)._simdregisters 1 = 0 := by rfl
+example : (D2.write 0 S₁)._simdregisters 2 = 0 := by rfl
+example : (D3.write 0 S₁)._simdregisters 3 = 0 := by rfl
+example : (D4.write 0 S₁)._simdregisters 4 = 0 := by rfl
+example : (D5.write 0 S₁)._simdregisters 5 = 0 := by rfl
+example : (D6.write 0 S₁)._simdregisters 6 = 0 := by rfl
+example : (D7.write 0 S₁)._simdregisters 7 = 0 := by rfl
+example : (D8.write 0 S₁)._simdregisters 8 = 0 := by rfl
+example : (D9.write 0 S₁)._simdregisters 9 = 0 := by rfl
+example : (D10.write 0 S₁)._simdregisters 10 = 0 := by rfl
+example : (D11.write 0 S₁)._simdregisters 11 = 0 := by rfl
+example : (D12.write 0 S₁)._simdregisters 12 = 0 := by rfl
+example : (D13.write 0 S₁)._simdregisters 13 = 0 := by rfl
+example : (D14.write 0 S₁)._simdregisters 14 = 0 := by rfl
+example : (D15.write 0 S₁)._simdregisters 15 = 0 := by rfl
+example : (D16.write 0 S₁)._simdregisters 16 = 0 := by rfl
+example : (D17.write 0 S₁)._simdregisters 17 = 0 := by rfl
+example : (D18.write 0 S₁)._simdregisters 18 = 0 := by rfl
+example : (D19.write 0 S₁)._simdregisters 19 = 0 := by rfl
+example : (D20.write 0 S₁)._simdregisters 20 = 0 := by rfl
+example : (D21.write 0 S₁)._simdregisters 21 = 0 := by rfl
+example : (D22.write 0 S₁)._simdregisters 22 = 0 := by rfl
+example : (D23.write 0 S₁)._simdregisters 23 = 0 := by rfl
+example : (D24.write 0 S₁)._simdregisters 24 = 0 := by rfl
+example : (D25.write 0 S₁)._simdregisters 25 = 0 := by rfl
+example : (D26.write 0 S₁)._simdregisters 26 = 0 := by rfl
+example : (D27.write 0 S₁)._simdregisters 27 = 0 := by rfl
+example : (D28.write 0 S₁)._simdregisters 28 = 0 := by rfl
+example : (D29.write 0 S₁)._simdregisters 29 = 0 := by rfl
+example : (D30.write 0 S₁)._simdregisters 30 = 0 := by rfl
+example : (D31.write 0 S₁)._simdregisters 31 = 0 := by rfl
+
+example : (DREG 31).read ((DREG 31).write 1 S₀) = 1 := by rfl
+example : (DREG 31).read ((DREG 31).write 8 S₁) = 8 := by rfl
+
+/-! ## SMID register lanes -/
+
+example : ((Q0 :> LANE_B 0).read (Q0.write 0x0a01 S₀))
+          = 0x01010101010101010101010101010101 := by rfl
+example : ((Q0 :> LANE_B 1).read (Q0.write 0xa001 S₀))
+          = 0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 := by rfl
+
+example : ((Q0 :> LANE_H 0).read (Q0.write 0xffff0a01 S₀))
+          = 0x0a010a010a010a010a010a010a010a01 := by rfl
+example : ((Q0 :> LANE_H 1).read (Q0.write 0xffff0a01 S₀))
+          = 0xffffffffffffffffffffffffffffffff := by rfl
+
+example : ((Q0 :> LANE_S 0).read (Q0.write 0xbb01ffff0a01 S₀))
+          = 0xffff0a01ffff0a01ffff0a01ffff0a01 := by rfl
+example : ((Q0 :> LANE_S 1).read (Q0.write 0xbb01ffff0a01 S₀))
+          = 0x0000bb010000bb010000bb010000bb01 := by rfl
+
+example : ((Q0 :> LANE_D 0).read (Q0.write 0xff00bb01ffff0a01 S₀))
+          = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
+example : ((Q0 :> LANE_D 1).read (Q0.write (0xff00bb01ffff0a01 <<< 64) S₀))
+          = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl

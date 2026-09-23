@@ -282,91 +282,106 @@ def State.extended (xty : ExtendedType) {n m : Nat}
   -- We use of `default` on the right as a substitute for HOL Light's ARB.
   ⟨λ s ↦ xty.extend (Component.read reg s), default⟩
 
-#exit
-
 namespace State
 
 /-- The main SIMD registers. -/
-def QREG (s : State) (n : Nat) : BitVec 128 :=
-  s.simdregisters n
+def QREG (n : Nat) : Component State (BitVec 128) :=
+  simdregisters :> .element n
 
-def DREG (s : State) (n : Nat) : BitVec 64 :=
-  (s.QREG n).truncate 64
+def DREG (n : Nat) : Component State (BitVec 64) :=
+  QREG n :> .zerotop_64
 
-def SREG (s : State) (n : Nat) : BitVec 32 :=
-  (s.DREG n).truncate 32
+def SREG (n : Nat) : Component State (BitVec 32) :=
+  DREG n :> .zerotop_32
 
-def HREG (s : State) (n : Nat) : BitVec 16 :=
-  (s.SREG n).truncate 16
+def HREG (n : Nat) : Component State (BitVec 16) :=
+  SREG n :> .zerotop_16
 
-def BREG (s : State) (n : Nat) : BitVec 8 :=
-  (s.HREG n).truncate 8
+def BREG (n : Nat) : Component State (BitVec 8) :=
+  HREG n :> .zerotop_8
 
-def Q0  (s : State) : BitVec 128 := s.QREG 0
-def Q1  (s : State) : BitVec 128 := s.QREG 1
-def Q2  (s : State) : BitVec 128 := s.QREG 2
-def Q3  (s : State) : BitVec 128 := s.QREG 3
-def Q4  (s : State) : BitVec 128 := s.QREG 4
-def Q5  (s : State) : BitVec 128 := s.QREG 5
-def Q6  (s : State) : BitVec 128 := s.QREG 6
-def Q7  (s : State) : BitVec 128 := s.QREG 7
-def Q8  (s : State) : BitVec 128 := s.QREG 8
-def Q9  (s : State) : BitVec 128 := s.QREG 9
-def Q10 (s : State) : BitVec 128 := s.QREG 10
-def Q11 (s : State) : BitVec 128 := s.QREG 11
-def Q12 (s : State) : BitVec 128 := s.QREG 12
-def Q13 (s : State) : BitVec 128 := s.QREG 13
-def Q14 (s : State) : BitVec 128 := s.QREG 14
-def Q15 (s : State) : BitVec 128 := s.QREG 15
-def Q16 (s : State) : BitVec 128 := s.QREG 16
-def Q17 (s : State) : BitVec 128 := s.QREG 17
-def Q18 (s : State) : BitVec 128 := s.QREG 18
-def Q19 (s : State) : BitVec 128 := s.QREG 19
-def Q20 (s : State) : BitVec 128 := s.QREG 20
-def Q21 (s : State) : BitVec 128 := s.QREG 21
-def Q22 (s : State) : BitVec 128 := s.QREG 22
-def Q23 (s : State) : BitVec 128 := s.QREG 23
-def Q24 (s : State) : BitVec 128 := s.QREG 24
-def Q25 (s : State) : BitVec 128 := s.QREG 25
-def Q26 (s : State) : BitVec 128 := s.QREG 26
-def Q27 (s : State) : BitVec 128 := s.QREG 27
-def Q28 (s : State) : BitVec 128 := s.QREG 28
-def Q29 (s : State) : BitVec 128 := s.QREG 29
-def Q30 (s : State) : BitVec 128 := s.QREG 30
-def Q31 (s : State) : BitVec 128 := s.QREG 31
+def Q0  := QREG 0
+def Q1  := QREG 1
+def Q2  := QREG 2
+def Q3  := QREG 3
+def Q4  := QREG 4
+def Q5  := QREG 5
+def Q6  := QREG 6
+def Q7  := QREG 7
+def Q8  := QREG 8
+def Q9  := QREG 9
+def Q10 := QREG 10
+def Q11 := QREG 11
+def Q12 := QREG 12
+def Q13 := QREG 13
+def Q14 := QREG 14
+def Q15 := QREG 15
+def Q16 := QREG 16
+def Q17 := QREG 17
+def Q18 := QREG 18
+def Q19 := QREG 19
+def Q20 := QREG 20
+def Q21 := QREG 21
+def Q22 := QREG 22
+def Q23 := QREG 23
+def Q24 := QREG 24
+def Q25 := QREG 25
+def Q26 := QREG 26
+def Q27 := QREG 27
+def Q28 := QREG 28
+def Q29 := QREG 29
+def Q30 := QREG 30
+def Q31 := QREG 31
 
-def D0  (s : State) : BitVec 64 := s.DREG 0
-def D1  (s : State) : BitVec 64 := s.DREG 1
-def D2  (s : State) : BitVec 64 := s.DREG 2
-def D3  (s : State) : BitVec 64 := s.DREG 3
-def D4  (s : State) : BitVec 64 := s.DREG 4
-def D5  (s : State) : BitVec 64 := s.DREG 5
-def D6  (s : State) : BitVec 64 := s.DREG 6
-def D7  (s : State) : BitVec 64 := s.DREG 7
-def D8  (s : State) : BitVec 64 := s.DREG 8
-def D9  (s : State) : BitVec 64 := s.DREG 9
-def D10 (s : State) : BitVec 64 := s.DREG 10
-def D11 (s : State) : BitVec 64 := s.DREG 11
-def D12 (s : State) : BitVec 64 := s.DREG 12
-def D13 (s : State) : BitVec 64 := s.DREG 13
-def D14 (s : State) : BitVec 64 := s.DREG 14
-def D15 (s : State) : BitVec 64 := s.DREG 15
-def D16 (s : State) : BitVec 64 := s.DREG 16
-def D17 (s : State) : BitVec 64 := s.DREG 17
-def D18 (s : State) : BitVec 64 := s.DREG 18
-def D19 (s : State) : BitVec 64 := s.DREG 19
-def D20 (s : State) : BitVec 64 := s.DREG 20
-def D21 (s : State) : BitVec 64 := s.DREG 21
-def D22 (s : State) : BitVec 64 := s.DREG 22
-def D23 (s : State) : BitVec 64 := s.DREG 23
-def D24 (s : State) : BitVec 64 := s.DREG 24
-def D25 (s : State) : BitVec 64 := s.DREG 25
-def D26 (s : State) : BitVec 64 := s.DREG 26
-def D27 (s : State) : BitVec 64 := s.DREG 27
-def D28 (s : State) : BitVec 64 := s.DREG 28
-def D29 (s : State) : BitVec 64 := s.DREG 29
-def D30 (s : State) : BitVec 64 := s.DREG 30
-def D31 (s : State) : BitVec 64 := s.DREG 31
+def D0  := DREG 0
+def D1  := DREG 1
+def D2  := DREG 2
+def D3  := DREG 3
+def D4  := DREG 4
+def D5  := DREG 5
+def D6  := DREG 6
+def D7  := DREG 7
+def D8  := DREG 8
+def D9  := DREG 9
+def D10 := DREG 10
+def D11 := DREG 11
+def D12 := DREG 12
+def D13 := DREG 13
+def D14 := DREG 14
+def D15 := DREG 15
+def D16 := DREG 16
+def D17 := DREG 17
+def D18 := DREG 18
+def D19 := DREG 19
+def D20 := DREG 20
+def D21 := DREG 21
+def D22 := DREG 22
+def D23 := DREG 23
+def D24 := DREG 24
+def D25 := DREG 25
+def D26 := DREG 26
+def D27 := DREG 27
+def D28 := DREG 28
+def D29 := DREG 29
+def D30 := DREG 30
+def D31 := DREG 31
+
+/--
+SIMD register lanes (writes are no-ops).
+-/
+def LANE_B (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ BitVec.replicate 16 (bv.extractLsb' (8 * i) 8)) id
+
+def LANE_H (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ BitVec.replicate 8 (bv.extractLsb' (16 * i) 16)) id
+
+def LANE_S (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ BitVec.replicate 4 (bv.extractLsb' (32 * i) 32)) id
+
+def LANE_D (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ BitVec.replicate 2 (bv.extractLsb' (64 * i) 64)) id
+
+#exit
 
 theorem zero_register (s : State) {n : Nat} :
     s.ZR = 0#n ∧ s.XZR = 0 ∧ s.XREG 31 = 0 ∧ s.WZR = 0 ∧ s.WREG 31 = 0 := by
