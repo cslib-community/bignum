@@ -8,6 +8,7 @@ module
 @[expose] public section
 
 /-! # Basic components -/
+
 -- Ported from HOL-Light (Library/components.ml).
 
 set_option autoImplicit false
@@ -17,7 +18,7 @@ namespace Bignum
 universe u v w w'
 
 /--
-Component of type `b` in a larger state space `a`.
+Component of type `b` in a composite of type `a`.
 -/
 structure Component (α : Type u) (β : Type v) where
   /-- Reader function. -/
@@ -30,23 +31,7 @@ namespace Component
 variable {α : Type u} {β : Type v} {γ : Type w} {γ' : Type w'}
 
 /--
-A kind of identity for components.
--/
-def entirety : Component α α :=
-  ⟨id, λ x _ ↦ x⟩
-
-theorem entirety_read (a : α) : entirety.read a = a := by
-  rfl
-
-theorem entirety_write (a a' : α) : entirety.write a' a = a' := by
-  rfl
-
-theorem entirety_read_write (a a' : α) :
-    entirety.read (entirety.write a' a) = a' := by
-  rfl
-
-/--
-Composition of state components.
+Composition of components.
 -/
 def compose (cp₁ : Component α β) (cp₂ : Component β γ) : Component α γ :=
   ⟨cp₂.read ∘ cp₁.read, λ c a ↦ cp₁.write (cp₂.write c (cp₁.read a)) a⟩
@@ -67,14 +52,6 @@ theorem compose_write
     (cp₁ :> cp₂).write c a = cp₁.write (cp₂.write c (cp₁.read a)) a := by
   rfl
 
-theorem compose_entirety (cp : Component α β) :
-    cp :> entirety = cp := by
-  rfl
-
-theorem entirety_compose (cp : Component α β) :
-    entirety :> cp = cp := by
-  rfl
-
 theorem read_write_compose
     (cp₁ : Component α β) (cp₂ : Component β γ)
     (h₁ : ∀ b a, cp₁.read (cp₁.write b a) = b)
@@ -82,6 +59,30 @@ theorem read_write_compose
     (c : γ) (a : α) :
     (cp₁ :> cp₂).read ((cp₁ :> cp₂).write c a) = c := by
   rw [compose_read, compose_write, h₁, h₂]
+
+/--
+"Identity" for components.
+-/
+def entirety : Component α α :=
+  ⟨id, λ x _ ↦ x⟩
+
+theorem entirety_read (a : α) : entirety.read a = a := by
+  rfl
+
+theorem entirety_write (a a' : α) : entirety.write a' a = a' := by
+  rfl
+
+theorem entirety_read_write (a a' : α) :
+    entirety.read (entirety.write a' a) = a' := by
+  rfl
+
+theorem compose_entirety (cp : Component α β) :
+    cp :> entirety = cp := by
+  rfl
+
+theorem entirety_compose (cp : Component α β) :
+    entirety :> cp = cp := by
+  rfl
 
 /--
 Pseudo-component for reading a value (read-only).

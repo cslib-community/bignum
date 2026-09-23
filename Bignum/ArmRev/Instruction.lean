@@ -151,7 +151,7 @@ def X28  := XREG 28
 def X29  := XREG 29
 def X30  := XREG 30
 
-/-- Stack pointer. --/
+/-- Stack pointer. -/
 def SP := registers :> Component.element 31
 
 /-- 32-bit versions of the main registers. -/
@@ -193,8 +193,6 @@ def WSP  := SP :> Component.zerotop_32
 
 end State
 
-#exit
-
 /--
 Shifted register operands.
 -/
@@ -211,6 +209,8 @@ deriving DecidableEq, Repr
 
 instance : ToString ShiftType where
   toString a := toString (repr a)
+
+#exit
 
 namespace ShiftType
 
