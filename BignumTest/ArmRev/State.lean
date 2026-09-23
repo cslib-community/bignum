@@ -692,7 +692,7 @@ example : (D31.write 0 S₁)._simdregisters 31 = 0 := by rfl
 example : (DREG 31).read ((DREG 31).write 1 S₀) = 1 := by rfl
 example : (DREG 31).read ((DREG 31).write 8 S₁) = 8 := by rfl
 
-/-! ## SMID register lanes -/
+/-! ## SIMD register lanes -/
 
 example : ((Q0 :> LANE_B 0).read (Q0.write 0x0a01 S₀))
           = 0x01010101010101010101010101010101 := by rfl
