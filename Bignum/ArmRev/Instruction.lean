@@ -227,26 +227,62 @@ def shift (sty : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
 end ShiftType
 
 /--
-Shifted version of register `reg` (writes are not affected).
+Shifted version of register `reg` (writes are no-ops).
 -/
 def State.shifted (sty : ShiftType) (sa : Nat) {n : Nat}
     (reg : Component State (BitVec n)) : Component State (BitVec n) :=
   ⟨λ s ↦ sty.shift sa (Component.read reg s), Component.write reg⟩
 
-#exit
-
 /--
 Extended register operands.
 -/
 inductive ExtendedType where
+  /-- Unsigned byte. -/
   | UXTB
+  /-- Unsigned half word. -/
   | UXTH
+  /-- Unsigned word. -/
   | UXTW
+  /-- Unsigned double word. -/
   | UXTX
+  /-- Signed byte. -/
+  | SXTB
+  /-- Signed half word. -/
   | SXTH
+  /-- Signed word. -/
   | SXTW
+  /-- Signed double word. -/
   | SXTX
 deriving DecidableEq, Repr
+
+namespace ExtendedType
+
+/--
+Perform the extension operation indicated by `xty` on `bv`.
+-/
+@[simp]
+def extend (xty : ExtendedType) {n m : Nat} (bv : BitVec n) : BitVec m :=
+  match xty with
+  | .UXTB => (bv.truncate 8).zeroExtend m
+  | .UXTH => (bv.truncate 16).zeroExtend m
+  | .UXTW => (bv.truncate 32).zeroExtend m
+  | .UXTX => (bv.truncate 64).zeroExtend m
+  | .SXTB => (bv.truncate 8).signExtend m
+  | .SXTH => (bv.truncate 16).signExtend m
+  | .SXTW => (bv.truncate 32).signExtend m
+  | .SXTX => (bv.truncate 64).signExtend m
+
+end ExtendedType
+
+/--
+Extended version of register `reg` (writes are undefined).
+-/
+def State.extended (xty : ExtendedType) {n m : Nat}
+    (reg : Component State (BitVec n)) : Component State (BitVec m) :=
+  -- We use of `default` on the right as a substitute for HOL Light's ARB.
+  ⟨λ s ↦ xty.extend (Component.read reg s), default⟩
+
+#exit
 
 namespace State
 

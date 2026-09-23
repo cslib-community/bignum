@@ -381,3 +381,28 @@ example : X1.read ((shifted .ASR 1 X1).write 2 S₀) = 2#64 := by rfl
 
 example : (shifted .ROR 1 X1).read (X1.write 1 S₀) = (1 <<< 63) := by rfl
 example : X1.read ((shifted .ROR 1 X1).write 2 S₀) = 2#64 := by rfl
+
+/-! ## Extended operands -/
+
+example : (extended .UXTB X1).read S₁ = 255#32 := by rfl
+example : (extended .UXTH X1).read S₁ = .allOnes 16 := by rfl
+example : (extended .UXTW X1).read S₁
+          = (BitVec.allOnes 32).zeroExtend 64 := by rfl
+example : (extended .UXTX X1).read S₁
+          = (BitVec.allOnes 64).zeroExtend 128 := by rfl
+example : ((extended .SXTB X1).read (X1.write (-127) S₁) : BitVec 32)
+          = BitVec.ofInt 32 (-127) := by rfl
+
+example : ((extended .SXTB X1).read
+            (X1.write (1 <<< 7) S₀) : BitVec 64).toInt
+          = (1 <<< 7 : BitVec 8).toInt := by rfl
+example : ((extended .SXTH X1).read
+            (X1.write (1 <<< 15) S₀) : BitVec 64).toInt
+          = (1 <<< 15 : BitVec 16).toInt := by rfl
+example : ((extended .SXTW X1).read
+            (X1.write (1 <<< 31) S₀) : BitVec 64).toInt
+          = (1 <<< 31 : BitVec 32).toInt := by rfl
+example : ((extended .SXTX X1).read
+            (X1.write (1 <<< 63) S₀) : BitVec 128).toInt
+          = (1 <<< 63 : BitVec 64).toInt := by rfl
+
