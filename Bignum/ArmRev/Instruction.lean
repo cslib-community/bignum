@@ -381,24 +381,13 @@ def LANE_S (i : Nat) : Component (BitVec 128) (BitVec 128) :=
 def LANE_D (i : Nat) : Component (BitVec 128) (BitVec 128) :=
   .through (λ bv ↦ BitVec.replicate 2 (bv.extractLsb' (64 * i) 64)) id
 
-#exit
-
-theorem zero_register (s : State) {n : Nat} :
-    s.ZR = 0#n ∧ s.XZR = 0 ∧ s.XREG 31 = 0 ∧ s.WZR = 0 ∧ s.WREG 31 = 0 := by
-  simp [s.ZR_zero, s.XZR_zero, s.XREG31_zero, s.WZR_zero, s.WREG31_zero]
-
-theorem XZR_ZR (s : State) : s.XZR = s.ZR := by
-  rewrite [s.XZR_zero, s.ZR_zero]; rfl
-
-theorem WZR_ZR (s : State) : s.WZR = s.ZR := by
-  rewrite [s.WZR_zero, s.ZR_zero]; rfl
-
 end State
+
+#exit
 
 /--
 Condition codes.
 -/
-
 inductive Condition where
   /-- Equal. -/
   | EQ

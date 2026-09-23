@@ -13,20 +13,31 @@ set_option autoImplicit false
 
 namespace Bignum.ArmRev.State
 
-theorem XZR_zero : XZR = Component.rvalue 0 := by
+theorem XZR_zero : XZR = .rvalue 0 := by
   rfl
 
-theorem WZR_zero : WZR = Component.rvalue 0 := by
+theorem WZR_zero : WZR = .rvalue 0 := by
   rfl
 
-theorem ZR_zero (w : Nat) : @ZR w = Component.rvalue 0 := by
+theorem ZR_zero (w : Nat) : @ZR w = .rvalue 0 := by
   rfl
 
-theorem XREG31_zero : XREG 31 = Component.rvalue 0 := by
+theorem XREG31_zero : XREG 31 = .rvalue 0 := by
   rfl
 
-theorem WREG31_zero : WREG 31 = Component.rvalue 0 := by
+theorem WREG31_zero : WREG 31 = .rvalue 0 := by
   rfl
+
+theorem zero_register {n : Nat} : @ZR n = (.rvalue 0) ∧
+    XZR = (.rvalue 0) ∧ XREG 31 = (.rvalue 0) ∧
+    WZR = (.rvalue 0) ∧ WREG 31 = (.rvalue 0) := by
+  simp [ZR_zero, XZR_zero, XREG31_zero, WZR_zero, WREG31_zero]
+
+theorem XZR_ZR : XZR = ZR := by
+  rw [XZR_zero, ZR_zero]
+
+theorem WZR_ZR : WZR = ZR := by
+  rw [WZR_zero, ZR_zero]
 
 theorem shifted_LSL_zero {w : Nat} (reg : Component State (BitVec w)) :
     shifted .LSL 0 reg = reg := by
