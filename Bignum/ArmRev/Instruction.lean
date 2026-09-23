@@ -370,16 +370,16 @@ def D31 := DREG 31
 SIMD register lanes (writes are no-ops).
 -/
 def LANE_B (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ BitVec.replicate 16 (bv.extractLsb' (8 * i) 8)) id
+  .through (λ bv ↦ .replicate 16 (bv.extractLsb' (8 * i) 8)) id
 
 def LANE_H (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ BitVec.replicate 8 (bv.extractLsb' (16 * i) 16)) id
+  .through (λ bv ↦ .replicate 8 (bv.extractLsb' (16 * i) 16)) id
 
 def LANE_S (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ BitVec.replicate 4 (bv.extractLsb' (32 * i) 32)) id
+  .through (λ bv ↦ .replicate 4 (bv.extractLsb' (32 * i) 32)) id
 
 def LANE_D (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ BitVec.replicate 2 (bv.extractLsb' (64 * i) 64)) id
+  .through (λ bv ↦ .replicate 2 (bv.extractLsb' (64 * i) 64)) id
 
 end State
 
