@@ -492,14 +492,6 @@ def invert : Condition → Condition
   | AL => NV
   | NV => AL
 
-theorem invert_condition (c : Condition) :
-    c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
-  cases c <;> simp [ofBitVec, toBitVec, invert]
-
-theorem invert_condition_involutive (c : Condition) :
-    c.invert.invert = c := by
-  cases c <;> simp [invert_condition, ofBitVec, toBitVec]
-
 end Condition
 
 /--
@@ -524,4 +516,16 @@ def condition (s : State) : Condition → Bool
   | .NV => true
 
 end State
+
+/--
+Addressing modes and offsets for loads and stores (LDP, LDR, STP, STR).
+-/
+inductive OffsetType where
+  | register (reg : Component State (BitVec 64))
+  | shiftreg (reg : Component State (BitVec 64)) (n : Nat)
+  | postreg (reg : Component State (BitVec 64))
+  | immediate (bv : BitVec 64)
+  | preimmediate (bv : BitVec 64)
+  | postimmediate (bv : BitVec 64)
+
 end Bignum.ArmRev

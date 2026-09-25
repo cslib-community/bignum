@@ -9,9 +9,13 @@ public import Bignum.ArmRev.Instruction
 
 @[expose] public section
 
+/-! # Theorems about ARM state -/
+
 set_option autoImplicit false
 
 namespace Bignum.ArmRev.State
+
+/-! ## Registers -/
 
 theorem XZR_zero : XZR = .rvalue 0 := by
   rfl
@@ -54,5 +58,73 @@ theorem shifted_ASR_zero {w : Nat} (reg : Component State (BitVec w)) :
 theorem shifted_ROR_zero {w : Nat} (reg : Component State (BitVec w)) :
     shifted .ROR 0  reg = reg := by
   simp [shifted, BitVec.rotateRight_def]
+
+/-! ## Condition codes -/
+
+namespace Condition
+
+theorem invert_ofBitVec_toBitVec_xor (c : Condition) :
+    c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
+  cases c <;> simp [ofBitVec, toBitVec, invert]
+
+theorem invert_involutive (c : Condition) :
+    c.invert.invert = c := by
+  cases c <;> simp [invert]
+
+end Condition
+
+theorem condition_EQ (s : State) :
+    s.condition .EQ = ZF.read s := by rfl
+
+theorem condition_NE (s : State) :
+    s.condition .NE = !ZF.read s := by rfl
+
+theorem condition_CS (s : State) :
+    s.condition .CS = CF.read s := by rfl
+
+theorem condition_HS (s : State) :
+    s.condition .HS = CF.read s := by rfl
+
+theorem condition_CC (s : State) :
+    s.condition .CC = !CF.read s := by rfl
+
+theorem condition_LO (s : State) :
+    s.condition .LO = !CF.read s := by rfl
+
+theorem condition_MI (s : State) :
+    s.condition .MI = NF.read s := by rfl
+
+theorem condition_PL (s : State) :
+    s.condition .PL = !NF.read s := by rfl
+
+theorem condition_VS (s : State) :
+    s.condition .VS = VF.read s := by rfl
+
+theorem condition_VC (s : State) :
+    s.condition .VC = !VF.read s := by rfl
+
+theorem condition_HI (s : State) :
+    s.condition .HI = (CF.read s && !ZF.read s) := by rfl
+
+theorem condition_LS (s : State) :
+    s.condition .LS = !(CF.read s && !ZF.read s) := by rfl
+
+theorem condition_GE (s : State) :
+    s.condition .GE = (NF.read s == VF.read s) := by rfl
+
+theorem condition_LT (s : State) :
+    s.condition .LT = !(NF.read s == VF.read s) := by rfl
+
+theorem condition_GT (s : State) :
+    s.condition .GT = (!ZF.read s && (NF.read s == VF.read s)) := by rfl
+
+theorem condition_LE (s : State) :
+    s.condition .LE = !(!ZF.read s && (NF.read s == VF.read s)) := by rfl
+
+theorem condition_AL (s : State) :
+    s.condition .AL = true := by rfl
+
+theorem condition_NV (s : State) :
+    s.condition .NV = true := by rfl
 
 end Bignum.ArmRev.State
