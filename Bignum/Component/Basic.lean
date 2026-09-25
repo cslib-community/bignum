@@ -15,12 +15,12 @@ set_option autoImplicit false
 
 namespace Bignum
 
-universe u v w w'
+universe u₁ u₂ u₃ u₄
 
 /--
 Component of type `b` in a composite of type `a`.
 -/
-structure Component (α : Type u) (β : Type v) where
+structure Component (α : Type u₁) (β : Type u₂) where
   /-- Reader function. -/
   read : α → β
   /-- Writer function. -/
@@ -28,7 +28,7 @@ structure Component (α : Type u) (β : Type v) where
 
 namespace Component
 
-variable {α : Type u} {β : Type v} {γ : Type w} {γ' : Type w'}
+variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
 /--
 Composition of components.
@@ -39,7 +39,7 @@ def compose (cp₁ : Component α β) (cp₂ : Component β γ) : Component α �
 infixr:90 ":>" => compose
 
 theorem compose_assoc
-    (cp₁ : Component α β) (cp₂ : Component β γ) (cp₃ : Component γ γ') :
+    (cp₁ : Component α β) (cp₂ : Component β γ) (cp₃ : Component γ δ) :
     cp₁ :> (cp₂ :> cp₃) = (cp₁ :> cp₂) :> cp₃ := by
   rfl
 
