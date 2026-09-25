@@ -381,10 +381,6 @@ def LANE_S (i : Nat) : Component (BitVec 128) (BitVec 128) :=
 def LANE_D (i : Nat) : Component (BitVec 128) (BitVec 128) :=
   .through (λ bv ↦ .replicate 2 (bv.extractLsb' (64 * i) 64)) id
 
-end State
-
-#exit
-
 /--
 Condition codes.
 -/
@@ -431,6 +427,9 @@ abbrev HS := CS
 /-- Alias for CC (carry clear). -/
 abbrev LO := CC
 
+/--
+Converts condition code to 4-bit encoding.
+-/
 def toBitVec :  Condition → BitVec 4
   | EQ => 0b0000
   | NE => 0b0001
@@ -449,6 +448,9 @@ def toBitVec :  Condition → BitVec 4
   | AL => 0b1110
   | NV => 0b1111
 
+/--
+Converts 4-bit encoding to condition code.
+-/
 def ofBitVec (bv : BitVec 4) : Condition :=
   match_bv bv with
   | [0000] => EQ
@@ -469,6 +471,9 @@ def ofBitVec (bv : BitVec 4) : Condition :=
   | [1111] => NV
   | _ => panic! "should not get here"
 
+/--
+Inverts condition code.
+-/
 def invert : Condition → Condition
   | EQ => NE
   | NE => EQ
@@ -497,22 +502,26 @@ theorem invert_condition_involutive (c : Condition) :
 
 end Condition
 
-def State.condition (s : State) : Condition → Bool
-  | .EQ => s.ZF
-  | .NE => !s.ZF
-  | .CS => s.CF
-  | .CC => !s.CF
-  | .MI => s.NF
-  | .PL => !s.NF
-  | .VS => s.VF
-  | .VC => !s.VF
-  | .HI => s.CF && !s.ZF
-  | .LS => !(s.CF && !s.ZF)
-  | .GE => s.NF == s.VF
-  | .LT => !(s.NF == s.VF)
-  | .GT => !s.ZF && (s.NF == s.VF)
-  | .LE => !(!s.ZF && (s.NF == s.VF))
+/--
+Tests whether the given condition holds in state `s`.
+-/
+def condition (s : State) : Condition → Bool
+  | .EQ => ZF.read s
+  | .NE => !ZF.read s
+  | .CS => CF.read s
+  | .CC => !CF.read s
+  | .MI => NF.read s
+  | .PL => !NF.read s
+  | .VS => VF.read s
+  | .VC => !VF.read s
+  | .HI => CF.read s && !ZF.read s
+  | .LS => !(CF.read s && !ZF.read s)
+  | .GE => NF.read s == VF.read s
+  | .LT => !(NF.read s == VF.read s)
+  | .GT => !ZF.read s && (NF.read s == VF.read s)
+  | .LE => !(!ZF.read s && (NF.read s == VF.read s))
   | .AL => true
   | .NV => true
 
+end State
 end Bignum.ArmRev
