@@ -2,7 +2,7 @@
 
 A port of parts of AWS's [s2n-bignum](https://github.com/awslabs/s2n-bignum) to Lean 4.
 
-Our immediate goal is to port to Lean 4 the relational [Hoare algebra formalism](https://arxiv.org/abs/2505.14348] implemented in [s2n-bignum](https://github.com/awslabs/s2n-bignum) to verify correctness and performance properties of real 64-bit ARM machine code (aarch64).
+Our immediate goal is to port to Lean 4 the relational [Hoare algebra formalism](https://arxiv.org/abs/2505.14348) implemented in [s2n-bignum](https://github.com/awslabs/s2n-bignum) to verify correctness and performance properties of real 64-bit ARM machine code (aarch64).
 
 Right now, we're only porting the aarch64 part.  But there are plans to port the 64-bit x86 (x86_64) part in the future.
 
