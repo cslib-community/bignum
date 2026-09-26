@@ -5,5 +5,5 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.ArmOld
-public import Bignum.Arm
+public import Bignum.ArmOld.Common.Basic.Defs
+public import Bignum.ArmOld.Common.Basic.Lemmas

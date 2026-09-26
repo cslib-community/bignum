@@ -5,5 +5,6 @@ Author(s): Guilherme Lima
 -/
 module
 
-public import Bignum.Arm.Instruction
-public import Bignum.Arm.InstructionLemmas
+public import Bignum.BitVec.Basic
+public import Bignum.BitVec.Lemmas
+public import Bignum.BitVec.MatchBV
