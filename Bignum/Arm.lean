@@ -5,5 +5,5 @@ Author(s): Guilherme Lima
 -/
 module
 
-public import Bignum.ArmRev.Instruction
-public import Bignum.ArmRev.InstructionLemmas
+public import Bignum.Arm.Instruction
+public import Bignum.Arm.InstructionLemmas

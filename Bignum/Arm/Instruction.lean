@@ -12,7 +12,7 @@ public import Bignum.Component
 
 set_option autoImplicit false
 
-namespace Bignum.ArmRev
+namespace Bignum.Arm
 
 /--
 Micro-architectural (uarch) events.
@@ -528,4 +528,4 @@ inductive OffsetType where
   | preimmediate (bv : BitVec 64)
   | postimmediate (bv : BitVec 64)
 
-end Bignum.ArmRev
+end Bignum.Arm

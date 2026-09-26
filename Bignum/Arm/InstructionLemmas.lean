@@ -5,7 +5,7 @@ Author: Guilherme Lima
 -/
 module
 
-public import Bignum.ArmRev.Instruction
+public import Bignum.Arm.Instruction
 
 @[expose] public section
 
@@ -13,7 +13,7 @@ public import Bignum.ArmRev.Instruction
 
 set_option autoImplicit false
 
-namespace Bignum.ArmRev.State
+namespace Bignum.Arm.State
 
 /-! ## Registers -/
 
@@ -127,4 +127,4 @@ theorem condition_AL (s : State) :
 theorem condition_NV (s : State) :
     s.condition .NV = true := by rfl
 
-end Bignum.ArmRev.State
+end Bignum.Arm.State

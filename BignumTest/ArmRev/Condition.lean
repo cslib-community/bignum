@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Author: Guilherme Lima
 -/
 
-import Bignum.ArmRev
+import Bignum.Arm
 
-open Bignum.ArmRev
+open Bignum.Arm
 
 -- example : Condition.EQ.toBitVec = 0b0000 := by rfl
 -- example : Condition.NE.toBitVec = 0b0001 := by rfl

@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Author: Guilherme Lima
 -/
 
-import Bignum.ArmRev
-open Bignum.ArmRev.State
+import Bignum.Arm
+open Bignum.Arm.State
 
 /-! # Unit tests for ARM state -/
 

@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Author: Guilherme Lima
 -/
 
-import Bignum.ArmRev
+import Bignum.Arm
 
-open Bignum.ArmRev
+open Bignum.Arm
 
 -- -- LSL
 
