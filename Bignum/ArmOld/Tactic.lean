@@ -28,7 +28,7 @@ reduce definitionally via `simp [exec, step]`.
 ## Usage
 
 ```lean
-theorem SIMPLE_SPEC (pc a b : ℕ) :
+theorem SIMPLE_SPEC (pc a b : Nat) :
     ensures arm pre post (maychange_regs [Reg.PC, Reg.X2]) := by
   intro s₀ ⟨h_loaded, h_pc, h_x0, h_x1⟩
   arm_steps [Instruction.ADD Reg.X2 Reg.X1 Reg.X0,

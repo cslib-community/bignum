@@ -217,13 +217,13 @@ bignum_from_memory (x,val m) s = a /\
 bignum_from_memory (y,val n) s = b
 ```
 -/
-def ArmState.read_bignum (s : ArmState) (addr : Address) (n : ℕ) : Option ℕ :=
+def ArmState.read_bignum (s : ArmState) (addr : Address) (n : Nat) : Option Nat :=
   s.mem.read_bignum addr n
 
 /--
 Write a bignum to memory.
 -/
-def ArmState.write_bignum (s : ArmState) (addr : Address) (n : ℕ) (val : ℕ) : ArmState :=
+def ArmState.write_bignum (s : ArmState) (addr : Address) (n : Nat) (val : Nat) : ArmState :=
   { s with mem := s.mem.write_bignum addr n val }
 
 /--

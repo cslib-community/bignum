@@ -75,7 +75,7 @@ def chunk2_instrs : List Instruction :=
 ## Specification
 -/
 
-def sequence_pre (pc a b c : ℕ) (s : ArmState) : Prop :=
+def sequence_pre (pc a b c : Nat) (s : ArmState) : Prop :=
   aligned_bytes_loaded s.mem (BitVec.ofNat 64 pc) sequence_mc ∧
   s.read_reg Reg.PC = BitVec.ofNat 64 pc ∧
   s.read_reg Reg.X0 = BitVec.ofNat 64 a ∧
@@ -83,12 +83,12 @@ def sequence_pre (pc a b c : ℕ) (s : ArmState) : Prop :=
   s.read_reg Reg.X2 = BitVec.ofNat 64 c
 
 /-- Intermediate assertion at pc+8: memory still loaded, PC at pc+8, X1 = a + b. -/
-def sequence_mid (pc a b : ℕ) (s : ArmState) : Prop :=
+def sequence_mid (pc a b : Nat) (s : ArmState) : Prop :=
   aligned_bytes_loaded s.mem (BitVec.ofNat 64 pc) sequence_mc ∧
   s.read_reg Reg.PC = BitVec.ofNat 64 (pc + 8) ∧
   s.read_reg Reg.X1 = BitVec.ofNat 64 (a + b)
 
-def sequence_post (pc a b : ℕ) (s : ArmState) : Prop :=
+def sequence_post (pc a b : Nat) (s : ArmState) : Prop :=
   s.read_reg Reg.PC = BitVec.ofNat 64 (pc + 16) ∧
   s.read_reg Reg.X1 = BitVec.ofNat 64 ((a + b) * 2)
 
@@ -147,7 +147,7 @@ private theorem chunk2_decode_list (s : ArmState) (pc : Word64)
 -/
 
 /-- First chunk: two ADD instructions, PC advances from pc to pc+8. -/
-theorem sequence_chunk1_correct (pc a b c : ℕ) :
+theorem sequence_chunk1_correct (pc a b c : Nat) :
     ensures arm
       (sequence_pre pc a b c)
       (sequence_mid pc a b)
@@ -178,7 +178,7 @@ theorem sequence_chunk1_correct (pc a b c : ℕ) :
     simp [hne_pc, hne_x1, hne_x2]
 
 /-- Second chunk: MOV + MUL, PC advances from pc+8 to pc+16. -/
-theorem sequence_chunk2_correct (pc a b : ℕ) :
+theorem sequence_chunk2_correct (pc a b : Nat) :
     ensures arm
       (sequence_mid pc a b)
       (sequence_post pc a b)
@@ -218,7 +218,7 @@ theorem sequence_chunk2_correct (pc a b : ℕ) :
 ## Main Correctness Theorem
 -/
 
-theorem sequence_correct (pc a b c : ℕ) :
+theorem sequence_correct (pc a b c : Nat) :
     ensures arm
       (sequence_pre pc a b c)
       (sequence_post pc a b)

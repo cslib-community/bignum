@@ -5,7 +5,6 @@ Author: Alexandre Rademaker
 -/
 module
 public import Bignum.ArmOld.Common.Word
-public import Mathlib.Data.Nat.Notation
 
 @[expose] public section
 
@@ -115,8 +114,8 @@ The bignum is stored as an array of n words at address addr.
 Corresponds to HOL Light's `bignum_from_memory`.
 Source: s2n-bignum proofs use this extensively (e.g., bignum_add.ml:91-92)
 -/
-def Memory.read_bignum (mem : Memory) (addr : Address) (n : ℕ) : Option ℕ :=
-  let rec aux (i : ℕ) (acc : ℕ) : Option ℕ :=
+def Memory.read_bignum (mem : Memory) (addr : Address) (n : Nat) : Option Nat :=
+  let rec aux (i : Nat) (acc : Nat) : Option Nat :=
     if i = 0 then
       some acc
     else
@@ -129,7 +128,7 @@ def Memory.read_bignum (mem : Memory) (addr : Address) (n : ℕ) : Option ℕ :=
 /--
 Write a bignum to memory as n 64-bit words.
 -/
-def Memory.write_bignum (mem : Memory) (addr : Address) (n : ℕ) (val : ℕ) : Memory :=
+def Memory.write_bignum (mem : Memory) (addr : Address) (n : Nat) (val : Nat) : Memory :=
   List.range n |>.foldl
     (fun m i =>
       let word_addr := addr + BitVec.ofNat 64 (8 * i)
@@ -144,7 +143,7 @@ Check if two memory regions do not overlap. This corresponds to HOL Light's
 Source: s2n-bignum/common/overlap.ml
 -/
 def nonoverlapping
-  (addr1 : Address) (size1 : ℕ) (addr2 : Address) (size2 : ℕ) : Prop :=
+  (addr1 : Address) (size1 : Nat) (addr2 : Address) (size2 : Nat) : Prop :=
   addr1.toNat + size1 ≤ addr2.toNat ∨ addr2.toNat + size2 ≤ addr1.toNat
 
 /--

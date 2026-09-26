@@ -7,7 +7,6 @@ module
 
 public import Bignum.ArmOld.Common
 public import Bignum.ArmOld.Machine.State
-public import Mathlib.Data.Nat.Notation
 
 @[expose] public section
 
@@ -40,12 +39,12 @@ inductive Instruction
   | AND  : Reg → Reg → Reg → Instruction
   | ORR  : Reg → Reg → Reg → Instruction
   | EOR  : Reg → Reg → Reg → Instruction
-  | LSL  : Reg → Reg → ℕ → Instruction
-  | LSR  : Reg → Reg → ℕ → Instruction
+  | LSL  : Reg → Reg → Nat → Instruction
+  | LSR  : Reg → Reg → Nat → Instruction
   | LDR  : Reg → Address → Instruction
   | STR  : Reg → Address → Instruction
   | MOV  : Reg → Reg → Instruction
-  | MOVZ : Reg → ℕ → ℕ → Instruction  -- MOVZ Rd, #imm, LSL #pos
+  | MOVZ : Reg → Nat → Nat → Instruction  -- MOVZ Rd, #imm, LSL #pos
   | MUL  : Reg → Reg → Reg → Instruction  -- MUL Rd, Rn, Rm (Rd := Rn * Rm)
   | RET  : Instruction
   deriving Repr, DecidableEq

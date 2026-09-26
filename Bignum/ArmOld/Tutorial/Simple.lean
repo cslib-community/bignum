@@ -174,7 +174,7 @@ private theorem simple_decode_list (s : ArmState) (pc : Word64)
     rwa [show pc + BitVec.ofNat 64 4 = pc + 4 from by bv_omega, ← h_pc1] at key
   · trivial
 
-theorem SIMPLE_SPEC (pc a b : ℕ) :
+theorem SIMPLE_SPEC (pc a b : Nat) :
     ensures arm
       (fun s => aligned_bytes_loaded s.mem (BitVec.ofNat 64 pc) simple_mc ∧
                 s.read_reg Reg.PC = BitVec.ofNat 64 pc ∧
