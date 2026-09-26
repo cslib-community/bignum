@@ -5,9 +5,9 @@ Author: Alexandre Rademaker
 -/
 module
 
-public meta import Bignum.Arm.Machine.Loader
+public meta import Bignum.ArmOld.Machine.Loader
 
-open Bignum.Arm
+open Bignum.ArmOld
 
 /-!
 ## Tests for the ELF Loader utilities

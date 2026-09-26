@@ -5,7 +5,7 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Common.Basic.Defs
+public import Bignum.ArmOld.Common.Basic.Defs
 public import Mathlib.Data.Finset.Basic
 public import Mathlib.Data.Nat.Digits.Defs
 public import Mathlib.Algebra.Group.Basic

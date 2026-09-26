@@ -5,11 +5,11 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Spec
-public import Bignum.Arm.Machine
-public import Bignum.Arm.Tactic
-public import Bignum.Arm.Simulate
-public import Bignum.Common.Word
+public import Bignum.ArmOld.Spec
+public import Bignum.ArmOld.Machine
+public import Bignum.ArmOld.Tactic
+public import Bignum.ArmOld.Simulate
+public import Bignum.ArmOld.Common.Word
 
 @[expose] public section
 
@@ -31,8 +31,8 @@ Starting with `X0 = a` and `X1 = b`, after executing both instructions we have
 Source: s2n-bignum/arm/tutorial/simple.ml
 -/
 
-namespace Bignum.Arm.Tutorial
-open Bignum Bignum.Arm
+namespace Bignum.ArmOld.Tutorial
+open Bignum Bignum.ArmOld
 
 /-!
 ## Machine Code
@@ -61,8 +61,8 @@ def simple_instrs : List Instruction :=
 HOL Light offers an alternative to writing the byte list by hand — reading it
 directly from the compiled `.o` file.
 
-The Lean equivalent is provided by `Bignum.Arm.Machine.Loader` (already imported
-transitively through `Bignum.Arm.Spec`).
+The Lean equivalent is provided by `Bignum.ArmOld.Machine.Loader` (already imported
+transitively through `Bignum.ArmOld.Spec`).
 
 ### Discovering bytes at elaboration time (`#load_obj`)
 
@@ -207,4 +207,4 @@ theorem SIMPLE_SPEC (pc a b : ℕ) :
                step, advance_pc, ArmState.write_reg, ArmState.read_reg]
     simp [hne_pc, hne_x2]
 
-end Bignum.Arm.Tutorial
+end Bignum.ArmOld.Tutorial

@@ -5,7 +5,7 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Spec
+public import Bignum.ArmOld.Spec
 
 @[expose] public section
 
@@ -48,7 +48,7 @@ arm_steps instrs s₀ h_dec  (* Lean *)
 ```
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 /--
 `arm_steps instrs s h_dec` applies `ensures_of_exec` to split the current goal
@@ -90,4 +90,4 @@ Usage in a proof after `intro s₀ h`:
 macro "arm_steps" instrs:term " from " s:term " via " h_dec:term : tactic =>
   `(tactic| apply arm_steps_split $instrs $s $h_dec)
 
-end Bignum.Arm
+end Bignum.ArmOld

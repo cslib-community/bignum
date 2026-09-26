@@ -5,7 +5,7 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Machine.Decode
+public import Bignum.ArmOld.Machine.Decode
 
 @[expose] public section
 
@@ -42,7 +42,7 @@ def p : IO Program := Program.fromObj 0 "path/to/program.o"
 ```
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 /-!
 ## Binary Parsing Helpers
@@ -509,4 +509,4 @@ elab "#load_bytes " path:str : command => do
   let body := "\n".intercalate restLines
   logInfo m!"-- {byteList.length} bytes from {pathStr}\n[\n  {firstLine},\n{body}\n]"
 
-end Bignum.Arm
+end Bignum.ArmOld

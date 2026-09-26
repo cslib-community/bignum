@@ -5,6 +5,6 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Common.Basic
-public import Bignum.Common.Word
-public import Bignum.Common.Memory
+public import Bignum.ArmOld.Machine
+public import Bignum.ArmOld.Spec
+public import Bignum.ArmOld.Tutorial

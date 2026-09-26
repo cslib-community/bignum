@@ -5,8 +5,8 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Common
-public import Bignum.Arm.Machine.State
+public import Bignum.ArmOld.Common
+public import Bignum.ArmOld.Machine.State
 public import Mathlib.Data.Nat.Notation
 
 @[expose] public section
@@ -22,7 +22,7 @@ expanded to include all instructions needed for bignum operations.
 Source: s2n-bignum/arm/proofs/instruction.ml (ARM instruction definitions)
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 /--
 ARM instruction type.
@@ -273,4 +273,4 @@ def exec_program (prog : Program) (s : ArmState) : ArmState :=
   else
     s  -- PC mismatch: don't execute
 
-end Bignum.Arm
+end Bignum.ArmOld

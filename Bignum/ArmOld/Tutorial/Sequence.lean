@@ -5,11 +5,11 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Spec
-public import Bignum.Arm.Machine
-public import Bignum.Arm.Tactic
-public import Bignum.Arm.Simulate
-public import Bignum.Common.Word
+public import Bignum.ArmOld.Spec
+public import Bignum.ArmOld.Machine
+public import Bignum.ArmOld.Tactic
+public import Bignum.ArmOld.Simulate
+public import Bignum.ArmOld.Common.Word
 
 @[expose] public section
 
@@ -48,8 +48,8 @@ Using `ensures_of_exec`, we work directly with `exec chunk s₀`, reducing each
 chunk proof to: decode + post + frame.
 -/
 
-namespace Bignum.Arm.Tutorial
-open Bignum Bignum.Arm
+namespace Bignum.ArmOld.Tutorial
+open Bignum Bignum.ArmOld
 
 /-!
 ## Machine Code
@@ -229,4 +229,4 @@ theorem sequence_correct (pc a b c : ℕ) :
     (sequence_chunk2_correct pc a b)
     (maychange_regs_trans _)
 
-end Bignum.Arm.Tutorial
+end Bignum.ArmOld.Tutorial

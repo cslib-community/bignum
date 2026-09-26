@@ -5,7 +5,7 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Spec
+public import Bignum.ArmOld.Spec
 
 @[expose] public section
 
@@ -36,7 +36,7 @@ tool, not part of the verification.
 Both return the final `ArmState`, which can be inspected with `ArmState.showRegs`.
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 /-!
 ## State Construction Helpers
@@ -139,4 +139,4 @@ instance : Repr ArmState where
   reprPrec s _ :=
     Std.Format.text (String.intercalate "\n" (ArmState.showRegs s))
 
-end Bignum.Arm
+end Bignum.ArmOld

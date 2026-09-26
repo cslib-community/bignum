@@ -5,5 +5,5 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Tutorial.Simple
-public import Bignum.Arm.Tutorial.Sequence
+public import Bignum.ArmOld.Tutorial.Simple
+public import Bignum.ArmOld.Tutorial.Sequence

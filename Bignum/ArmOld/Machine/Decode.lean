@@ -5,8 +5,8 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Machine.Instruction
-public import Bignum.Arm.Machine.State
+public import Bignum.ArmOld.Machine.Instruction
+public import Bignum.ArmOld.Machine.State
 
 @[expose] public section
 
@@ -47,7 +47,7 @@ Future extensions will add:
 - Branches (B/BL/Bcond/CBZ/CBNZ)
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 /-!
 ## Bit Extraction Helpers
@@ -399,4 +399,4 @@ theorem Program.fromBytes_instructions (addr : Word64) (bytes : List UInt8) :
   unfold Program.fromBytes
   rfl
 
-end Bignum.Arm
+end Bignum.ArmOld

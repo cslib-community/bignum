@@ -5,7 +5,7 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm.Machine.Decode
+public import Bignum.ArmOld.Machine.Decode
 
 @[expose] public section
 
@@ -39,7 +39,7 @@ Realistically Modelled Machine Code" (CAV 2025):
 Source: s2n-bignum/common/relational.ml (HOL Light implementation)
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 /-!
 ## Operational Semantics - Eventually
@@ -484,4 +484,4 @@ theorem ensures_sequence
     ⟨hpf.1, h_frame_trans s₀ s₁ s₂ h_f1 hpf.2⟩) s₁ h_ev2
 
 
-end Bignum.Arm
+end Bignum.ArmOld

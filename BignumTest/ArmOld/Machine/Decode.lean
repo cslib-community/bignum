@@ -5,9 +5,9 @@ Author: Alexandre Rademaker
 -/
 module
 
-public meta import Bignum.Arm.Machine.Decode
+public meta import Bignum.ArmOld.Machine.Decode
 
-open Bignum.Arm
+open Bignum.ArmOld
 
 /-!
 ## Tests for ARM Instruction Decoding

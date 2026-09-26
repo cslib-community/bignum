@@ -5,6 +5,5 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Arm
+public import Bignum.ArmOld
 public import Bignum.ArmRev
-public import Bignum.Common

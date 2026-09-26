@@ -5,7 +5,7 @@ Author: Alexandre Rademaker
 -/
 module
 
-public import Bignum.Common
+public import Bignum.ArmOld.Common
 
 @[expose] public section
 
@@ -27,7 +27,7 @@ This corresponds to the ARM state in HOL Light's ARM model.
 Source: s2n-bignum/arm/proofs/arm.ml and instruction.ml
 -/
 
-namespace Bignum.Arm
+namespace Bignum.ArmOld
 
 
 /--
@@ -359,4 +359,4 @@ theorem ArmState.read_flag_write_reg (s : ArmState) (f : Flag) (r : Reg) (v : Wo
   unfold write_reg read_flag
   rfl
 
-end Bignum.Arm
+end Bignum.ArmOld
