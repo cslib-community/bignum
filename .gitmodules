@@ -1,3 +1,0 @@
-[submodule "s2n-bignum"]
-	path = s2n-bignum
-	url = https://github.com/awslabs/s2n-bignum

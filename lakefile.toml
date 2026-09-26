@@ -1,15 +1,13 @@
 name = "bignum"
 version = "0.1.0"
-testDriver = "BignumTest"
 defaultTargets = ["Bignum"]
+lintDriver = "batteries/runLinter"
+testDriver = "BignumTest"
+requiresModuleSystem = true
 
 [leanOptions]
 #autoImplicit = false
 relaxedAutoImplicit = false
-# pp.unicode.fun = true # pretty-prints `fun a ↦ b`
-# weak.linter.mathlibStandardSet = true
-# maxSynthPendingDepth = 3
-# experimental.module = true
 
 [[require]]
 name = "mathlib"
@@ -25,7 +23,3 @@ name = "Bignum"
 [[lean_lib]]
 name = "BignumTest"
 globs = ["BignumTest.+"]
-
-[[lean_exe]]
-name = "sh"
-root = "Shake"
