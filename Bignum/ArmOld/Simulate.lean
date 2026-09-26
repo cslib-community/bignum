@@ -139,8 +139,4 @@ instance : Repr ArmState where
   reprPrec s _ :=
     Std.Format.text (String.intercalate "\n" (ArmState.showRegs s))
 
-<<<<<<< HEAD:Bignum/Arm/Simulate.lean
-end Bignum.Arm
-=======
 end Bignum.ArmOld
->>>>>>> gflima:Bignum/ArmOld/Simulate.lean

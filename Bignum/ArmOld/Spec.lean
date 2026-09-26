@@ -483,9 +483,4 @@ theorem ensures_sequence
   exact eventually_mono (fun s₂ hpf =>
     ⟨hpf.1, h_frame_trans s₀ s₁ s₂ h_f1 hpf.2⟩) s₁ h_ev2
 
-
-<<<<<<< HEAD:Bignum/Arm/Spec.lean
-end Bignum.Arm
-=======
 end Bignum.ArmOld
->>>>>>> gflima:Bignum/ArmOld/Spec.lean
