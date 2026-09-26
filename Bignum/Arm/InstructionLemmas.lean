@@ -131,32 +131,41 @@ theorem condition_EQ_not_NE (s : State) :
     s.condition .EQ = !s.condition .NE := by
   rw [condition_EQ, condition_NE, Bool.not_not]
 
-theorem Condition_CS_not_CC (s : State) :
+theorem condition_CS_not_CC (s : State) :
     s.condition .CS = !s.condition .CC := by
   rw [condition_CS, condition_CC, Bool.not_not]
 
-theorem Condition_MI_not_PL (s : State) :
+theorem condition_MI_not_PL (s : State) :
     s.condition .MI = !s.condition .PL := by
   rw [condition_MI, condition_PL, Bool.not_not]
 
-theorem Condition_VS_not_VC (s : State) :
+theorem condition_VS_not_VC (s : State) :
     s.condition .VS = !s.condition .VC := by
   rw [condition_VS, condition_VC, Bool.not_not]
 
-theorem Condition_HI_not_LS (s : State) :
+theorem condition_HI_not_LS (s : State) :
     s.condition .HI = !s.condition .LS := by
   rw [condition_HI, condition_LS, Bool.not_not]
 
-theorem Condition_GE_not_LT (s : State) :
+theorem condition_GE_not_LT (s : State) :
     s.condition .GE = !s.condition .LT := by
   rw [condition_GE, condition_LT, Bool.not_not]
 
-theorem Condition_GT_not_LE (s : State) :
+theorem condition_GT_not_LE (s : State) :
     s.condition .GT = !s.condition .LE := by
   rw [condition_GT, condition_LE, Bool.not_not]
 
-theorem Condition_AL_eq_NV (s : State) :
+theorem condition_AL_NV (s : State) :
     s.condition .AL = s.condition .NV := by
   rw [condition_AL, condition_NV]
+
+theorem condition_invert (s : State) (c : Condition) :
+    s.condition (c.invert) =
+    if c = .AL ∨ c = .NV then s.condition c
+    else !(s.condition c) := by
+  cases c <;> simp [Condition.invert,
+    condition_EQ_not_NE, condition_CS_not_CC, condition_MI_not_PL,
+    condition_VS_not_VC, condition_HI_not_LS, condition_GE_not_LT,
+    condition_GT_not_LE, condition_AL_NV]
 
 end Bignum.Arm.State
