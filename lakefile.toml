@@ -10,12 +10,17 @@ requiresModuleSystem = true
 relaxedAutoImplicit = false
 
 [[require]]
+name = "batteries"
+scope = "leanprover-community"
+rev = "main"
+
+[[require]]
 name = "mathlib"
 scope = "leanprover-community"
 
-[[require]]
-name = "cslib"
-scope = "leanprover"
+# [[require]]
+# name = "cslib"
+# scope = "leanprover"
 
 [[lean_lib]]
 name = "Bignum"
