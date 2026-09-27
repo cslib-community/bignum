@@ -33,6 +33,7 @@ variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 /--
 Composition of components.
 -/
+@[simp]
 def compose (cp₁ : Component α β) (cp₂ : Component β γ) : Component α γ :=
   ⟨cp₂.read ∘ cp₁.read, λ c a ↦ cp₁.write (cp₂.write c (cp₁.read a)) a⟩
 
@@ -99,6 +100,7 @@ def element [BEq α] (a : α) : Component (α → β) β :=
 /--
 Component that applies a pair of functions (f,g) to a component.
 -/
+@[simp]
 def through (f : α → β) (g : β → α) : Component α β :=
   ⟨f, λ b _ ↦ g b⟩
 
