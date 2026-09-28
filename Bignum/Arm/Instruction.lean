@@ -520,9 +520,6 @@ inductive OffsetType where
 
 namespace OffsetType
 
-/-- Alias for "no offset". -/
-abbrev none : OffsetType := .immediate 0
-
 /-- Whether the offset type implies a writeback. -/
 def writesback (oty : OffsetType) : Bool :=
   match oty with
@@ -533,10 +530,13 @@ def writesback (oty : OffsetType) : Bool :=
   | .preimmediate _ => true
   | .postimmediate _ => true
 
+/-- Alias for no offset. -/
+abbrev no_offset : OffsetType := .immediate 0
+
 end OffsetType
 
 /-- The actual address offset used (0 for post-index). -/
-def State.offset_address (oty : OffsetType) (s : State) : BitVec 64 :=
+def State.offset_address (s : State) (oty : OffsetType) : BitVec 64 :=
   match oty with
   | .register reg => reg.read s
   | .shiftreg reg k => (reg.read s).shiftLeft k
@@ -546,7 +546,7 @@ def State.offset_address (oty : OffsetType) (s : State) : BitVec 64 :=
   | .postimmediate _ => 0
 
 /-- The offset to add to the register. -/
-def State.offset_writeback (oty : OffsetType) (s : State) : BitVec 64 :=
+def State.offset_writeback (s : State) (oty : OffsetType) : BitVec 64 :=
   match oty with
   | .register _ => 0
   | .shiftreg _ _ => 0
