@@ -9,7 +9,7 @@ public import Bignum.Component
 
 @[expose] public section
 
-/-! # Lemmas about relations and Hoare-type rules -/
+/-! # Relational model of programs and Hoare-type rules -/
 
 set_option autoImplicit false
 
