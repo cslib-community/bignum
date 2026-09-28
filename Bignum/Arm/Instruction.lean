@@ -72,6 +72,8 @@ def allOnes : State := {
 instance : Inhabited State where
   default := allZeros
 
+end State
+
 def PC : Component State (BitVec 64) :=
   ⟨λ s ↦ s._PC, λ x s ↦ {s with _PC := x}⟩
 
@@ -194,8 +196,6 @@ def W29  := WREG 29
 def W30  := WREG 30
 def WSP  := SP :> .zerotop_32
 
-end State
-
 /--
 Shifted register operands.
 -/
@@ -228,13 +228,6 @@ def shift (sty : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
   | .ROR => bv.rotateRight sa.toNat
 
 end ShiftType
-
-/--
-Shifted version of register `reg` (writes are no-ops).
--/
-def State.shifted (sty : ShiftType) (sa : Nat) {n : Nat}
-    (reg : Component State (BitVec n)) : Component State (BitVec n) :=
-  ⟨λ s ↦ sty.shift sa (Component.read reg s), Component.write reg⟩
 
 /--
 Extended register operands.
@@ -276,16 +269,6 @@ def extend (xty : ExtendedType) {n m : Nat} (bv : BitVec n) : BitVec m :=
   | .SXTX => (bv.truncate 64).signExtend m
 
 end ExtendedType
-
-/--
-Extended version of register `reg` (writes are undefined).
--/
-def State.extended (xty : ExtendedType) {n m : Nat}
-    (reg : Component State (BitVec n)) : Component State (BitVec m) :=
-  -- We use of `default` on the right as a substitute for HOL Light's ARB.
-  ⟨λ s ↦ xty.extend (Component.read reg s), default⟩
-
-namespace State
 
 /-- The main SIMD registers. -/
 def QREG (n : Nat) : Component State (BitVec 128) :=
@@ -500,7 +483,7 @@ end Condition
 /--
 Tests whether the given condition holds in state `s`.
 -/
-def condition (s : State) : Condition → Bool
+def State.condition (s : State) : Condition → Bool
   | .EQ => ZF.read s
   | .NE => !ZF.read s
   | .CS => CF.read s
@@ -517,8 +500,6 @@ def condition (s : State) : Condition → Bool
   | .LE => !(!ZF.read s && (NF.read s == VF.read s))
   | .AL => true
   | .NV => true
-
-end State
 
 /--
 Addressing modes and offsets for loads and stores (LDP, LDR, STP, STR).
@@ -574,11 +555,11 @@ def State.offset_writeback (oty : OffsetType) (s : State) : BitVec 64 :=
   | .preimmediate bv => bv
   | .postimmediate bv => bv
 
-/-! ## General register-register instructions. -/
+/-! ## General register-register instructions -/
 
 universe u
 
-def State.ADD {α : Type u} {w : Nat}
+def ADD {α : Type u} {w : Nat}
     (Rd : Component α (BitVec w))
     (Rm : Component α (BitVec w))
     (Rn : Component α (BitVec w))
@@ -588,7 +569,7 @@ def State.ADD {α : Type u} {w : Nat}
   let d : BitVec w := m + n
   (Rd ≔ d) s
 
-def State.SUB {α : Type u} {w : Nat}
+def SUB {α : Type u} {w : Nat}
     (Rd : Component α (BitVec w))
     (Rm : Component α (BitVec w))
     (Rn : Component α (BitVec w))

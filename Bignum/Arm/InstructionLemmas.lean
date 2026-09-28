@@ -5,6 +5,7 @@ Author: Guilherme Lima
 -/
 module
 
+public import Bignum.Arm.Component
 public import Bignum.Arm.Instruction
 
 @[expose] public section
@@ -13,7 +14,7 @@ public import Bignum.Arm.Instruction
 
 set_option autoImplicit false
 
-namespace Bignum.Arm.State
+namespace Bignum.Arm
 
 /-! ## Registers -/
 
@@ -44,20 +45,20 @@ theorem WZR_ZR : WZR = ZR := by
   rw [WZR_zero, ZR_zero]
 
 theorem shifted_LSL_zero {w : Nat} (reg : Component State (BitVec w)) :
-    shifted .LSL 0 reg = reg := by
-  simp [shifted]
+    reg.shifted .LSL 0 = reg := by
+  simp [Component.shifted]
 
 theorem shifted_LSR_zero {w : Nat} (reg : Component State (BitVec w)) :
-    shifted .LSR 0 reg = reg := by
-  simp [shifted]
+    reg.shifted .LSR 0 = reg := by
+  simp [Component.shifted]
 
 theorem shifted_ASR_zero {w : Nat} (reg : Component State (BitVec w)) :
-    shifted .ASR 0  reg = reg := by
-  simp [shifted]
+    reg.shifted .ASR 0 = reg := by
+  simp [Component.shifted]
 
 theorem shifted_ROR_zero {w : Nat} (reg : Component State (BitVec w)) :
-    shifted .ROR 0  reg = reg := by
-  simp [shifted, BitVec.rotateRight_def]
+    reg.shifted .ROR 0 = reg := by
+  simp [Component.shifted, BitVec.rotateRight_def]
 
 /-! ## Condition codes -/
 
@@ -168,4 +169,4 @@ theorem condition_invert (s : State) (c : Condition) :
     condition_VS_not_VC, condition_HI_not_LS, condition_GE_not_LT,
     condition_GT_not_LE, condition_AL_NV]
 
-end Bignum.Arm.State
+end Bignum.Arm

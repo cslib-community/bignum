@@ -6,32 +6,32 @@ Author: Guilherme Lima
 module
 
 import Bignum.Arm
-open Bignum.Arm.State
+open Bignum.Arm
 
 /-! # Unit tests for ARM state -/
 
-def S₀ := allZeros
-def S₁ := allOnes
+def S₀ := State.allZeros
+def S₁ := State.allOnes
 
 /-! ## allZeros -/
 
-example : allZeros._PC               = 0  := by rfl
-example : allZeros._registers 42     = 0  := by rfl
-example : allZeros._simdregisters 42 = 0  := by rfl
-example : allZeros._flags            = 0  := by rfl
-example : allZeros._memory 42        = 0  := by rfl
-example : allZeros._events           = [] := by rfl
+example : S₀._PC               = 0  := by rfl
+example : S₀._registers 42     = 0  := by rfl
+example : S₀._simdregisters 42 = 0  := by rfl
+example : S₀._flags            = 0  := by rfl
+example : S₀._memory 42        = 0  := by rfl
+example : S₀._events           = [] := by rfl
 
 /-! ## allOnes -/
 
-example : allOnes._PC               = .allOnes 64  := by rfl
-example : allOnes._registers 42     = .allOnes 64  := by rfl
-example : allOnes._simdregisters 42 = .allOnes 128 := by rfl
-example : allOnes._flags            = .allOnes 4   := by rfl
-example : allOnes._memory 42        = .allOnes 8   := by rfl
-example : allOnes._events           = []           := by rfl
+example : S₁._PC               = .allOnes 64  := by rfl
+example : S₁._registers 42     = .allOnes 64  := by rfl
+example : S₁._simdregisters 42 = .allOnes 128 := by rfl
+example : S₁._flags            = .allOnes 4   := by rfl
+example : S₁._memory 42        = .allOnes 8   := by rfl
+example : S₁._events           = []           := by rfl
 
-/-! ## State components -/
+/-! ## Basic components -/
 
 example : PC.read S₀            = S₀._PC            := by rfl
 example : PC.read S₁            = S₁._PC            := by rfl
@@ -365,45 +365,45 @@ example : (WREG 31).read ((WREG 31).write 1 S₀) = 0 := by rfl
 example : (WREG 31).read ((WREG 31).write 8 S₁) = 0 := by rfl
 
 -- Writing to W* should overwrite the top 32-bit of X* with 0.
-example : X0.read (W0.write (1 <<< 33) allOnes) = 0 := by rfl
-example : SP.read (WSP.write 0 allOnes) = 0 := by rfl
+example : X0.read (W0.write (1 <<< 33) S₁) = 0 := by rfl
+example : SP.read (WSP.write 0 S₁) = 0 := by rfl
 
 /-! ## Shifted operands -/
 
-example : (shifted .LSL 1 X1).read (X1.write 1 S₀) = 1 <<< 1 := by rfl
-example : X1.read ((shifted .LSL 1 X1).write 1 S₀) = 1#64 := by rfl
+example : (X1.shifted .LSL 1).read (X1.write 1 S₀) = 1 <<< 1 := by rfl
+example : X1.read ((X1.shifted .LSL 1).write 1 S₀) = 1#64 := by rfl
 
-example : (shifted .LSR 63 X1).read (X1.write (1 <<< 63) S₀) = 1 := by rfl
-example : X1.read ((shifted .LSL 1 X1).write 1 S₀) = 1#64 := by rfl
+example : (X1.shifted .LSR 63).read (X1.write (1 <<< 63) S₀) = 1 := by rfl
+example : X1.read ((X1.shifted .LSL 1).write 1 S₀) = 1#64 := by rfl
 
-example : (shifted .ASR 63 X1).read (X1.write (1 <<< 63) S₀)
+example : (X1.shifted .ASR 63).read (X1.write (1 <<< 63) S₀)
           = .allOnes 64 := by rfl
-example : X1.read ((shifted .ASR 1 X1).write 2 S₀) = 2#64 := by rfl
+example : X1.read ((X1.shifted .ASR 1).write 2 S₀) = 2#64 := by rfl
 
-example : (shifted .ROR 1 X1).read (X1.write 1 S₀) = (1 <<< 63) := by rfl
-example : X1.read ((shifted .ROR 1 X1).write 2 S₀) = 2#64 := by rfl
+example : (X1.shifted .ROR 1).read (X1.write 1 S₀) = (1 <<< 63) := by rfl
+example : X1.read ((X1.shifted .ROR 1).write 2 S₀) = 2#64 := by rfl
 
 /-! ## Extended operands -/
 
-example : (extended .UXTB X1).read S₁ = 255#32 := by rfl
-example : (extended .UXTH X1).read S₁ = .allOnes 16 := by rfl
-example : (extended .UXTW X1).read S₁
+example : (X1.extended .UXTB).read S₁ = 255#32 := by rfl
+example : (X1.extended .UXTH).read S₁ = .allOnes 16 := by rfl
+example : (X1.extended .UXTW).read S₁
           = (BitVec.allOnes 32).zeroExtend 64 := by rfl
-example : (extended .UXTX X1).read S₁
+example : (X1.extended .UXTX).read S₁
           = (BitVec.allOnes 64).zeroExtend 128 := by rfl
-example : ((extended .SXTB X1).read (X1.write (-127) S₁) : BitVec 32)
+example : ((X1.extended .SXTB).read (X1.write (-127) S₁) : BitVec 32)
           = BitVec.ofInt 32 (-127) := by rfl
 
-example : ((extended .SXTB X1).read
+example : ((X1.extended .SXTB).read
             (X1.write (1 <<< 7) S₀) : BitVec 64).toInt
           = (1 <<< 7 : BitVec 8).toInt := by rfl
-example : ((extended .SXTH X1).read
+example : ((X1.extended .SXTH).read
             (X1.write (1 <<< 15) S₀) : BitVec 64).toInt
           = (1 <<< 15 : BitVec 16).toInt := by rfl
-example : ((extended .SXTW X1).read
+example : ((X1.extended .SXTW).read
             (X1.write (1 <<< 31) S₀) : BitVec 64).toInt
           = (1 <<< 31 : BitVec 32).toInt := by rfl
-example : ((extended .SXTX X1).read
+example : ((X1.extended .SXTX).read
             (X1.write (1 <<< 63) S₀) : BitVec 128).toInt
           = (1 <<< 63 : BitVec 64).toInt := by rfl
 

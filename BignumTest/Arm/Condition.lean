@@ -6,7 +6,7 @@ Author: Guilherme Lima
 module
 
 import Bignum.Arm
-open Bignum.Arm.State
+open Bignum.Arm
 
 example : Condition.HS = .CS := by rfl
 example : Condition.LO = .CC := by rfl
