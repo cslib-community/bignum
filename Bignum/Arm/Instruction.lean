@@ -216,7 +216,7 @@ instance : ToString ShiftType where
 namespace ShiftType
 
 /--
-Perform the shift operation indicated by `sty` on `bv`.
+Perform the shift operation indicated by `sty` on `bv` by amount `sa`.
 -/
 @[simp]
 def shift (sty : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
