@@ -30,10 +30,10 @@ theorem toNatLE_cons (b : BitVec 8) (bs : ByteList) :
     ByteList.toNatLE (b :: bs) = b.toNat + bs.toNatLE * 256 := by
   rw [toNatLE, List.foldr_cons, ← toNatLE, Nat.shiftLeft_eq]
 
-theorem toNatLE_bound (l : ByteList) : l.toNatLE < 256 ^ l.length := by
+theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256 ^ bs.length := by
   unfold toNatLE
   conv => lhs; arg 1; intro _ _; rw [Nat.shiftLeft_eq]; simp
-  induction l with
+  induction bs with
   | nil => simp
   | cons b bs ih =>
     rw [List.foldr_cons, List.length_cons, Nat.pow_add_one (m:=bs.length),
@@ -45,23 +45,20 @@ theorem toNatLE_bound (l : ByteList) : l.toNatLE < 256 ^ l.length := by
 theorem ofNatLE_zero (n : Nat) : ByteList.ofNatLE 0 n = [] := by
   rfl
 
-theorem ofNatLE_succ (m n : Nat) :
-    ByteList.ofNatLE m.succ n
-    = BitVec.ofNat 8 n :: ByteList.ofNatLE m (n / 256) := by
+theorem ofNatLE_succ (k n : Nat) : ByteList.ofNatLE k.succ n
+    = BitVec.ofNat 8 n :: ByteList.ofNatLE k (n / 256) := by
   rw [ofNatLE]; congr; rw [Nat.shiftRight_eq_div_pow]
 
-theorem length_ofNatLE (m n : Nat) :
-    (ofNatLE m n).length = m := by
-  induction m generalizing n with
+theorem length_ofNatLE (k n : Nat) : (ofNatLE k n).length = k := by
+  induction k generalizing n with
   | zero => rfl
   | succ _ ih => rw [ofNatLE, List.length_cons, ih]
 
-theorem length_ofIntLE (m : Nat) (n : Int) :
-    (ofIntLE m n).length = m := by
+theorem length_ofIntLE (k : Nat) (n : Int) : (ofIntLE k n).length = k := by
   rw [ofIntLE, length_ofNatLE]
 
 theorem ofNatLE_toNatLE (bs : ByteList) :
-    ByteList.ofNatLE (bs.length) bs.toNatLE = bs := by
+    .ofNatLE bs.length bs.toNatLE = bs := by
   induction bs with
   | nil => simp [ofNatLE]
   | cons b bs ih =>
@@ -73,6 +70,25 @@ theorem ofNatLE_toNatLE (bs : ByteList) :
       and_intros <;> simp <;> rw [h256] <;>
         apply BitVec.toNat_lt_twoPow_of_le <;> simp
     simp [h.left, h.right]; assumption
+
+theorem toNatLE_ofNatLE_zero (k : Nat) :
+    ByteList.toNatLE (.ofNatLE k 0) = 0 := by
+  induction k with
+  | zero => rfl
+  | succ _ ih => simp [ofNatLE_succ, toNatLE_cons, ih]
+
+theorem toNatLE_ofNatLE (k n : Nat) :
+    ByteList.toNatLE (.ofNatLE k n) = n % 256 ^ k := by
+  induction k generalizing n with
+  | zero => rw [ofNatLE_zero, toNatLE_nil, Nat.mod_one]
+  | succ _ ih =>
+    simp [ofNatLE_succ, toNatLE_cons, ih,
+      Nat.mul_comm, ← Nat.mod_mul, Nat.pow_succ]
+
+theorem toNatLE_mod (k n : Nat) :
+    ByteList.ofNatLE k (n % 256 ^ k) = ByteList.ofNatLE k n := by
+  conv => lhs; arg 1; rw [← length_ofNatLE k n]
+  rw [← toNatLE_ofNatLE, ofNatLE_toNatLE]
 
 end ByteList
 end Bignum
