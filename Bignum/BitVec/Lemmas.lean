@@ -16,6 +16,11 @@ set_option autoImplicit false
 
 namespace BitVec
 
+theorem toNat_div_twoPow_eq_zero {w : Nat}
+    (x : BitVec w) (n : Nat) (h : w ≤ n) :
+    x.toNat / 2 ^ n = 0 := by
+  simp; apply BitVec.toNat_lt_twoPow_of_le h
+
 theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
     (x.setLsb i b).getLsb j = if i = j then b else x.getLsb j := by
   unfold setLsb; cases b <;> by_cases h : i = j <;>

@@ -34,7 +34,7 @@ Truncates the list if `n` is too large.
 def ofNatLE (len n : Nat) : ByteList :=
   match len with
   | 0 => []
-  | size' + 1 => n :: ByteList.ofNatLE size' (n >>> 8)
+  | size' + 1 => BitVec.ofNat 8 n :: ByteList.ofNatLE size' (n >>> 8)
 
 /--
 Converts an integer `n` to a little-endian byte list of `len` bytes.
