@@ -9,9 +9,11 @@ public import Bignum.Component
 
 @[expose] public section
 
-/-! # Byte-addressable memory -/
+/-! # Memory operations -/
 
 set_option autoImplicit false
+
+namespace Bignum
 
 /-! ## Byte list -/
 
@@ -26,22 +28,23 @@ def toNatLE (bs : ByteList) : Nat :=
   bs.foldr (λ b n ↦ b.toNat + n <<< 8) 0
 
 /--
-Converts a natural number `n` to a little-endian byte list of `size` bytes.
+Converts a natural number `n` to a little-endian byte list of `len` bytes.
 Truncates the list if `n` is too large.
 -/
-def ofNatLE (size n : Nat) : ByteList :=
-  match size with
+def ofNatLE (len n : Nat) : ByteList :=
+  match len with
   | 0 => []
   | size' + 1 => n :: ByteList.ofNatLE size' (n >>> 8)
 
 /--
-Converts an integer `n` to a little-endian byte list of `size` bytes.
-Truncates the list to `size` bytes if `n` is too small or large.
+Converts an integer `n` to a little-endian byte list of `len` bytes.
+Truncates the list to `len` bytes if `n` is too small or large.
 -/
-def ofIntLE (size : Nat) (n : Int) : ByteList :=
-  ofNatLE size $ Int.toNat (n.emod (256 ^ size))
+def ofIntLE (len : Nat) (n : Int) : ByteList :=
+  ofNatLE len $ Int.toNat (n.emod (256 ^ len))
 
 end ByteList
 
-namespace Bignum.Memory
-end Bignum.Memory
+namespace Memory
+end Memory
+end Bignum

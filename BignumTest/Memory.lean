@@ -6,7 +6,7 @@ Author: Guilherme Lima
 module
 
 import Bignum.Memory
-open Bignum.Memory
+open Bignum
 
 /-! # Unit test for memory operations -/
 

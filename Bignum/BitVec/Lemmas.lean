@@ -10,7 +10,7 @@ public import Bignum.BitVec.Basic
 
 @[expose] public section
 
-/-! # More theorems about bitvectors -/
+/-! # More lemmas about bitvectors -/
 
 set_option autoImplicit false
 

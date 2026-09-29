@@ -105,3 +105,4 @@ def through (f : α → β) (g : β → α) : Component α β :=
   ⟨f, λ b _ ↦ g b⟩
 
 end Component
+end Bignum
