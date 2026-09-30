@@ -41,7 +41,7 @@ Converts an integer `n` to a little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `n` is too small or large.
 -/
 def ofIntLE (len : Nat) (n : Int) : ByteList :=
-  ofNatLE len $ Int.toNat (n.emod (256 ^ len))
+  ofNatLE len $ Int.natAbs (n % 256 ^ len)
 
 end ByteList
 

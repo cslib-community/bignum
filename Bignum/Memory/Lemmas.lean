@@ -81,14 +81,22 @@ theorem toNatLE_ofNatLE (k n : Nat) :
     ByteList.toNatLE (.ofNatLE k n) = n % 256 ^ k := by
   induction k generalizing n with
   | zero => rw [ofNatLE_zero, toNatLE_nil, Nat.mod_one]
-  | succ _ ih =>
-    simp [ofNatLE_succ, toNatLE_cons, ih,
+  | succ _ ih => simp [ofNatLE_succ, toNatLE_cons, ih,
       Nat.mul_comm, ← Nat.mod_mul, Nat.pow_succ]
 
-theorem toNatLE_mod (k n : Nat) :
+theorem ofNatLE_mod (k n : Nat) :
     ByteList.ofNatLE k (n % 256 ^ k) = ByteList.ofNatLE k n := by
   conv => lhs; arg 1; rw [← length_ofNatLE k n]
   rw [← toNatLE_ofNatLE, ofNatLE_toNatLE]
+
+theorem toNatLE_ofNatLE_of_lt (k n : Nat) (h : n < 256 ^ k) :
+    ByteList.toNatLE (.ofNatLE k n) = n := by
+  simp [toNatLE_ofNatLE, Nat.mod_eq_iff_lt]; assumption
+
+theorem ofIntLE_ofNat (k : Nat) (n : Nat) :
+    ByteList.ofIntLE k (.ofNat n) = .ofNatLE k n := by
+  rw [ofIntLE, Int.natAbs_emod_of_nonneg] <;> try lia
+  simp; rw [ofNatLE_mod]
 
 end ByteList
 end Bignum
