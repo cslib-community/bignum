@@ -14,6 +14,8 @@ open BitVec
 
 example : (0#0).toBitString = "" := by rfl
 example : (1101#4).toBitString = "1101" := by rfl
+example : (1101#5).toBitString = "01101" := by rfl
+example : (1101#1).toBitString = "1" := by rfl
 
 /-! ## setLsb -/
 

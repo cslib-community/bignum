@@ -18,7 +18,7 @@ namespace BitVec
 Converts bitvector to bitstring.
 -/
 def toBitString {w : Nat} (x : BitVec w) : String :=
-  String.ofList $ (List.range w).reverse.map (if x.getLsbD · then '1' else '0')
+  (List.range w).foldr (λ i s ↦ s.push (if x.getLsbD i then '1' else '0')) ""
 
 /--
 Sets the least significant bit at index `i` of `x` to `b`.
