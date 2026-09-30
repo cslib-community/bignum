@@ -20,14 +20,14 @@ namespace Bignum.Component
 Component for a bit within a bitvector.
 -/
 def bitelement {w : Nat} (i : Fin w) : Component (BitVec w) Bool :=
-  ⟨λ bv ↦ bv.getLsb i, λ b bv ↦ BitVec.setLsb bv i b⟩
+  ⟨λ bv ↦ bv.getLsb i, λ b bv ↦ bv.setLsb i b⟩
 
 /--
 Component for subwords of a bitvector.
 -/
 def subword {w : Nat} (start len : Nat) :
     Component (BitVec w) (BitVec len) :=
-  ⟨BitVec.extractLsb' start len, λ b bv ↦ bv.overwriteLsb' start len b⟩
+  ⟨.extractLsb' start len, λ b bv ↦ bv.overwriteLsb' start len b⟩
 
 /--
 Component for the bottom-half of a bitvector.
@@ -63,21 +63,33 @@ Components for subwords of larger bitvectors which force a zero
 extension on writes.  Intended to mimic x86-64 and aarch64 behaviors.
 -/
 def zerotop_256 : Component (BitVec 512) (BitVec 256) :=
-  Component.through (BitVec.truncate 256) (BitVec.truncate 512)
+  .through (BitVec.truncate 256) (BitVec.truncate 512)
 
 def zerotop_128 : Component (BitVec 256) (BitVec 128) :=
-  Component.through (BitVec.truncate 128) (BitVec.truncate 256)
+  .through (BitVec.truncate 128) (BitVec.truncate 256)
 
 def zerotop_64 : Component (BitVec 128) (BitVec 64) :=
-  Component.through (BitVec.truncate 64) (BitVec.truncate 128)
+  .through (BitVec.truncate 64) (BitVec.truncate 128)
 
 def zerotop_32 : Component (BitVec 64) (BitVec 32) :=
-  Component.through (BitVec.truncate 32) (BitVec.truncate 64)
+  .through (BitVec.truncate 32) (BitVec.truncate 64)
 
 def zerotop_16 : Component (BitVec 32) (BitVec 16) :=
-  Component.through (BitVec.truncate 16) (BitVec.truncate 32)
+  .through (BitVec.truncate 16) (BitVec.truncate 32)
 
 def zerotop_8 : Component (BitVec 16) (BitVec 8) :=
-  Component.through (BitVec.truncate 8) (BitVec.truncate 16)
+  .through (BitVec.truncate 8) (BitVec.truncate 16)
+
+/--
+Component for reading a writing bytes to memory.
+-/
+def bytes_read {w : Nat} (addr : BitVec w) (n : Nat)
+    (mem : BitVec w → BitVec 8) : Nat :=
+  -- TODO: Move this to memory and return a ByteList.
+  -- Then prove that ByteList.toNatLE equals this number.
+  match n with
+  | 0 => 0
+  | n + 1 =>
+    bytes_read addr n mem + 2 ^ (8 * n) * (mem (addr + .ofNat _ n)).toNat
 
 end Bignum.Component

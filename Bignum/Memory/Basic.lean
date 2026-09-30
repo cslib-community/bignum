@@ -46,5 +46,11 @@ def ofIntLE (len : Nat) (n : Int) : ByteList :=
 end ByteList
 
 namespace Memory
+universe u
+variable {α : Type u} (memory : Component α (BitVec 64))
+
+-- def bytes_loaded (a : α) (pc : BitVec 64) (bs : ByteList) : Prop :=
+--   sorry
+
 end Memory
 end Bignum
