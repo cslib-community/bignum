@@ -30,7 +30,7 @@ theorem toNatLE_cons (b : BitVec 8) (bs : ByteList) :
     ByteList.toNatLE (b :: bs) = b.toNat + bs.toNatLE * 256 := by
   rw [toNatLE, List.foldr_cons, ← toNatLE, Nat.shiftLeft_eq]
 
-theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256 ^ bs.length := by
+theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256^bs.length := by
   unfold toNatLE
   conv => lhs; arg 1; intro _ _; rw [Nat.shiftLeft_eq]; simp
   induction bs with
@@ -38,7 +38,7 @@ theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256 ^ bs.length := by
   | cons b bs ih =>
     rw [List.foldr_cons, List.length_cons, Nat.pow_add_one (m:=bs.length),
       Nat.mul_comm _ 256, Nat.mul_comm _ 256]
-    have h : b.toNat < 2 ^ 8 := by
+    have h : b.toNat < 2^8 := by
       apply BitVec.toNat_lt_twoPow_of_le; decide
     apply Nat.add_mul_lt_mul_of_lt_of_lt <;> assumption
 
@@ -65,7 +65,7 @@ theorem ofNatLE_toNatLE (bs : ByteList) :
     rw [List.length_cons, ofNatLE_succ, toNatLE_cons]
     simp [BitVec.ofNat_add, BitVec.ofNat_toNat, BitVec.ofNat_mul]
     rw [Nat.add_div (by decide), BitVec.toNat_mod_cancel]; simp
-    have h256 : 256 = 2 ^ 8 := by rfl
+    have h256 : 256 = 2^8 := by rfl
     have h : (b.toNat / 256 = 0) ∧ (if 256 ≤ b.toNat then 1 else 0) = 0 := by
       and_intros <;> simp <;> rw [h256] <;>
         apply BitVec.toNat_lt_twoPow_of_le <;> simp
@@ -78,18 +78,18 @@ theorem toNatLE_ofNatLE_zero (k : Nat) :
   | succ _ ih => simp [ofNatLE_succ, toNatLE_cons, ih]
 
 theorem toNatLE_ofNatLE (k n : Nat) :
-    ByteList.toNatLE (.ofNatLE k n) = n % 256 ^ k := by
+    ByteList.toNatLE (.ofNatLE k n) = n % 256^k := by
   induction k generalizing n with
   | zero => rw [ofNatLE_zero, toNatLE_nil, Nat.mod_one]
   | succ _ ih => simp [ofNatLE_succ, toNatLE_cons, ih,
       Nat.mul_comm, ← Nat.mod_mul, Nat.pow_succ]
 
 theorem ofNatLE_mod (k n : Nat) :
-    ByteList.ofNatLE k (n % 256 ^ k) = ByteList.ofNatLE k n := by
+    ByteList.ofNatLE k (n % 256^k) = ByteList.ofNatLE k n := by
   conv => lhs; arg 1; rw [← length_ofNatLE k n]
   rw [← toNatLE_ofNatLE, ofNatLE_toNatLE]
 
-theorem toNatLE_ofNatLE_of_lt (k n : Nat) (h : n < 256 ^ k) :
+theorem toNatLE_ofNatLE_of_lt (k n : Nat) (h : n < 256^k) :
     ByteList.toNatLE (.ofNatLE k n) = n := by
   simp [toNatLE_ofNatLE, Nat.mod_eq_iff_lt]; assumption
 
