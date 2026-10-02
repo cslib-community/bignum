@@ -27,3 +27,8 @@ example : (mem.read_bytesLE 0 4).toNatLE
   = mem.read_bytesLE_asNat 0 4 := by rfl
 example : (mem.read_bytesLE 8 13).toNatLE
   = mem.read_bytesLE_asNat 8 13 := by rfl
+
+example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4
+    = [0xaa#8, 0xbb#8, 0x04#8, 0x05#8] := by rfl
+example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4
+    = (mem.write_bytesLE_asNat 2 2 48042).read_bytesLE 2 4 := by rfl

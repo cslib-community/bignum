@@ -6,3 +6,4 @@ Author(s): Guilherme Lima
 module
 
 public import Bignum.Memory.Basic
+public import Bignum.Memory.Lemmas

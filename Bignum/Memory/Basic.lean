@@ -29,16 +29,16 @@ def toNatLE (bs : ByteList) : Nat :=
 
 /--
 Converts a natural number `n` to a little-endian byte list of `len` bytes.
-Truncates the list if `n` is too large.
+Truncates the list to `len` bytes if `n` is too large.
 -/
 def ofNatLE (len n : Nat) : ByteList :=
   match len with
   | 0 => []
-  | len + 1 => BitVec.ofNat 8 n :: ByteList.ofNatLE len (n >>> 8)
+  | k + 1 => .ofNat 8 n :: ofNatLE k (n >>> 8)
 
 /--
 Converts an integer `n` to a little-endian byte list of `len` bytes.
-Truncates the list to `len` bytes if `n` is too small or large.
+Truncates the list to `len` bytes if `n` is too small or too large.
 -/
 def ofIntLE (len : Nat) (n : Int) : ByteList :=
   ofNatLE len $ Int.natAbs (n % 256^len)
@@ -52,25 +52,50 @@ abbrev Memory (w : Nat) := BitVec w → BitVec 8
 namespace Memory
 
 /--
-Reads `len` bytes from `memory` starting at offset `addr`.
-Returns a little-endian byte list.
+Reads `len` bytes from memory starting at offset `addr`.
+Returns the little-endian encoded result as a byte list.
 -/
 def read_bytesLE
     {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : ByteList :=
   match len with
   | 0 => []
-  | len + 1 => mem addr :: mem.read_bytesLE (addr + 1#w) len
+  | k + 1 => mem addr :: mem.read_bytesLE (addr + 1#w) k
 
 /--
-Reads `len` bytes from `memory` starting at offset `addr`.
-Returns the little-endian encoded result a natural number.
+Reads `len` bytes from memory starting at offset `addr`.
+Returns the little-endian encoded result as a natural number.
 -/
 def read_bytesLE_asNat
     {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : Nat :=
   match len with
   | 0 => 0
-  | len + 1 => (mem (addr + .ofNat _ len)).toNat * 2 ^ (8 * len)
-      + mem.read_bytesLE_asNat addr len
+  | k + 1 => (mem (addr + .ofNat _ k)).toNat * 2 ^ (8 * k)
+      + mem.read_bytesLE_asNat addr k
+
+/--
+Writes `len` bytes from `bs` to memory starting at offset `addr`.
+Assumes that `bs` is little-endian encoded.  Returns the updated memory.
+-/
+def write_bytesLE
+    {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) (bs : ByteList) :
+    Memory w :=
+  match len with
+  | 0 => mem
+  | k + 1 => let mem' := λ x ↦ if x == addr then bs.headD 0 else mem x
+      write_bytesLE mem' (addr + 1#w) k bs.tail
+
+/--
+Writes `len` bytes from `n` to memory starting at offset `addr`.
+Assumes that `n` is little-endian encoded.  Returns the updated memory.
+-/
+def write_bytesLE_asNat
+    {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
+    Memory w :=
+  match len with
+  | 0 => mem
+  | k + 1 => let mem' := λ x ↦ if x == addr + .ofNat w k
+                               then .ofNat 8 (n / 2^(8 * k) % 2^8) else mem x
+      write_bytesLE_asNat mem' addr k n
 
 end Memory
 end Bignum
