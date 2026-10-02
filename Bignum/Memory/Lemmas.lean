@@ -118,9 +118,9 @@ theorem read_bytesLE_len_zero (addr : BitVec w) :
     mem.read_bytesLE addr 0 = [] := by
   rw [read_bytesLE]
 
-theorem read_bytesLE_len_succ (addr : BitVec w) (len : Nat) :
-    mem.read_bytesLE addr (len + 1)
-    = mem addr :: mem.read_bytesLE (addr + 1#w) len:= by
+theorem read_bytesLE_len_succ (addr : BitVec w) (k : Nat) :
+    mem.read_bytesLE addr (k + 1)
+    = mem addr :: mem.read_bytesLE (addr + 1#w) k := by
   rw [read_bytesLE]
 
 theorem read_bytesLE_len_add (addr : BitVec w) (n m : Nat) :
@@ -138,25 +138,25 @@ theorem read_bytesLE_len_add (addr : BitVec w) (n m : Nat) :
       rw [BitVec.ofNat_add, BitVec.add_assoc, BitVec.add_comm _ 1#w]
     rw [h, ← ih]
 
-theorem length_read_bytesLE (addr : BitVec w) (len : Nat) :
-    (mem.read_bytesLE addr len).length = len := by
-  induction len generalizing addr with
+theorem length_read_bytesLE (addr : BitVec w) (k : Nat) :
+    (mem.read_bytesLE addr k).length = k := by
+  induction k generalizing addr with
   | zero => rw [read_bytesLE_len_zero, List.length_nil]
-  | succ len ih => rw [read_bytesLE_len_succ, List.length_cons, ih]
+  | succ k ih => rw [read_bytesLE_len_succ, List.length_cons, ih]
 
 theorem read_bytesLE_asNat_len_zero (addr : BitVec w) :
     mem.read_bytesLE_asNat addr 0 = 0 := by
   rw [read_bytesLE_asNat]
 
-theorem read_bytesLE_asNat_len_succ (addr : BitVec w) (len : Nat) :
-    mem.read_bytesLE_asNat addr (len + 1)
-    = (mem (addr + .ofNat _ len)).toNat * 2^(8 * len)
-      + mem.read_bytesLE_asNat addr len := by
+theorem read_bytesLE_asNat_len_succ (addr : BitVec w) (k : Nat) :
+    mem.read_bytesLE_asNat addr (k + 1)
+    = (mem (addr + .ofNat _ k)).toNat * 2^(8 * k)
+      + mem.read_bytesLE_asNat addr k := by
   rw [read_bytesLE_asNat]
 
-theorem read_bytesLE_eq_toNatLE (addr : BitVec w) (len : Nat) :
-    (mem.read_bytesLE addr len).toNatLE = mem.read_bytesLE_asNat addr len := by
-  induction len generalizing addr with
+theorem read_bytesLE_eq_toNatLE (addr : BitVec w) (k : Nat) :
+    (mem.read_bytesLE addr k).toNatLE = mem.read_bytesLE_asNat addr k := by
+  induction k generalizing addr with
   | zero => simp [read_bytesLE, read_bytesLE_asNat, ByteList.toNatLE_nil]
   | succ _ ih =>
     rw [read_bytesLE_len_add, ByteList.toNatLE_append,
