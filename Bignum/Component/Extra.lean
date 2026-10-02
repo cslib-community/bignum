@@ -80,16 +80,4 @@ def zerotop_16 : Component (BitVec 32) (BitVec 16) :=
 def zerotop_8 : Component (BitVec 16) (BitVec 8) :=
   .through (BitVec.truncate 8) (BitVec.truncate 16)
 
-/--
-Component for reading a writing bytes to memory.
--/
-def bytes_read {w : Nat} (addr : BitVec w) (n : Nat)
-    (mem : BitVec w → BitVec 8) : Nat :=
-  -- TODO: Move this to memory and return a ByteList.
-  -- Then prove that ByteList.toNatLE equals this number.
-  match n with
-  | 0 => 0
-  | n + 1 =>
-    bytes_read addr n mem + 2 ^ (8 * n) * (mem (addr + .ofNat _ n)).toNat
-
 end Bignum.Component

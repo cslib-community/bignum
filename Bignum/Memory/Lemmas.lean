@@ -30,6 +30,15 @@ theorem toNatLE_cons (b : BitVec 8) (bs : ByteList) :
     ByteList.toNatLE (b :: bs) = b.toNat + bs.toNatLE * 256 := by
   rw [toNatLE, List.foldr_cons, ← toNatLE, Nat.shiftLeft_eq]
 
+theorem toNatLE_append (bs₁ bs₂ : ByteList) :
+    ByteList.toNatLE (bs₁ ++ bs₂)
+    = bs₁.toNatLE + bs₂.toNatLE * 2 ^ (8 * bs₁.length) := by
+  induction bs₁ generalizing bs₂ with
+  | nil => simp [toNatLE_nil]
+  | cons b bs₁ ih =>
+    simp [List.cons_append, toNatLE_cons, Nat.add_assoc,
+      ih, Nat.add_mul, Nat.mul_add, Nat.pow_add, Nat.mul_assoc]
+
 theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256^bs.length := by
   unfold toNatLE
   conv => lhs; arg 1; intro _ _; rw [Nat.shiftLeft_eq]; simp
@@ -99,4 +108,61 @@ theorem ofIntLE_ofNat (k : Nat) (n : Nat) :
   simp; rw [ofNatLE_mod]
 
 end ByteList
+
+/-! ## Memory -/
+
+namespace Memory
+variable {w : Nat} (mem : Memory w)
+
+theorem read_bytesLE_len_zero (addr : BitVec w) :
+    mem.read_bytesLE addr 0 = [] := by
+  rw [read_bytesLE]
+
+theorem read_bytesLE_len_succ (addr : BitVec w) (len : Nat) :
+    mem.read_bytesLE addr (len + 1)
+    = mem addr :: mem.read_bytesLE (addr + 1#w) len:= by
+  rw [read_bytesLE]
+
+theorem read_bytesLE_len_add (addr : BitVec w) (n m : Nat) :
+    mem.read_bytesLE addr (n + m)
+    = mem.read_bytesLE addr n
+    ++ mem.read_bytesLE (addr + BitVec.ofNat w n) m := by
+  induction n generalizing addr m with
+  | zero => simp [read_bytesLE_len_zero]
+  | succ n ih =>
+    rw [Nat.add_comm, ← Nat.add_assoc,
+      read_bytesLE_len_succ, Nat.add_comm,
+      read_bytesLE_len_succ, List.cons_append]
+    have h : addr + BitVec.ofNat w (n + 1)
+             = addr + 1#w + BitVec.ofNat w n := by
+      rw [BitVec.ofNat_add, BitVec.add_assoc, BitVec.add_comm _ 1#w]
+    rw [h, ← ih]
+
+theorem length_read_bytesLE (addr : BitVec w) (len : Nat) :
+    (mem.read_bytesLE addr len).length = len := by
+  induction len generalizing addr with
+  | zero => rw [read_bytesLE_len_zero, List.length_nil]
+  | succ len ih => rw [read_bytesLE_len_succ, List.length_cons, ih]
+
+theorem read_bytesLE_asNat_len_zero (addr : BitVec w) :
+    mem.read_bytesLE_asNat addr 0 = 0 := by
+  rw [read_bytesLE_asNat]
+
+theorem read_bytesLE_asNat_len_succ (addr : BitVec w) (len : Nat) :
+    mem.read_bytesLE_asNat addr (len + 1)
+    = (mem (addr + .ofNat _ len)).toNat * 2^(8 * len)
+      + mem.read_bytesLE_asNat addr len := by
+  rw [read_bytesLE_asNat]
+
+theorem read_bytesLE_eq_toNatLE (addr : BitVec w) (len : Nat) :
+    (mem.read_bytesLE addr len).toNatLE = mem.read_bytesLE_asNat addr len := by
+  induction len generalizing addr with
+  | zero => simp [read_bytesLE, read_bytesLE_asNat, ByteList.toNatLE_nil]
+  | succ _ ih =>
+    rw [read_bytesLE_len_add, ByteList.toNatLE_append,
+      read_bytesLE_asNat_len_succ, ih]
+    conv => rhs; rw [Nat.add_comm]
+    congr; simp [length_read_bytesLE]
+
+end Memory
 end Bignum

@@ -34,7 +34,7 @@ Truncates the list if `n` is too large.
 def ofNatLE (len n : Nat) : ByteList :=
   match len with
   | 0 => []
-  | size' + 1 => BitVec.ofNat 8 n :: ByteList.ofNatLE size' (n >>> 8)
+  | len + 1 => BitVec.ofNat 8 n :: ByteList.ofNatLE len (n >>> 8)
 
 /--
 Converts an integer `n` to a little-endian byte list of `len` bytes.
@@ -45,12 +45,32 @@ def ofIntLE (len : Nat) (n : Int) : ByteList :=
 
 end ByteList
 
-namespace Memory
-universe u
-variable {α : Type u} (memory : Component α (BitVec 64))
+/-! ## Byte-addressable memory -/
 
--- def bytes_loaded (a : α) (pc : BitVec 64) (bs : ByteList) : Prop :=
---   sorry
+abbrev Memory (w : Nat) := BitVec w → BitVec 8
+
+namespace Memory
+
+/--
+Reads `len` bytes from `memory` starting at offset `addr`.
+Returns a little-endian byte list.
+-/
+def read_bytesLE
+    {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : ByteList :=
+  match len with
+  | 0 => []
+  | len + 1 => mem addr :: mem.read_bytesLE (addr + 1#w) len
+
+/--
+Reads `len` bytes from `memory` starting at offset `addr`.
+Returns the little-endian encoded result a natural number.
+-/
+def read_bytesLE_asNat
+    {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : Nat :=
+  match len with
+  | 0 => 0
+  | len + 1 => (mem (addr + .ofNat _ len)).toNat * 2 ^ (8 * len)
+      + mem.read_bytesLE_asNat addr len
 
 end Memory
 end Bignum
