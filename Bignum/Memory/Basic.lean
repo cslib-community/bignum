@@ -94,7 +94,7 @@ def write_bytesLE_asNat
   match len with
   | 0 => mem
   | k + 1 => let mem' := λ x ↦
-        if x == addr + .ofNat w k
+        if x == addr + .ofNat _ k
         then .ofNat 8 (n / 2^(8 * k) % 2^8) else mem x
       write_bytesLE_asNat mem' addr k n
 
