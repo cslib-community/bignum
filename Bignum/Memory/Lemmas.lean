@@ -227,6 +227,16 @@ theorem write_bytesLE_asNat_succ (addr : BitVec w) (k n : Nat) :
         then .ofNat 8 (n / 2^(8 * k) % 2^8) else mem x) addr k n := by
   rw [write_bytesLE_asNat]
 
+theorem write_bytesLE_add (addr : BitVec w) (n m : Nat) (bs : ByteList) :
+    mem.write_bytesLE addr (n + m) bs =
+    (mem.write_bytesLE addr n bs).write_bytesLE
+      (addr + .ofNat _ n) m (bs.drop n) := by
+  induction n generalizing mem addr m bs with
+  | zero => simp [write_bytesLE_zero]
+  | succ _ ih =>
+    conv => lhs; rw [Nat.add_assoc, Nat.add_comm 1, ih, write_bytesLE_succ']
+    simp [ih, BitVec.ofNat_add, BitVec.add_assoc]
+
 -- theorem write_bytesLE_eq_asNat (addr : BitVec w) (k : Nat) (bs : ByteList) :
 --     mem.write_bytesLE addr k bs
 --     = mem.write_bytesLE_asNat addr k (bs.toNatLE) := by
