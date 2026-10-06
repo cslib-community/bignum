@@ -169,8 +169,8 @@ theorem write_bytesLE_zero (addr : BitVec w) (bs : ByteList) :
 
 theorem write_bytesLE_succ (addr : BitVec w) (k : Nat) (bs : ByteList) :
     mem.write_bytesLE addr (k + 1) bs =
-    write_bytesLE (λ x ↦
-      if x = addr then bs.headD 0#8 else mem x) (addr + 1#w) k bs.tail := by
+    write_bytesLE (fun x => if x = addr then bs.headD 0#8 else mem x)
+      (addr + 1#w) k bs.tail := by
   simp [write_bytesLE]
 
 theorem write_bytesLE_succ' (addr : BitVec w) (k : Nat) (bs : ByteList) :
@@ -200,13 +200,14 @@ theorem write_bytesLE_cons
     (addr : BitVec w) (k : Nat) (b : BitVec 8) (bs : ByteList) :
     mem.write_bytesLE addr k (b :: bs) =
     if k = 0 then mem
-    else (mem.write_bytesLE addr 1 [b]).write_bytesLE (addr + 1) k.pred bs := by
+    else (mem.write_bytesLE addr 1 [b]).write_bytesLE
+      (addr + 1) k.pred bs := by
   cases _ : k with
   | zero => apply write_bytesLE_zero_cons
   | succ _ => apply write_bytesLE_succ_cons
 
 theorem write_bytesLE_take (addr : BitVec w) (k : Nat) (bs : ByteList) :
-    mem.write_bytesLE addr k bs = mem.write_bytesLE addr k (bs.take k) := by
+    mem.write_bytesLE addr k (bs.take k) = mem.write_bytesLE addr k bs := by
   induction bs generalizing mem addr k with
   | nil => simp
   | cons _ _ ih =>
@@ -214,7 +215,7 @@ theorem write_bytesLE_take (addr : BitVec w) (k : Nat) (bs : ByteList) :
     | zero => apply write_bytesLE_zero
     | succ _ =>
       rw [write_bytesLE_cons, write_bytesLE_cons, write_bytesLE_succ_cons]
-      simp [write_bytesLE_zero]; rw [ih, ← write_bytesLE_succ_cons, ← h]
+      simp [write_bytesLE_zero]; rw [← ih, ← write_bytesLE_succ_cons, ← h]
 
 theorem write_bytesLE_asNat_zero (addr : BitVec w) (n : Nat) :
     mem.write_bytesLE_asNat addr 0 n = mem := by
@@ -222,7 +223,7 @@ theorem write_bytesLE_asNat_zero (addr : BitVec w) (n : Nat) :
 
 theorem write_bytesLE_asNat_succ (addr : BitVec w) (k n : Nat) :
     mem.write_bytesLE_asNat addr (k + 1) n =
-    write_bytesLE_asNat (λ x ↦ if x = addr + .ofNat _ k
+    write_bytesLE_asNat (fun x => if x = addr + .ofNat _ k
         then .ofNat 8 (n / 2^(8 * k) % 256) else mem x) addr k n := by
   simp [write_bytesLE_asNat]
 
@@ -245,7 +246,7 @@ theorem write_bytesLE_add (addr : BitVec w) (n m : Nat) (bs : ByteList) :
 
 -- theorem write_bytesLE_succ'' (addr : BitVec w) (k : Nat) (bs : ByteList) :
 --     mem.write_bytesLE addr (k + 1) bs =
---     write_bytesLE (λ x ↦
+--     write_bytesLE (fun x =>
 --       if x = addr + .ofNat _ k
 --       then (bs.getD k 0#8) else mem x) addr k bs := by
 --   induction k generalizing mem addr bs with
