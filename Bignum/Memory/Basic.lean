@@ -83,7 +83,8 @@ def write_bytesLE
   match len with
   | 0 => mem
   | k + 1 =>
-    write_bytesLE (fun x => if x == addr then bs.headD 0 else mem x)
+    write_bytesLE
+      (fun x => if x == addr then bs.headD 0#8 else mem x)
       (addr + 1#w) k bs.tail
 
 /--

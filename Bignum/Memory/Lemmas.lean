@@ -115,6 +115,8 @@ end ByteList
 namespace Memory
 variable {w : Nat} (mem : Memory w)
 
+/-! ### read_bytesLE -/
+
 theorem read_bytesLE_zero (addr : BitVec w) :
     mem.read_bytesLE addr 0 = [] := by
   rw [read_bytesLE]
@@ -162,6 +164,8 @@ theorem read_bytesLE_toNatLE_eq_asNat (addr : BitVec w) (k : Nat) :
       read_bytesLE_asNat_succ, ih]
     conv => rhs; rw [Nat.add_comm]
     congr; simp [length_read_bytesLE]
+
+/-! ### write_bytesLE -/
 
 theorem write_bytesLE_zero (addr : BitVec w) (bs : ByteList) :
     mem.write_bytesLE addr 0 bs = mem := by
@@ -217,6 +221,16 @@ theorem write_bytesLE_take (addr : BitVec w) (k : Nat) (bs : ByteList) :
       rw [write_bytesLE_cons, write_bytesLE_cons, write_bytesLE_succ_cons]
       simp [write_bytesLE_zero]; rw [← ih, ← write_bytesLE_succ_cons, ← h]
 
+theorem write_bytesLE_add (addr : BitVec w) (n m : Nat) (bs : ByteList) :
+    mem.write_bytesLE addr (n + m) bs =
+    (mem.write_bytesLE addr n bs).write_bytesLE
+      (addr + .ofNat _ n) m (bs.drop n) := by
+  induction n generalizing mem addr m bs with
+  | zero => simp [write_bytesLE_zero]
+  | succ _ ih =>
+    conv => lhs; rw [Nat.add_assoc, Nat.add_comm 1, ih, write_bytesLE_succ']
+    simp [ih, BitVec.ofNat_add, BitVec.add_assoc]
+
 theorem write_bytesLE_asNat_zero (addr : BitVec w) (n : Nat) :
     mem.write_bytesLE_asNat addr 0 n = mem := by
   rw [write_bytesLE_asNat]
@@ -234,29 +248,33 @@ theorem write_bytesLE_asNat_succ' (addr : BitVec w) (k n : Nat) :
         addr k n := by
   simp [write_bytesLE_asNat_succ, write_bytesLE_asNat_zero]
 
-theorem write_bytesLE_add (addr : BitVec w) (n m : Nat) (bs : ByteList) :
-    mem.write_bytesLE addr (n + m) bs =
-    (mem.write_bytesLE addr n bs).write_bytesLE
-      (addr + .ofNat _ n) m (bs.drop n) := by
-  induction n generalizing mem addr m bs with
-  | zero => simp [write_bytesLE_zero]
-  | succ _ ih =>
-    conv => lhs; rw [Nat.add_assoc, Nat.add_comm 1, ih, write_bytesLE_succ']
-    simp [ih, BitVec.ofNat_add, BitVec.add_assoc]
+theorem write_bytesLE_succ'' (addr : BitVec w) (k : Nat) (bs : ByteList) :
+    mem.write_bytesLE addr (k + 1) bs =
+    (mem.write_bytesLE addr k bs).write_bytesLE
+      (addr + .ofNat _ k) 1 (bs.drop k) := by
+  rw [write_bytesLE_add]
 
--- theorem write_bytesLE_succ'' (addr : BitVec w) (k : Nat) (bs : ByteList) :
+theorem write_bytesLE_comm₁
+    (addr₁ addr₂ : BitVec w) (bs₁ bs₂ : ByteList) (h : addr₁ ≠ addr₂) :
+    (mem.write_bytesLE addr₁ 1 bs₁).write_bytesLE addr₂ 1 bs₂ =
+    (mem.write_bytesLE addr₂ 1 bs₂).write_bytesLE addr₁ 1 bs₁ := by
+  simp only [write_bytesLE_succ, write_bytesLE_zero]
+  ext addr _ _; by_cases ha : addr = addr₁ <;> simp [ha, h]
+
+-- theorem write_bytesLE_succ'''
+--     (addr : BitVec w) (k : Nat) (bs : ByteList) :
 --     mem.write_bytesLE addr (k + 1) bs =
---     write_bytesLE (fun x =>
---       if x = addr + .ofNat _ k
---       then (bs.getD k 0#8) else mem x) addr k bs := by
---   induction k generalizing mem addr bs with
---   | zero =>
---     simp only [write_bytesLE_zero, write_bytesLE_succ]
---     rw [List.headD_eq_getD]; simp
---   | succ k ih =>
---     conv => lhs; rw [write_bytesLE_succ, ih]
---     conv => rhs; rw []
---     sorry
+--     (mem.write_bytesLE
+--       (addr + .ofNat _ k) 1 (bs.drop k)).write_bytesLE addr k bs := by
+--   induction k using Nat.caseStrongRecOn generalizing mem addr bs with
+--   | zero => simp [write_bytesLE]
+--   | _ k ih =>
+--     rw [write_bytesLE_succ', ih _ (Nat.le_of_eq rfl)]
+--     rw [BitVec.add_assoc, BitVec.add_comm 1#w, ← BitVec.ofNat_add]
+--     rw [write_bytesLE_comm₁]
+--     rw [← write_bytesLE_succ']
+--     · simp
+--     · sorry -- addr ≠ addr + BitVec.ofNat w (k + 1)
 
 -- theorem write_bytesLE_eq_asNat (addr : BitVec w) (k : Nat) (bs : ByteList) :
 --     mem.write_bytesLE addr k bs =
@@ -268,6 +286,7 @@ theorem write_bytesLE_add (addr : BitVec w) (n m : Nat) (bs : ByteList) :
 --     conv => rhs; rw [write_bytesLE_asNat_succ', ← ih]
 --     simp [write_bytesLE_asNat_succ, write_bytesLE_asNat_zero, ← ih]
 --     rw [← write_bytesLE_add]
+--     --rw [write_bytesLE_succ]
 --     sorry
 
 end Memory
