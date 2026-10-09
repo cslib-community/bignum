@@ -70,8 +70,8 @@ def read_bytesLE_asNat
   match len with
   | 0 => 0
   | k + 1 =>
-    (mem (addr + .ofNat _ k)).toNat * 2^(8 * k) +
-      mem.read_bytesLE_asNat addr k
+    mem.read_bytesLE_asNat addr k +
+      (mem (addr + .ofNat _ k)).toNat * 2^(8 * k)
 
 /--
 Writes `len` bytes from `bs` to memory starting at offset `addr`.
@@ -98,10 +98,20 @@ def write_bytesLE_asNat {w : Nat}
   | 0 => mem
   | k + 1 =>
     write_bytesLE_asNat (fun x =>
-      if x == addr + .ofNat _ k
-      then .ofNat 8 (n / 2^(8 * k) % 2^8)
-      else mem x)
-    addr k n
+        if x == addr + .ofNat _ k
+        then .ofNat 8 (n / 2^(8 * k) % 2^8)
+        else mem x)
+      addr k n
+
+def write_bytesLE_asNat' {w : Nat}
+    (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
+    Memory w :=
+  match len with
+  | 0 => mem
+  | k + 1 =>
+    write_bytesLE_asNat'
+      (fun x => if x == addr then .ofNat 8 (n % 256) else mem x)
+      (addr + 1#w) k (n / 256)
 
 end Memory
 end Bignum

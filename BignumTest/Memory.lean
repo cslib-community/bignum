@@ -21,14 +21,38 @@ example : ByteList.ofIntLE 1 (-129) = [0x7f] := by rfl
 /-! ## Memory -/
 
 def mem : Memory 64 := BitVec.truncate 8
+
+/-! ### read_bytesLE -/
+
 example : mem.read_bytesLE 0 4 = [0x00#8, 0x01#8, 0x02#8, 0x03#8] := by rfl
 example : mem.read_bytesLE_asNat 0 4 = 0x03020100 := by rfl
-example : (mem.read_bytesLE 0 4).toNatLE
-  = mem.read_bytesLE_asNat 0 4 := by rfl
-example : (mem.read_bytesLE 8 13).toNatLE
-  = mem.read_bytesLE_asNat 8 13 := by rfl
+example : mem.read_bytesLE_asNat 0 4 = 50462976 := by rfl
 
-example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4
-    = [0xaa#8, 0xbb#8, 0x04#8, 0x05#8] := by rfl
-example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4
-    = (mem.write_bytesLE_asNat 2 2 48042).read_bytesLE 2 4 := by rfl
+example : (mem.read_bytesLE 0 4).toNatLE =
+    mem.read_bytesLE_asNat 0 4 := by rfl
+example : (mem.read_bytesLE 8 13).toNatLE =
+    mem.read_bytesLE_asNat 8 13 := by rfl
+
+/-! ### write_bytesLE -/
+
+-- wraps around and starts reading from the beginning of the address space
+example : mem.read_bytesLE (BitVec.allOnes 64) 3
+    = [0xff#8, 0x00#8, 0x01#8] := by rfl
+example: mem.read_bytesLE_asNat (BitVec.allOnes 64) 3
+    = 65791 := by rfl
+
+example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4 =
+    [0xaa#8, 0xbb#8, 0x04#8, 0x05#8] := by rfl
+
+example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4 =
+    (mem.write_bytesLE_asNat 2 2 48042).read_bytesLE 2 4 := by rfl
+
+-- wraps around and starts writing to the beginning of the address space
+example : (mem.write_bytesLE_asNat
+    (.allOnes 64) 3 0x010203).read_bytesLE (.allOnes 64) 3 =
+    [0x03, 0x02, 0x01] := by rfl
+
+
+-- #eval (λ n ↦ BitVec.ofNat 8 (n / 2^(8 * 4) % 2^8)) 0x08070605
+-- #eval (mem.write_bytesLE_asNat 0xf 4 0x08070605).read_bytesLE (0xf-1) 6
+-- #eval (mem.write_bytesLE_asNat' 0xf 4 0x08070605).read_bytesLE (0xf-1) 6
