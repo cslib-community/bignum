@@ -16,6 +16,10 @@ set_option autoImplicit false
 
 namespace BitVec
 
+theorem ofNat_mod {w : Nat} (n : Nat) :
+    BitVec.ofNat w (n % 2^w) = BitVec.ofNat w n := by
+  apply BitVec.eq_of_toNat_eq; simp [BitVec.toNat_ofNat]
+
 theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
     (x.setLsb i b).getLsb j = if i = j then b else x.getLsb j := by
   unfold setLsb; cases b <;> by_cases h : i = j <;>
