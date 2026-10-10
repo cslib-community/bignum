@@ -30,21 +30,19 @@ theorem toNatLE_cons (b : BitVec 8) (bs : ByteList) :
     ByteList.toNatLE (b :: bs) = b.toNat + bs.toNatLE * 256 := by
   rw [toNatLE, List.foldr_cons, ← toNatLE, Nat.shiftLeft_eq]
 
--- theorem toNatLE_tail (bs : ByteList) :
---     ByteList.toNatLE bs.tail = ((ByteList.toNatLE bs) / 256) := by
---   cases bs with
---   | nil => simp [toNatLE_nil]
---   | cons b bs' =>
---     simp [toNatLE_cons, Nat.add_div]
---     sorry
+theorem toNatLE_tail (bs : ByteList) :
+    ByteList.toNatLE bs.tail = (bs.toNatLE) / 256 := by
+  cases bs with
+  | nil => simp [toNatLE_nil]
+  | cons b _ => simp [toNatLE_cons,
+      Nat.add_mul_div_right _ _ (Nat.zero_lt_succ _), b.isLt]
 
 theorem toNatLE_append (bs₁ bs₂ : ByteList) :
     ByteList.toNatLE (bs₁ ++ bs₂) =
     bs₁.toNatLE + bs₂.toNatLE * 2 ^ (8 * bs₁.length) := by
   induction bs₁ generalizing bs₂ with
   | nil => simp [toNatLE_nil]
-  | cons _ _ ih =>
-    simp [List.cons_append, toNatLE_cons, Nat.add_assoc,
+  | cons _ _ ih => simp [List.cons_append, toNatLE_cons, Nat.add_assoc,
       ih, Nat.add_mul, Nat.mul_add, Nat.pow_add, Nat.mul_assoc]
 
 theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256^bs.length := by
