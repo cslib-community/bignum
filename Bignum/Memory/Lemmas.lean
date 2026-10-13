@@ -19,6 +19,9 @@ set_option autoImplicit false
 
 namespace Bignum
 
+theorem Nat.mod_pow_lt (n m k : Nat) (h : m > 0) : n % m^k < m^k :=
+  Nat.mod_lt _ (Nat.pow_pos h)
+
 /-! ## Byte list -/
 
 namespace ByteList
@@ -41,6 +44,19 @@ theorem toNatLE_tail (bs : ByteList) :
   | nil => simp [toNatLE_nil]
   | cons b _ => simp [toNatLE_cons,
       Nat.add_mul_div_right _ _ (Nat.zero_lt_succ _), b.isLt]
+
+theorem toNatLE_take (k : Nat) (bs : ByteList) :
+    ByteList.toNatLE (bs.take k) = bs.toNatLE % 2^(8 * k) := by
+  induction k generalizing bs with
+  | zero => simp [toNatLE_nil, Nat.mod_one]
+  | succ k ih =>
+    cases bs with
+    | nil => simp [toNatLE_nil]
+    | cons b _ =>
+      have h : 2^(8 * k) * 256 = 2^(8 * (k + 1)) := by
+        rw [Nat.mul_add, Nat.pow_add]
+      simp [toNatLE_cons, ih, ← Nat.mul_mod_mul_right,
+        h, b.toNat_add_mod_shift]
 
 theorem toNatLE_append (bs₁ bs₂ : ByteList) :
     ByteList.toNatLE (bs₁ ++ bs₂) =

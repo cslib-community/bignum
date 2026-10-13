@@ -26,6 +26,14 @@ theorem ofNat_mod_cancel_of_ge {w : Nat} (n m : Nat) (h : m ≥ w):
   rw [BitVec.toNat_ofNat, BitVec.toNat_ofNat]
   exact Nat.mod_mod_of_dvd _ (Nat.pow_dvd_pow _ h)
 
+theorem toNat_add_mod_shift (b : BitVec 8) (n k : Nat) :
+    b.toNat + n * 256 % 2^(8 * (k + 1)) =
+    (b.toNat + n * 256) % 2^(8 * (k + 1)) := by
+  have h : 2^(8 * (k + 1)) = 256 * 2^(8 * k) := by
+    rw [Nat.mul_add_one, Nat.pow_add, Nat.mul_comm]
+  rw [h, Nat.mul_comm n, ← Nat.add_mod_mod, Nat.mul_mod_mul_left]
+  symm; apply Nat.mod_eq_of_lt; omega
+
 theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
     (x.setLsb i b).getLsb j = if i = j then b else x.getLsb j := by
   unfold setLsb; cases b <;> by_cases h : i = j <;>
@@ -33,8 +41,8 @@ theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
 
 theorem overwriteLsb'_extractLsb'_low {w : Nat} (start len : Nat)
     (x : BitVec w) (y : BitVec len) :
-    (x.overwriteLsb' start len y).extractLsb' 0 start
-    = x.extractLsb' 0 start := by
+    (x.overwriteLsb' start len y).extractLsb' 0 start =
+    x.extractLsb' 0 start := by
   simp only [overwriteLsb', setWidth_append]
   by_cases h₁ : w ≤ start <;> simp [h₁]
   · rw [setWidth_extractLsb'_of_le h₁, extractLsb'_eq_self]
@@ -44,15 +52,15 @@ theorem overwriteLsb'_extractLsb'_low {w : Nat} (start len : Nat)
 
 theorem overwriteLsb'_extractLsb'_mid {w : Nat} (start len : Nat)
     (x : BitVec w) (y : BitVec len) :
-    (x.overwriteLsb' start len y).extractLsb' start len
-    = (y.extractLsb' 0 (w - start)).setWidth len := by
+    (x.overwriteLsb' start len y).extractLsb' start len =
+    (y.extractLsb' 0 (w - start)).setWidth len := by
   -- TODO: Remove grind.
   simp only [overwriteLsb', setWidth_append]; grind
 
 theorem overwriteLsb'_extractLsb'_high {w : Nat} (start len : Nat)
     (x : BitVec w) (y : BitVec len) :
-    (x.overwriteLsb' start len y).extractLsb' (start + len) w
-    = x.extractLsb' (start + len) w := by
+    (x.overwriteLsb' start len y).extractLsb' (start + len) w =
+    x.extractLsb' (start + len) w := by
   -- TODO: Remove grind.
   simp only [overwriteLsb', setWidth_append]; grind
 
