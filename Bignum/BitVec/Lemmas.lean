@@ -16,9 +16,15 @@ set_option autoImplicit false
 
 namespace BitVec
 
-theorem ofNat_mod {w : Nat} (n : Nat) :
+theorem ofNat_mod_cancel {w : Nat} (n : Nat) :
     BitVec.ofNat w (n % 2^w) = BitVec.ofNat w n := by
   apply BitVec.eq_of_toNat_eq; simp [BitVec.toNat_ofNat]
+
+theorem ofNat_mod_cancel_of_ge {w : Nat} (n m : Nat) (h : m ≥ w):
+    BitVec.ofNat w (n % 2^m) = BitVec.ofNat w n := by
+  apply BitVec.eq_of_toNat_eq
+  rw [BitVec.toNat_ofNat, BitVec.toNat_ofNat]
+  exact Nat.mod_mod_of_dvd _ (Nat.pow_dvd_pow _ h)
 
 theorem setLsb_getLsb {w : Nat} (x : BitVec w) (i j : Fin w) (b : Bool) :
     (x.setLsb i b).getLsb j = if i = j then b else x.getLsb j := by
