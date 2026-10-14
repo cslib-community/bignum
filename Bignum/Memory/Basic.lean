@@ -5,8 +5,6 @@ Author(s): Guilherme Lima
 -/
 module
 
-public import Bignum.Component
-
 @[expose] public section
 
 /-! # Memory operations -/
@@ -50,6 +48,14 @@ end ByteList
 abbrev Memory (w : Nat) := BitVec w → BitVec 8
 
 namespace Memory
+
+/-- The all zeros memory. -/
+def allZeros {w : Nat} : Memory w :=
+  λ _ ↦ 0#8
+
+/-- The all ones memory. -/
+def allOnes {w : Nat} : Memory w :=
+  λ _ ↦ .allOnes 8
 
 /--
 Reads `len` bytes from memory starting at offset `addr`.

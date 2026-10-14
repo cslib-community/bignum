@@ -714,3 +714,9 @@ example : ((Q0 :> LANE_D 0).read (Q0.write 0xff00bb01ffff0a01 S₀))
           = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
 example : ((Q0 :> LANE_D 1).read (Q0.write (0xff00bb01ffff0a01 <<< 64) S₀))
           = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
+
+/-! ## Memory components -/
+
+example : (bytes 0 2).read S₀ = [0#8, 0#8] := by rfl
+example : (bytes 0 2).read ((bytes 0 2).write [1#8, 2#8] S₀) =
+    [1#8, 2#8] := by rfl

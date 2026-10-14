@@ -7,6 +7,7 @@ module
 
 public import Bignum.BitVec
 public import Bignum.Component
+public import Bignum.Memory
 public import Bignum.Relational
 
 @[expose] public section
@@ -42,7 +43,7 @@ structure State where
   _flags : BitVec 4
 
   /-- Byte-addressable memory with a 64-bit address space. -/
-  _memory : BitVec 64 → BitVec 8
+  _memory : Memory 64
 
   /-- Observable uarch events. -/
   _events : List UArchEvent
@@ -55,17 +56,17 @@ def allZeros : State := {
   _registers     := λ _ ↦ 0
   _simdregisters := λ _ ↦ 0
   _flags         := 0
-  _memory        := λ _ ↦ 0
+  _memory        := .allZeros
   _events        := []
 }
 
 /-- The all ones state. -/
 def allOnes : State := {
-  _PC            := BitVec.allOnes 64
-  _registers     := λ _ ↦ BitVec.allOnes 64
-  _simdregisters := λ _ ↦ BitVec.allOnes 128
-  _flags         := BitVec.allOnes 4
-  _memory        := λ _ ↦ BitVec.allOnes 8,
+  _PC            := .allOnes 64
+  _registers     := λ _ ↦ .allOnes 64
+  _simdregisters := λ _ ↦ .allOnes 128
+  _flags         := .allOnes 4
+  _memory        := .allOnes
   _events        := []
 }
 
@@ -86,7 +87,7 @@ def simdregisters : Component State (BitVec 5 → BitVec 128) :=
 def flags : Component State (BitVec 4) :=
   ⟨λ s ↦ s._flags, λ x s ↦ {s with _flags := x}⟩
 
-def memory : Component State (BitVec 64 → BitVec 8) :=
+def memory : Component State (Memory 64) :=
   ⟨λ s ↦ s._memory, λ x s ↦ {s with _memory := x}⟩
 
 def events : Component State (List UArchEvent) :=
@@ -554,6 +555,13 @@ def State.offset_writeback (s : State) (oty : OffsetType) : BitVec 64 :=
   | .immediate _ => 0
   | .preimmediate bv => bv
   | .postimmediate bv => bv
+
+/-! ## Memory components -/
+
+/-- Multi-byte chunk of memory in little-endian encoding. -/
+def bytes (addr : BitVec 64) (len : Nat) :
+    Component State ByteList :=
+  memory :> .bytesLE addr len
 
 /-! ## General register-register instructions -/
 

@@ -7,6 +7,7 @@ module
 
 public import Bignum.BitVec
 public import Bignum.Component.Basic
+public import Bignum.Memory
 
 @[expose] public section
 
@@ -15,6 +16,8 @@ public import Bignum.Component.Basic
 set_option autoImplicit false
 
 namespace Bignum.Component
+
+/-! ## Bitvector -/
 
 /--
 Component for a bit within a bitvector.
@@ -79,5 +82,18 @@ def zerotop_16 : Component (BitVec 32) (BitVec 16) :=
 
 def zerotop_8 : Component (BitVec 16) (BitVec 8) :=
   .through (BitVec.truncate 8) (BitVec.truncate 16)
+
+/-! ## Memory -/
+
+/--
+Component for a multi-byte chunk of memory in little-endian encoding.  The
+chunk is represented as a byte list.  `addr` is the address from (to) which
+the chunk should be read (written).  `len` is the size of the chunk in
+bytes.
+-/
+def bytesLE {w : Nat} (addr : BitVec w) (len : Nat) :
+    Component (Memory w) ByteList :=
+  ⟨fun mem ↦ Memory.read_bytesLE mem addr len,
+   fun bs mem ↦ Memory.write_bytesLE mem addr len bs⟩
 
 end Bignum.Component
