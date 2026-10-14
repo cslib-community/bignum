@@ -51,6 +51,10 @@ example : flags.read (PC.write 1 S₀) = 0 := by rfl
 example : PC.read (PC.write 1 S₁) = 1 := by rfl
 example : flags.read (PC.write 1 S₁) = .allOnes 4 := by rfl
 
+example : S₀.read PC = S₀._PC := by rfl
+example : S₁.read PC = S₁._PC := by rfl
+example : (S₀.write PC (.allOnes 64)).read PC = .allOnes 64 := by rfl
+
 /-! ## Condition flags -/
 
 example : NF.read S₀ = false := by rfl
@@ -717,6 +721,6 @@ example : ((Q0 :> LANE_D 1).read (Q0.write (0xff00bb01ffff0a01 <<< 64) S₀))
 
 /-! ## Memory components -/
 
-example : (bytes 0 2).read S₀ = [0#8, 0#8] := by rfl
-example : (bytes 0 2).read ((bytes 0 2).write [1#8, 2#8] S₀) =
+example : S₀.read (bytes 0 2) = [0#8, 0#8] := by rfl
+example : (S₀.write (bytes 0 2) [1#8, 2#8]).read (bytes 0 2) =
     [1#8, 2#8] := by rfl

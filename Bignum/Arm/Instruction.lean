@@ -18,6 +18,8 @@ set_option autoImplicit false
 
 namespace Bignum.Arm
 
+universe u
+
 /--
 Micro-architectural (uarch) events.
 -/
@@ -72,6 +74,14 @@ def allOnes : State := {
 
 instance : Inhabited State where
   default := allZeros
+
+/-- Reads from state component. -/
+def read (s : State) {α : Type u} (cp : Component State α) : α :=
+  cp.read s
+
+/-- Writes to state component. -/
+def write (s : State) {α : Type u} (cp : Component State α) (a : α) : State :=
+  cp.write a s
 
 end State
 
@@ -564,8 +574,6 @@ def bytes (addr : BitVec 64) (len : Nat) :
   memory :> .bytesLE addr len
 
 /-! ## General register-register instructions -/
-
-universe u
 
 def ADD {α : Type u} {w : Nat}
     (Rd : Component α (BitVec w))
