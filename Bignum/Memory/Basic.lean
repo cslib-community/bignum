@@ -64,13 +64,15 @@ def read_bytesLE
 /--
 Reads `len` bytes from memory starting at offset `addr`.
 Returns a little-endian encoded natural number.
+
+This definition corresponds to s2n-bignum's `FST bytes`.
 -/
-def read_bytesLE_asNat
+def read_bytesLE_Nat
     {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : Nat :=
   match len with
   | 0 => 0
   | k + 1 =>
-    mem.read_bytesLE_asNat addr k +
+    mem.read_bytesLE_Nat addr k +
       (mem (addr + .ofNat _ k)).toNat * 2^(8 * k)
 
 /--
@@ -84,33 +86,44 @@ def write_bytesLE
   | 0 => mem
   | k + 1 =>
     write_bytesLE
-      (fun x => if x == addr then bs.headD 0#8 else mem x)
+      (fun x ↦ if x == addr then bs.headD 0#8 else mem x)
       (addr + 1#w) k bs.tail
 
 /--
 Writes `len` bytes from `n` to memory starting at offset `addr`.
 Assumes that `n` is little-endian encoded.  Returns the updated memory.
+
+This definition corresponds to the method of s2n-bignum's component `bytes`.
+Notice that the writing is done in reverse order, i.e., from the end to the
+beginning of the address space (from `addr+k` to `addr`).  Because of this
+we cannot prove that this function is equivalent to `write_bytesLE` or
+`write_bytesLE_Nat`, unless we assume `len ≤ 2^w`.  See `???`.
 -/
-def write_bytesLE_asNat {w : Nat}
+def write_bytesLE_Nat' {w : Nat}
     (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
     Memory w :=
   match len with
   | 0 => mem
   | k + 1 =>
-    write_bytesLE_asNat (fun x =>
+    write_bytesLE_Nat' (fun x ↦
         if x == addr + .ofNat _ k
         then .ofNat 8 (n / 2^(8 * k) % 2^8)
         else mem x)
       addr k n
 
-def write_bytesLE_asNat' {w : Nat}
+/--
+Alternative version of `write_bytesLE_Nat'` which performs the writing in
+direct order, from the beginning to the end of the address space.  This
+function is equivalent to `write_bytesLE ∘ ByteList.ofNat`.
+-/
+def write_bytesLE_Nat {w : Nat}
     (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
     Memory w :=
   match len with
   | 0 => mem
   | k + 1 =>
-    write_bytesLE_asNat'
-      (fun x => if x == addr then .ofNat 8 (n % 256) else mem x)
+    write_bytesLE_Nat
+      (fun x ↦ if x == addr then .ofNat 8 (n % 256) else mem x)
       (addr + 1#w) k (n / 256)
 
 end Memory

@@ -19,9 +19,6 @@ set_option autoImplicit false
 
 namespace Bignum
 
-theorem Nat.mod_pow_lt (n m k : Nat) (h : m > 0) : n % m^k < m^k :=
-  Nat.mod_lt _ (Nat.pow_pos h)
-
 /-! ## Byte list -/
 
 namespace ByteList
@@ -157,9 +154,8 @@ theorem read_bytesLE_add (addr : BitVec w) (k₁ k₂ : Nat) :
   induction k₁ generalizing addr k₂ with
   | zero => simp [read_bytesLE_zero]
   | succ k₁ ih =>
-    rw [Nat.add_comm, ← Nat.add_assoc,
-      read_bytesLE_succ, Nat.add_comm,
-      read_bytesLE_succ, List.cons_append]
+    rw [Nat.add_comm, ← Nat.add_assoc]
+    simp [read_bytesLE_succ, Nat.add_comm, List.cons_append]
     have h : addr + BitVec.ofNat w (k₁ + 1) = addr + 1#w + .ofNat w k₁ := by
       rw [BitVec.ofNat_add, BitVec.add_assoc, BitVec.add_comm _ 1#w]
     rw [h, ← ih]
@@ -170,32 +166,30 @@ theorem length_read_bytesLE (addr : BitVec w) (k : Nat) :
   | zero => rw [read_bytesLE_zero, List.length_nil]
   | succ _ ih => rw [read_bytesLE_succ, List.length_cons, ih]
 
-/-! ### read_bytesLE_asNat -/
+theorem read_bytesLE_Nat_zero (addr : BitVec w) :
+    mem.read_bytesLE_Nat addr 0 = 0 := by
+  rw [read_bytesLE_Nat]
 
-theorem read_bytesLE_asNat_zero (addr : BitVec w) :
-    mem.read_bytesLE_asNat addr 0 = 0 := by
-  rw [read_bytesLE_asNat]
-
-theorem read_bytesLE_asNat_succ (addr : BitVec w) (k : Nat) :
-    mem.read_bytesLE_asNat addr (k + 1) =
-    mem.read_bytesLE_asNat addr k +
+theorem read_bytesLE_Nat_succ (addr : BitVec w) (k : Nat) :
+    mem.read_bytesLE_Nat addr (k + 1) =
+    mem.read_bytesLE_Nat addr k +
       (mem (addr + .ofNat w k)).toNat * 2^(8 * k) := by
-  rw [read_bytesLE_asNat]
+  rw [read_bytesLE_Nat]
 
-theorem read_bytesLE_asNat_eq (addr : BitVec w) (k : Nat) :
-    mem.read_bytesLE_asNat addr k = (mem.read_bytesLE addr k).toNatLE := by
+theorem read_bytesLE_Nat_eq_toNatLE (addr : BitVec w) (k : Nat) :
+    mem.read_bytesLE_Nat addr k = (mem.read_bytesLE addr k).toNatLE := by
   induction k generalizing addr with
-  | zero => simp [read_bytesLE, read_bytesLE_asNat, ByteList.toNatLE_nil]
+  | zero => simp [read_bytesLE, read_bytesLE_Nat, ByteList.toNatLE_nil]
   | succ _ ih =>
     rw [read_bytesLE_add, ByteList.toNatLE_append,
-      read_bytesLE_asNat_succ, ih]
+      read_bytesLE_Nat_succ, ih]
     simp [length_read_bytesLE, read_bytesLE, ByteList.toNatLE]
 
-theorem read_bytesLE_eq_asNat (addr : BitVec w) (k : Nat) :
+theorem read_bytesLE_eq_ofNatLE_Nat (addr : BitVec w) (k : Nat) :
     mem.read_bytesLE addr k =
-    ByteList.ofNatLE k (mem.read_bytesLE_asNat addr k) := by
+    .ofNatLE k (mem.read_bytesLE_Nat addr k) := by
   conv => rhs; arg 1; rw [← length_read_bytesLE mem addr k]
-  rw [read_bytesLE_asNat_eq, ByteList.ofNatLE_toNatLE]
+  rw [read_bytesLE_Nat_eq_toNatLE, ByteList.ofNatLE_toNatLE]
 
 /-! ### write_bytesLE -/
 
@@ -263,133 +257,139 @@ theorem write_bytesLE_add (addr : BitVec w) (k₁ k₂ : Nat) (bs : ByteList) :
     conv => lhs; rw [Nat.add_assoc, Nat.add_comm 1, ih, write_bytesLE_succ']
     simp [ih, BitVec.ofNat_add, BitVec.add_assoc]
 
-/-! ### write_bytesLE_asNat -/
+theorem write_bytesLE_Nat'_zero (addr : BitVec w) (n : Nat) :
+    mem.write_bytesLE_Nat' addr 0 n = mem := by
+  rw [write_bytesLE_Nat']
 
-theorem write_bytesLE_asNat_zero (addr : BitVec w) (n : Nat) :
-    mem.write_bytesLE_asNat addr 0 n = mem := by
-  rw [write_bytesLE_asNat]
-
-theorem write_bytesLE_asNat_succ (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat addr (k + 1) n =
-    write_bytesLE_asNat (fun x => if x = addr + .ofNat w k
+theorem write_bytesLE_Nat'_succ (addr : BitVec w) (k n : Nat) :
+    mem.write_bytesLE_Nat' addr (k + 1) n =
+    write_bytesLE_Nat' (fun x => if x = addr + .ofNat w k
         then .ofNat 8 (n / 2^(8 * k) % 256) else mem x) addr k n := by
-  simp [write_bytesLE_asNat]
+  simp [write_bytesLE_Nat']
 
-theorem write_bytesLE_asNat_succ' (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat addr (k + 1) n =
-    (mem.write_bytesLE_asNat
-      (addr + .ofNat w k) 1 (n / 2^(8 * k))).write_bytesLE_asNat
+theorem write_bytesLE_Nat'_succ' (addr : BitVec w) (k n : Nat) :
+    mem.write_bytesLE_Nat' addr (k + 1) n =
+    (mem.write_bytesLE_Nat'
+      (addr + .ofNat w k) 1 (n / 2^(8 * k))).write_bytesLE_Nat'
         addr k n := by
-  simp [write_bytesLE_asNat]
+  simp [write_bytesLE_Nat']
 
-theorem write_bytesLE_asNat_succ''
+theorem write_bytesLE_Nat'_succ''
     (addr : BitVec w) (k n : Nat) (hk : k < 2^w) :
-    write_bytesLE_asNat mem addr (k + 1) n =
-    write_bytesLE_asNat
+    write_bytesLE_Nat' mem addr (k + 1) n =
+    write_bytesLE_Nat'
       (fun x ↦ if x == addr then .ofNat 8 (n % 256) else mem x)
       (addr + 1#w) k (n / 256) := by
   induction k generalizing mem addr n with
-  | zero => simp [write_bytesLE_asNat]
+  | zero => simp [write_bytesLE_Nat']
   | succ k ih =>
-    rw [write_bytesLE_asNat, ih _ _ _ (by omega), write_bytesLE_asNat_succ]
+    rw [write_bytesLE_Nat', ih _ _ _ (by omega), write_bytesLE_Nat'_succ]
     congr; funext x
-    have e1 : addr + 1#w + .ofNat w k = addr + .ofNat w (k + 1) := by
+    have ha : addr + 1#w + .ofNat w k = addr + .ofNat w (k + 1) := by
       rw [BitVec.ofNat_add, addr.add_assoc, BitVec.add_comm 1#w]
     let fk : Fin (2 ^ w) := ⟨k + 1, hk⟩
     have hne := addr.add_ofNat_ne_self fk (by simp [fk])
     by_cases hx : x = addr
-    · simp [hx, fk, hne.symm, e1]
+    · simp [hx, fk, hne.symm, ha]
     · by_cases hx' : x = addr + BitVec.ofNat w (k + 1)
-      · simp [hx', fk, hne, e1]; rw [Nat.div_div_eq_div_mul,
+      · simp [hx', fk, hne, ha]; rw [Nat.div_div_eq_div_mul,
           Nat.mul_comm 256, Nat.mul_add, Nat.pow_add]
-      · simp [hx', e1]
+      · simp [hx', ha]
 
-theorem write_bytesLE_asNat'_zero (addr : BitVec w) (n : Nat) :
-    mem.write_bytesLE_asNat' addr 0 n = mem := by
-  rw [write_bytesLE_asNat']
+theorem write_bytesLE_Nat_zero (addr : BitVec w) (n : Nat) :
+    mem.write_bytesLE_Nat addr 0 n = mem := by
+  rw [write_bytesLE_Nat]
 
-theorem write_bytesLE_asNat'_succ (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat' addr (k + 1) n =
-    write_bytesLE_asNat'
+theorem write_bytesLE_Nat_succ (addr : BitVec w) (k n : Nat) :
+    mem.write_bytesLE_Nat addr (k + 1) n =
+    write_bytesLE_Nat
       (fun x => if x = addr then .ofNat 8 (n % 256) else mem x)
       (addr + 1#w) k (n / 256) := by
-  simp [write_bytesLE_asNat']
+  simp [write_bytesLE_Nat]
 
-theorem write_bytesLE_asNat'_succ' (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat' addr (k + 1) n =
-    (mem.write_bytesLE_asNat' addr 1 n).write_bytesLE_asNat'
+theorem write_bytesLE_Nat_succ' (addr : BitVec w) (k n : Nat) :
+    mem.write_bytesLE_Nat addr (k + 1) n =
+    (mem.write_bytesLE_Nat addr 1 n).write_bytesLE_Nat
       (addr + 1#w) k (n / 256) := by
-  simp [write_bytesLE_asNat']
+  simp [write_bytesLE_Nat]
 
-theorem write_bytesLE_asNat'_one_mod_cancel (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat' addr 1 (n % (2^(8 * (k + 1)))) =
-    mem.write_bytesLE_asNat' addr 1 n := by
-  simp [write_bytesLE_asNat']
-  suffices h : n % 2^(8 * (k + 1)) % 256 = n % 256 by rw [h]
-  have h : 2^(8 * k) * 256 = 2^(8 * (k + 1)) := by
-    rw [Nat.mul_add, Nat.pow_add]
-  rw [← h, Nat.mod_mul_left_mod]
-
-theorem write_bytesLE_asNat'_mod_cancel (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat' addr k (n % 2^(8 * k)) =
-    mem.write_bytesLE_asNat' addr k n := by
+theorem write_bytesLE_Nat_mod_cancel (addr : BitVec w) (k n : Nat) :
+    mem.write_bytesLE_Nat addr k (n % 2^(8 * k)) =
+    mem.write_bytesLE_Nat addr k n := by
   induction k generalizing mem addr n with
-  | zero => simp [write_bytesLE_asNat'_zero]
+  | zero => simp [write_bytesLE_Nat_zero]
   | succ k ih =>
-    have h : 2^(8 * k) * 256 = 2^(8 * (k + 1)) := by
+    have e₁ : 2^(8 * k) * 256 = 2^(8 * (k + 1)) := by
       rw [Nat.mul_add, Nat.pow_add]
-    rw [write_bytesLE_asNat'_succ', ← h, Nat.mod_mul_left_div_self, ih]
-    suffices h' : mem.write_bytesLE_asNat' addr 1 (n % (2^(8 * k) * 256))
-        = mem.write_bytesLE_asNat' addr 1 n by
-      rw [h', ← write_bytesLE_asNat'_succ']
-    rw [h, write_bytesLE_asNat'_one_mod_cancel]
+    have e₂ : mem.write_bytesLE_Nat addr 1 (n % (2^(8 * k) * 256))
+        = mem.write_bytesLE_Nat addr 1 n := by
+      simp [e₁, write_bytesLE_Nat]
+      funext x; by_cases h : x = addr <;> simp [h]; congr 1;
+      rw [Nat.mod_mod_of_dvd]; rw [← e₁]; apply Nat.dvd_mul_left
+    rw [write_bytesLE_Nat_succ', ← e₁, Nat.mod_mul_left_div_self, ih]
+    rw [e₂, ← write_bytesLE_Nat_succ']
 
-theorem write_bytesLE_asNat'_add (addr : BitVec w) (k₁ k₂ : Nat) (n : Nat) :
-    mem.write_bytesLE_asNat' addr (k₁ + k₂) n =
-    (mem.write_bytesLE_asNat' addr k₁ n).write_bytesLE_asNat'
+theorem write_bytesLE_Nat_add (addr : BitVec w) (k₁ k₂ : Nat) (n : Nat) :
+    mem.write_bytesLE_Nat addr (k₁ + k₂) n =
+    (mem.write_bytesLE_Nat addr k₁ n).write_bytesLE_Nat
       (addr + .ofNat w k₁) k₂ (n / 2^(8 * k₁)) := by
   induction k₁ generalizing mem addr k₂ n with
-  | zero => simp [write_bytesLE_asNat'_zero]
+  | zero => simp [write_bytesLE_Nat_zero]
   | succ _ ih =>
     conv => lhs; rw [Nat.add_comm _ 1, Nat.add_assoc, Nat.add_comm,
-      write_bytesLE_asNat'_succ', ih, BitVec.add_assoc,
+      write_bytesLE_Nat_succ', ih, BitVec.add_assoc,
       BitVec.add_comm 1#w, ← BitVec.ofNat_add]
-    conv => rhs; rw [write_bytesLE_asNat'_succ']
+    conv => rhs; rw [write_bytesLE_Nat_succ']
     rw [show 256 = 2^8 from rfl, Nat.div_div_eq_div_mul,
         ← Nat.pow_add', Nat.mul_add]
 
-theorem write_bytesLE_eq_asNat'_toNatLE
+theorem write_bytesLE_Nat_toNatLE_eq
     (addr : BitVec w) (k : Nat) (bs : ByteList) :
-    mem.write_bytesLE addr k bs =
-    mem.write_bytesLE_asNat' addr k bs.toNatLE := by
+    mem.write_bytesLE_Nat addr k bs.toNatLE =
+    mem.write_bytesLE addr k bs := by
   induction k generalizing mem addr bs with
-  | zero => simp [write_bytesLE, write_bytesLE_asNat']
+  | zero => simp [write_bytesLE, write_bytesLE_Nat]
   | succ _ ih =>
-    rw [write_bytesLE_succ', write_bytesLE_asNat'_succ',
-      ih, ByteList.toNatLE_tail]; congr; rw [write_bytesLE_succ,
-      write_bytesLE_zero, write_bytesLE_asNat'_succ,
-      write_bytesLE_asNat'_zero, bs.headD_zero]
+    rw [write_bytesLE_succ', write_bytesLE_Nat_succ',
+      ← ih, ByteList.toNatLE_tail]; congr; rw [write_bytesLE_succ,
+      write_bytesLE_zero, write_bytesLE_Nat_succ,
+      write_bytesLE_Nat_zero, bs.headD_zero]
 
-theorem write_bytesLE_asNat'_eq_ofNatLE (addr : BitVec w) (k n : Nat) :
-    mem.write_bytesLE_asNat' addr k n =
-    mem.write_bytesLE addr k (.ofNatLE k n) := by
+theorem write_bytesLE_ofNatLE_eq (addr : BitVec w) (k n : Nat) :
+    mem.write_bytesLE addr k (.ofNatLE k n) =
+    mem.write_bytesLE_Nat addr k n := by
   induction k generalizing mem addr n with
-  | zero => rw [write_bytesLE_asNat'_zero, write_bytesLE_zero]
+  | zero => rw [write_bytesLE_Nat_zero, write_bytesLE_zero]
   | succ _ ih =>
-    rw [write_bytesLE_asNat'_succ', write_bytesLE_succ', ih]
-    conv => rhs; arg 4; rw [ByteList.ofNatLE_succ, List.tail_cons]
-    congr; rw [write_bytesLE_asNat'_succ, write_bytesLE_asNat'_zero,
+    rw [write_bytesLE_Nat_succ', write_bytesLE_succ', ← ih]
+    conv => lhs; arg 4; rw [ByteList.ofNatLE_succ, List.tail_cons]
+    congr; rw [write_bytesLE_Nat_succ, write_bytesLE_Nat_zero,
       write_bytesLE_succ, write_bytesLE_zero, ByteList.ofNatLE_succ,
       List.headD_cons, BitVec.ofNat_mod_cancel]
 
-theorem write_bytesLE_asNat_eq_asNat' {w : Nat} (mem : Memory w) (addr : BitVec w)
-    (len n : Nat) (hlen : len ≤ 2 ^ w) :
-    write_bytesLE_asNat mem addr len n = write_bytesLE_asNat' mem addr len n := by
-  induction len generalizing mem addr n with
-  | zero => simp [write_bytesLE_asNat, write_bytesLE_asNat']
+theorem write_bytesLE_Nat'_eq
+    (addr : BitVec w) (k n : Nat) (hk : k ≤ 2 ^ w) :
+    write_bytesLE_Nat' mem addr k n =
+    write_bytesLE_Nat mem addr k n := by
+  induction k generalizing mem addr n with
+  | zero => simp [write_bytesLE_Nat', write_bytesLE_Nat]
   | succ k ih =>
-    rw [write_bytesLE_asNat_succ'' _ _ _ _ hlen, write_bytesLE_asNat']
-    exact ih _ _ _ (by omega)
+    rw [mem.write_bytesLE_Nat'_succ'' _ _ _ hk, write_bytesLE_Nat]
+    apply ih; omega
+
+theorem write_bytesLE_Nat'_toNatLE_eq
+    (addr : BitVec w) (k : Nat) (bs : ByteList) (hk : k ≤ 2^w) :
+    mem.write_bytesLE_Nat' addr k bs.toNatLE =
+    mem.write_bytesLE addr k bs := by
+  rw [write_bytesLE_Nat'_eq _ _ _ _ hk]
+  apply write_bytesLE_Nat_toNatLE_eq
+
+theorem write_bytesLE_ofNatLE_eq'
+    (addr : BitVec w) (k n : Nat) (hk : k ≤ 2^w) :
+    mem.write_bytesLE addr k (.ofNatLE k n) =
+    mem.write_bytesLE_Nat' addr k n := by
+  rw [write_bytesLE_Nat'_eq _ _ _ _ hk]
+  apply write_bytesLE_ofNatLE_eq
 
 end Memory
 end Bignum
