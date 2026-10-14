@@ -97,7 +97,8 @@ This definition corresponds to the method of s2n-bignum's component `bytes`.
 Notice that the writing is done in reverse order, i.e., from the end to the
 beginning of the address space (from `addr+k` to `addr`).  Because of this
 we cannot prove that this function is equivalent to `write_bytesLE` or
-`write_bytesLE_Nat`, unless we assume `len ≤ 2^w`.  See `???`.
+`write_bytesLE_Nat`, unless we assume `len ≤ 2^w`.  See
+`write_bytesLE_Nat'_eq`.
 -/
 def write_bytesLE_Nat' {w : Nat}
     (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
