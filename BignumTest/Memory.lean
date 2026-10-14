@@ -33,13 +33,13 @@ example : (mem.read_bytesLE 0 4).toNatLE =
 example : (mem.read_bytesLE 8 13).toNatLE =
     mem.read_bytesLE_Nat 8 13 := by rfl
 
-/-! ### write_bytesLE -/
-
 -- wraps around and starts reading from the beginning of the address space
 example : mem.read_bytesLE (BitVec.allOnes 64) 3
     = [0xff#8, 0x00#8, 0x01#8] := by rfl
 example: mem.read_bytesLE_Nat (BitVec.allOnes 64) 3
     = 65791 := by rfl
+
+/-! ### write_bytesLE -/
 
 example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4 =
     [0xaa#8, 0xbb#8, 0x04#8, 0x05#8] := by rfl
@@ -49,5 +49,9 @@ example : (mem.write_bytesLE 2 2 [0xaa, 0xbb]).read_bytesLE 2 4 =
 
 -- wraps around and starts writing to the beginning of the address space
 example : (mem.write_bytesLE_Nat'
+    (.allOnes 64) 3 0x010203).read_bytesLE (.allOnes 64) 3 =
+    [0x03, 0x02, 0x01] := by rfl
+
+example : (mem.write_bytesLE_Nat
     (.allOnes 64) 3 0x010203).read_bytesLE (.allOnes 64) 3 =
     [0x03, 0x02, 0x01] := by rfl

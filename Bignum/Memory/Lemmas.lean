@@ -287,7 +287,7 @@ theorem write_bytesLE_Nat'_succ''
     congr; funext x
     have ha : addr + 1#w + .ofNat w k = addr + .ofNat w (k + 1) := by
       rw [BitVec.ofNat_add, addr.add_assoc, BitVec.add_comm 1#w]
-    let fk : Fin (2 ^ w) := ⟨k + 1, hk⟩
+    let fk : Fin (2^w) := ⟨k + 1, hk⟩
     have hne := addr.add_ofNat_ne_self fk (by simp [fk])
     by_cases hx : x = addr
     · simp [hx, fk, hne.symm, ha]
@@ -368,7 +368,7 @@ theorem write_bytesLE_ofNatLE_eq (addr : BitVec w) (k n : Nat) :
       List.headD_cons, BitVec.ofNat_mod_cancel]
 
 theorem write_bytesLE_Nat'_eq
-    (addr : BitVec w) (k n : Nat) (hk : k ≤ 2 ^ w) :
+    (addr : BitVec w) (k n : Nat) (hk : k ≤ 2^w) :
     write_bytesLE_Nat' mem addr k n =
     write_bytesLE_Nat mem addr k n := by
   induction k generalizing mem addr n with
