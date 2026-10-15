@@ -65,37 +65,37 @@ def allOnes {w : Nat} : Memory w :=
 Reads `len` bytes from memory starting at offset `addr`.
 Returns a little-endian byte list.
 -/
-def read_bytesLE
+def readBytesLE
     {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : ByteList :=
   match len with
   | 0 => []
-  | k + 1 => mem addr :: mem.read_bytesLE (addr + 1#w) k
+  | k + 1 => mem addr :: mem.readBytesLE (addr + 1#w) k
 
 /--
 Reads `len` bytes from memory starting at offset `addr`.
 Returns a little-endian encoded natural number.
 
-This definition corresponds to s2n-bignum's `FST bytes`.
+This definition corresponds to the read method s2n-bignum's `bytes`.
 -/
-def read_bytesLE_Nat
+def readBytesNatLE
     {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) : Nat :=
   match len with
   | 0 => 0
   | k + 1 =>
-    mem.read_bytesLE_Nat addr k +
+    mem.readBytesNatLE addr k +
       (mem (addr + .ofNat _ k)).toNat * 2^(8 * k)
 
 /--
 Writes `len` bytes from `bs` to memory starting at offset `addr`.
 Assumes that `bs` is little-endian encoded.  Returns the updated memory.
 -/
-def write_bytesLE
+def writeBytesLE
     {w : Nat} (mem : Memory w) (addr : BitVec w) (len : Nat) (bs : ByteList) :
     Memory w :=
   match len with
   | 0 => mem
   | k + 1 =>
-    write_bytesLE
+    writeBytesLE
       (fun x ↦ if x == addr then bs.headD 0#8 else mem x)
       (addr + 1#w) k bs.tail
 
@@ -103,93 +103,92 @@ def write_bytesLE
 Writes `len` bytes from `n` to memory starting at offset `addr`.
 Assumes that `n` is little-endian encoded.  Returns the updated memory.
 
-This definition corresponds to the method of s2n-bignum's component `bytes`.
+This definition corresponds to the write method of s2n-bignum's `bytes`.
 Notice that the writing is done in reverse order, i.e., from the end to the
-beginning of the address space (from `addr+k` to `addr`).  Because of this
-we cannot prove that this function is equivalent to `write_bytesLE` or
-`write_bytesLE_Nat`, unless we assume `len ≤ 2^w`.  See
-`write_bytesLE_Nat'_eq`.
+beginning of the address space (from `addr+k` to `addr`).  We cannot prove
+that this function is equivalent to `writeBytesLE` or `writeBytesNatLE`,
+unless we assume `len ≤ 2^w`.  See `writeBytesNatLE'_eq`.
 -/
-def write_bytesLE_Nat' {w : Nat}
+def writeBytesNatLE' {w : Nat}
     (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
     Memory w :=
   match len with
   | 0 => mem
   | k + 1 =>
-    write_bytesLE_Nat' (fun x ↦
+    writeBytesNatLE' (fun x ↦
         if x == addr + .ofNat _ k
         then .ofNat 8 (n / 2^(8 * k) % 2^8)
         else mem x)
       addr k n
 
 /--
-Alternative version of `write_bytesLE_Nat'` which performs the writing in
+Alternative version of `writeBytesNatLE'` which performs the writing in
 direct order, from the beginning to the end of the address space.  This
-function is equivalent to `write_bytesLE ∘ ByteList.ofNat`.
+function is equivalent to `writeBytesLE ∘ ByteList.ofNat`.
 -/
-def write_bytesLE_Nat {w : Nat}
+def writeBytesNatLE {w : Nat}
     (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
     Memory w :=
   match len with
   | 0 => mem
   | k + 1 =>
-    write_bytesLE_Nat
+    writeBytesNatLE
       (fun x ↦ if x == addr then .ofNat 8 (n % 256) else mem x)
       (addr + 1#w) k (n / 256)
 
 /--
 Asserts that byte list `bs` is loaded on memory at address `addr`.
 -/
-def BytesLE_loaded {w : Nat}
+def BytesLoadedLE {w : Nat}
     (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Prop :=
-  mem.read_bytesLE addr bs.length = bs
+  mem.readBytesLE addr bs.length = bs
 
 /--
 Tests whether byte list `bs` is loaded on memory at address `addr`.
 -/
-def bytesLE_loaded {w : Nat}
+def bytesLoadedLE {w : Nat}
     (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Bool :=
-  mem.read_bytesLE addr bs.length == bs
+  mem.readBytesLE addr bs.length == bs
 
-theorem bytesLE_loaded_iff {w : Nat} (mem : Memory w) (addr : BitVec w)
+theorem bytesLoadedLE_iff {w : Nat} (mem : Memory w) (addr : BitVec w)
     (bs : ByteList) :
-    mem.bytesLE_loaded addr bs ↔ mem.BytesLE_loaded addr bs := by
-  unfold bytesLE_loaded BytesLE_loaded; constructor
+    mem.bytesLoadedLE addr bs ↔ mem.BytesLoadedLE addr bs := by
+  unfold bytesLoadedLE BytesLoadedLE; constructor
   · exact eq_of_beq
   · intro h; simp [h]
 
 instance {w : Nat} (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
-    Decidable (BytesLE_loaded mem addr bs) :=
-  decidable_of_iff (bytesLE_loaded mem addr bs)
-    (bytesLE_loaded_iff mem addr bs)
+    Decidable (BytesLoadedLE mem addr bs) :=
+  decidable_of_iff (bytesLoadedLE mem addr bs)
+    (bytesLoadedLE_iff mem addr bs)
 
 /--
 Asserts that byte list `bs` is loaded at 4-byte aligned address `addr`.
 -/
-structure AlignedBytesLE_loaded {w : Nat}
+structure AlignedBytesLoadedLE {w : Nat}
     (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Prop where
   aligned : (4 ∣ addr.toNat)
-  loaded : mem.BytesLE_loaded addr bs
+  loaded : mem.BytesLoadedLE addr bs
 
 /--
 Tests whether byte list `bs` is loaded at 4-byte aligned address `addr`.
 -/
-def aligned_bytesLE_loaded {w : Nat}
+def alignedBytesLoadedLE {w : Nat}
     (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Bool :=
-  (4 ∣ addr.toNat) && mem.bytesLE_loaded addr bs
+  (4 ∣ addr.toNat) && mem.bytesLoadedLE addr bs
 
-theorem aligned_bytesLE_loaded_iff {w : Nat}
+theorem alignedBytesLoadedLE_iff {w : Nat}
     (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
-    mem.aligned_bytesLE_loaded addr bs ↔
-    mem.AlignedBytesLE_loaded addr bs := by
-  simp [aligned_bytesLE_loaded]; constructor <;> intro ⟨hl, hr⟩
-  · exact ⟨hl, (mem.bytesLE_loaded_iff _ _).mp hr⟩
-  · exact ⟨hl, (mem.bytesLE_loaded_iff _ _ ).mpr hr⟩
+    mem.alignedBytesLoadedLE addr bs ↔
+    mem.AlignedBytesLoadedLE addr bs := by
+  simp [alignedBytesLoadedLE]; constructor <;> intro ⟨hl, hr⟩
+  · exact ⟨hl, (mem.bytesLoadedLE_iff _ _).mp hr⟩
+  · exact ⟨hl, (mem.bytesLoadedLE_iff _ _ ).mpr hr⟩
 
 instance {w : Nat} (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
-    Decidable (AlignedBytesLE_loaded mem addr bs) :=
-  decidable_of_iff (aligned_bytesLE_loaded mem addr bs)
-    (aligned_bytesLE_loaded_iff mem addr bs)
+    Decidable (AlignedBytesLoadedLE mem addr bs) :=
+  decidable_of_iff (alignedBytesLoadedLE mem addr bs)
+    (alignedBytesLoadedLE_iff mem addr bs)
 
 end Memory
 end Bignum

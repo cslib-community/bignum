@@ -20,7 +20,7 @@ universe u₁ u₂ u₃ u₄
 variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
 /--
-Composition of relations (stands for sequencing).
+Composition of relations (sequencing).
 -/
 def seq (r₁ : α → β → Prop) (r₂ : β → γ → Prop) : α → γ → Prop :=
   λ a c ↦ ∃ b, r₁ a b ∧ r₂ b c

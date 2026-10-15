@@ -93,7 +93,7 @@ bytes.
 -/
 def bytesLE {w : Nat} (addr : BitVec w) (len : Nat) :
     Component (Memory w) ByteList :=
-  ⟨fun mem ↦ Memory.read_bytesLE mem addr len,
-   fun bs mem ↦ Memory.write_bytesLE mem addr len bs⟩
+  ⟨fun mem ↦ Memory.readBytesLE mem addr len,
+   fun bs mem ↦ Memory.writeBytesLE mem addr len bs⟩
 
 end Bignum.Component
