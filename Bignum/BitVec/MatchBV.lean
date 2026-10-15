@@ -8,6 +8,8 @@ module
 
 import Lean
 
+set_option linter.missingDocs false
+
 @[expose] public section
 
 /-! # Pattern matching over `BitVec` -/

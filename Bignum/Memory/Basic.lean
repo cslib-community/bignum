@@ -15,6 +15,7 @@ namespace Bignum
 
 /-! ## Byte list -/
 
+/-- List of bytes. -/
 abbrev ByteList := List (BitVec 8)
 
 namespace ByteList
@@ -23,7 +24,7 @@ namespace ByteList
 Converts a little-endian byte list `bs` to a natural number.
 -/
 def toNatLE (bs : ByteList) : Nat :=
-  bs.foldr (λ b n ↦ b.toNat + n <<< 8) 0
+  bs.foldr (fun b n ↦ b.toNat + n <<< 8) 0
 
 /--
 Converts a natural number `n` to a little-endian byte list of `len` bytes.
@@ -45,21 +46,18 @@ end ByteList
 
 /-! ## Byte-addressable memory -/
 
+/-- Mapping of addresses to bytes. -/
 abbrev Memory (w : Nat) := BitVec w → BitVec 8
 
 namespace Memory
 
-/--
-The all zeros memory.
--/
+/-- The all zeros memory. -/
 def allZeros {w : Nat} : Memory w :=
-  λ _ ↦ 0#8
+  fun _ ↦ 0#8
 
-/--
-The all ones memory.
--/
+/-- The all ones memory. -/
 def allOnes {w : Nat} : Memory w :=
-  λ _ ↦ .allOnes 8
+  fun _ ↦ .allOnes 8
 
 /--
 Reads `len` bytes from memory starting at offset `addr`.
@@ -167,7 +165,9 @@ Asserts that byte list `bs` is loaded at 4-byte aligned address `addr`.
 -/
 structure AlignedBytesLoadedLE {w : Nat}
     (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Prop where
+  /-- Address `addr` is 4-byte aligned. -/
   aligned : (4 ∣ addr.toNat)
+  /-- Byte list `bs` is loaded at address `addr`. -/
   loaded : mem.BytesLoadedLE addr bs
 
 /--

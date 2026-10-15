@@ -9,9 +9,9 @@ public import Bignum.Component
 
 @[expose] public section
 
-/-! ## Relational model of programs and Hoare-type rules -/
+/-! # Relational model of programs and Hoare-type rules -/
 
-namespace Bignum
+namespace Bignum.Relational
 
 universe u₁ u₂ u₃ u₄
 
@@ -23,7 +23,7 @@ Composition of relations (sequencing).
 def seq (r₁ : α → β → Prop) (r₂ : β → γ → Prop) : α → γ → Prop :=
   fun a c ↦ ∃ b, r₁ a b ∧ r₂ b c
 
-@[inherit_doc] scoped infixr:62 " ,, " => seq
+@[inherit_doc] infixr:62 " ,, " => seq
 
 /--
 Subsumption of relations.
@@ -31,7 +31,7 @@ Subsumption of relations.
 def subsumed (r r' : α → β → Prop) : Prop :=
   forall a b, r a b → r' a b
 
-@[inherit_doc] scoped infixl:50 " ⊑ " => subsumed
+@[inherit_doc] infixl:50 " ⊑ " => subsumed
 
 /--
 Assignment of component as a (functional) relation.
@@ -39,6 +39,6 @@ Assignment of component as a (functional) relation.
 def assign (cp : Component α β) (b : β) : α → α → Prop :=
   fun a a' ↦ cp.write b a = a'
 
-@[inherit_doc] scoped infixl:70 " ≔ " => assign
+@[inherit_doc] infixl:70 " ≔ " => assign
 
-end Bignum
+end Bignum.Relational

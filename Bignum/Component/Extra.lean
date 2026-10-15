@@ -20,67 +20,136 @@ namespace Bignum.Component
 /-! ## Bitvector -/
 
 /--
-Component for a bit within a bitvector.
+A bit within a bitvector.
 -/
 def bitelement {w : Nat} (i : Fin w) : Component (BitVec w) Bool :=
-  ⟨λ bv ↦ bv.getLsb i, λ b bv ↦ bv.setLsb i b⟩
+  ⟨fun bv ↦ bv.getLsb i, fun b bv ↦ bv.setLsb i b⟩
 
 /--
-Component for subwords of a bitvector.
+A subword of a bitvector.
 -/
 def subword {w : Nat} (start len : Nat) :
     Component (BitVec w) (BitVec len) :=
-  ⟨.extractLsb' start len, λ b bv ↦ bv.overwriteLsb' start len b⟩
+  ⟨.extractLsb' start len, fun b bv ↦ bv.overwriteLsb' start len b⟩
 
 /--
-Component for the bottom-half of a bitvector.
+The bottom-half of a bitvector.
 -/
 def bottomhalf {w : Nat} : Component (BitVec w) (BitVec (w / 2)) :=
   subword 0 (w / 2)
 
 /--
-Component for the top-half of a bitvector.
+The top-half of a bitvector.
 -/
 def tophalf {w : Nat} : Component (BitVec w) (BitVec (w.succ / 2)) :=
   subword (w / 2) (w.succ / 2)
 
-/-
-Components for subwords of bitvectors with a specific length.
+/--
+The bottom 256 bits of a 512-bit bitvector.
 -/
-def bottom_256 : Component (BitVec 512) (BitVec 256) := @bottomhalf 512
-def bottom_128 : Component (BitVec 256) (BitVec 128) := @bottomhalf 256
-def bottom_64  : Component (BitVec 128) (BitVec 64)  := @bottomhalf 128
-def bottom_32  : Component (BitVec 64) (BitVec 32)   := @bottomhalf 64
-def bottom_16  : Component (BitVec 32) (BitVec 16)   := @bottomhalf 32
-def bottom_8   : Component (BitVec 16) (BitVec 8)    := @bottomhalf 16
+def bottom256 : Component (BitVec 512) (BitVec 256) :=
+  bottomhalf
 
-def top_256    : Component (BitVec 512) (BitVec 256) := @tophalf 512
-def top_128    : Component (BitVec 256) (BitVec 128) := @tophalf 256
-def top_64     : Component (BitVec 128) (BitVec 64)  := @tophalf 128
-def top_32     : Component (BitVec 64) (BitVec 32)   := @tophalf 64
-def top_16     : Component (BitVec 32) (BitVec 16)   := @tophalf 32
-def top_8      : Component (BitVec 16) (BitVec 8)    := @tophalf 16
-
-/-
-Components for subwords of larger bitvectors which force a zero
-extension on writes.  Intended to mimic x86-64 and aarch64 behaviors.
+/--
+The bottom 128 bits of a 256-bit bitvector.
 -/
-def zerotop_256 : Component (BitVec 512) (BitVec 256) :=
+def bottom128 : Component (BitVec 256) (BitVec 128) :=
+  bottomhalf
+
+/--
+The bottom 64 bits of a 128-bit bitvector.
+-/
+def bottom64 : Component (BitVec 128) (BitVec 64) :=
+  bottomhalf
+
+/--
+The bottom 32 bits of a 64-bit bitvector.
+-/
+def bottom32 : Component (BitVec 64) (BitVec 32) :=
+  bottomhalf
+
+/--
+The bottom 16 bits of a 32-bit bitvector.
+-/
+def bottom16 : Component (BitVec 32) (BitVec 16) :=
+  bottomhalf
+
+/--
+The bottom 8 bits of a 16-bit bitvector.
+-/
+def bottom8 : Component (BitVec 16) (BitVec 8) :=
+  bottomhalf
+
+/--
+The top 256 bits of a 512-bit bitvector.
+-/
+def top256 : Component (BitVec 512) (BitVec 256) :=
+  tophalf
+
+/--
+The top 128 bits of a 256-bit bitvector.
+-/
+def top128 : Component (BitVec 256) (BitVec 128) :=
+  tophalf
+
+/--
+The top 64 bits of a 128-bit bitvector.
+-/
+def top64 : Component (BitVec 128) (BitVec 64) :=
+  tophalf
+
+/--
+The top 32 bits of a 64-bit bitvector.
+-/
+def top32 : Component (BitVec 64) (BitVec 32) :=
+  tophalf
+
+/--
+The top 16 bits of a 32-bit bitvector.
+-/
+def top16 : Component (BitVec 32) (BitVec 16) :=
+  tophalf
+
+/--
+The top 8 bits of a 16-bit bitvector.
+-/
+def top8 : Component (BitVec 16) (BitVec 8) :=
+  tophalf
+
+/--
+The bottom 256 bits of 512-bit bitvector, zeroing the top 256 bits on write.
+-/
+def zerotop256 : Component (BitVec 512) (BitVec 256) :=
   .through (BitVec.truncate 256) (BitVec.truncate 512)
 
-def zerotop_128 : Component (BitVec 256) (BitVec 128) :=
+/--
+The bottom 128 bits of 256-bit bitvector, zeroing the top 128 bits on write.
+-/
+def zerotop128 : Component (BitVec 256) (BitVec 128) :=
   .through (BitVec.truncate 128) (BitVec.truncate 256)
 
-def zerotop_64 : Component (BitVec 128) (BitVec 64) :=
+/--
+The bottom 64 bits of 128-bit bitvector, zeroing the top 64 bits on write.
+-/
+def zerotop64 : Component (BitVec 128) (BitVec 64) :=
   .through (BitVec.truncate 64) (BitVec.truncate 128)
 
-def zerotop_32 : Component (BitVec 64) (BitVec 32) :=
+/--
+The bottom 32 bits of 64-bit bitvector, zeroing the top 32 bits on write.
+-/
+def zerotop32 : Component (BitVec 64) (BitVec 32) :=
   .through (BitVec.truncate 32) (BitVec.truncate 64)
 
-def zerotop_16 : Component (BitVec 32) (BitVec 16) :=
+/--
+The bottom 16 bits of 32-bit bitvector, zeroing the top 16 bits on write.
+-/
+def zerotop16 : Component (BitVec 32) (BitVec 16) :=
   .through (BitVec.truncate 16) (BitVec.truncate 32)
 
-def zerotop_8 : Component (BitVec 16) (BitVec 8) :=
+/--
+The bottom 8 bits of 16-bit bitvector, zeroing the top 8 bits on write.
+-/
+def zerotop8 : Component (BitVec 16) (BitVec 8) :=
   .through (BitVec.truncate 8) (BitVec.truncate 16)
 
 /-! ## Memory -/

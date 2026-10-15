@@ -90,28 +90,28 @@ theorem assign_seq (cp : Component α β) (b : β) (r : α → β → Prop) (a :
     ((cp ≔ b) ,, r) a = r (cp.write b a) := by
   unfold seq assign; simp
 
-theorem assign_zerotop_8 (cp : Component α (BitVec 16)) (bv : BitVec 8) :
-    ((cp :> .zerotop_8) ≔ bv) = (cp ≔ bv.zeroExtend 16) := by
-  unfold assign; simp [Component.zerotop_8]
+theorem assign_zerotop8 (cp : Component α (BitVec 16)) (bv : BitVec 8) :
+    ((cp :> .zerotop8) ≔ bv) = (cp ≔ bv.zeroExtend 16) := by
+  unfold assign; simp [Component.zerotop8]
 
-theorem assign_zerotop_16 (cp : Component α (BitVec 32)) (bv : BitVec 16) :
-    ((cp :> .zerotop_16) ≔ bv) = (cp ≔ bv.zeroExtend 32) := by
-  unfold assign; simp [Component.zerotop_16]
+theorem assign_zerotop16 (cp : Component α (BitVec 32)) (bv : BitVec 16) :
+    ((cp :> .zerotop16) ≔ bv) = (cp ≔ bv.zeroExtend 32) := by
+  unfold assign; simp [Component.zerotop16]
 
-theorem assign_zerotop_32 (cp : Component α (BitVec 64)) (bv : BitVec 32) :
-    ((cp :> .zerotop_32) ≔ bv) = (cp ≔ bv.zeroExtend 64) := by
-  unfold assign; simp [Component.zerotop_32]
+theorem assign_zerotop32 (cp : Component α (BitVec 64)) (bv : BitVec 32) :
+    ((cp :> .zerotop32) ≔ bv) = (cp ≔ bv.zeroExtend 64) := by
+  unfold assign; simp [Component.zerotop32]
 
-theorem assign_zerotop_64 (cp : Component α (BitVec 128)) (bv : BitVec 64) :
-    ((cp :> .zerotop_64) ≔ bv) = (cp ≔ bv.zeroExtend 128) := by
-  unfold assign; simp [Component.zerotop_64]
+theorem assign_zerotop64 (cp : Component α (BitVec 128)) (bv : BitVec 64) :
+    ((cp :> .zerotop64) ≔ bv) = (cp ≔ bv.zeroExtend 128) := by
+  unfold assign; simp [Component.zerotop64]
 
-theorem assign_zerotop_128 (cp : Component α (BitVec 256)) (bv : BitVec 128) :
-    ((cp :> .zerotop_128) ≔ bv) = (cp ≔ bv.zeroExtend 256) := by
-  unfold assign; simp [Component.zerotop_128]
+theorem assign_zerotop128 (cp : Component α (BitVec 256)) (bv : BitVec 128) :
+    ((cp :> .zerotop128) ≔ bv) = (cp ≔ bv.zeroExtend 256) := by
+  unfold assign; simp [Component.zerotop128]
 
-theorem assign_zerotop_512 (cp : Component α (BitVec 512)) (bv : BitVec 256) :
-    ((cp :> .zerotop_256) ≔ bv) = (cp ≔ bv.zeroExtend 512) := by
-  unfold assign; simp [Component.zerotop_256]
+theorem assign_zerotop512 (cp : Component α (BitVec 512)) (bv : BitVec 256) :
+    ((cp :> .zerotop256) ≔ bv) = (cp ≔ bv.zeroExtend 512) := by
+  unfold assign; simp [Component.zerotop256]
 
 end Bignum.Relational

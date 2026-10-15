@@ -125,7 +125,7 @@ def XZR : Component State (BitVec 64) :=
 
 /-- Bottom 32-bits of the zero register, ignored as destination. -/
 def WZR : Component State (BitVec 32) :=
-  XZR :> .bottom_32
+  XZR :> .bottom32
 
 /-- Generic version of XZR. -/
 def ZR {w : Nat} : Component State (BitVec w) :=
@@ -172,7 +172,7 @@ def SP := registers :> .element 31
 
 /-- 32-bit versions of the main registers. -/
 def WREG (n : Nat) : Component State (BitVec 32) :=
-  XREG n :> .zerotop_32
+  XREG n :> .zerotop32
 
 def W0   := WREG 0
 def W1   := WREG 1
@@ -205,7 +205,7 @@ def W27  := WREG 27
 def W28  := WREG 28
 def W29  := WREG 29
 def W30  := WREG 30
-def WSP  := SP :> .zerotop_32
+def WSP  := SP :> .zerotop32
 
 /--
 Shifted register operands.
@@ -286,16 +286,16 @@ def QREG (n : Nat) : Component State (BitVec 128) :=
   simdregisters :> .element n
 
 def DREG (n : Nat) : Component State (BitVec 64) :=
-  QREG n :> .zerotop_64
+  QREG n :> .zerotop64
 
 def SREG (n : Nat) : Component State (BitVec 32) :=
-  DREG n :> .zerotop_32
+  DREG n :> .zerotop32
 
 def HREG (n : Nat) : Component State (BitVec 16) :=
-  SREG n :> .zerotop_16
+  SREG n :> .zerotop16
 
 def BREG (n : Nat) : Component State (BitVec 8) :=
-  HREG n :> .zerotop_8
+  HREG n :> .zerotop8
 
 def Q0  := QREG 0
 def Q1  := QREG 1

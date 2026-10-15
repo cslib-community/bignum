@@ -34,10 +34,11 @@ variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 Composition of components.
 -/
 @[simp]
-def compose (cp₁ : Component α β) (cp₂ : Component β γ) : Component α γ :=
-  ⟨cp₂.read ∘ cp₁.read, λ c a ↦ cp₁.write (cp₂.write c (cp₁.read a)) a⟩
+def Component.compose
+    (cp₁ : Component α β) (cp₂ : Component β γ) : Component α γ :=
+  ⟨cp₂.read ∘ cp₁.read, fun c a ↦ cp₁.write (cp₂.write c (cp₁.read a)) a⟩
 
-infixr:90 ":>" => compose
+@[inherit_doc] infixr:90 " :> " => Component.compose
 
 theorem compose_assoc
     (cp₁ : Component α β) (cp₂ : Component β γ) (cp₃ : Component γ δ) :
@@ -65,7 +66,7 @@ theorem read_write_compose
 "Identity" for components.
 -/
 def entirety : Component α α :=
-  ⟨id, λ x _ ↦ x⟩
+  ⟨id, fun x _ ↦ x⟩
 
 theorem entirety_read (a : α) : entirety.read a = a := by
   rfl
@@ -89,20 +90,20 @@ theorem entirety_compose (cp : Component α β) :
 Pseudo-component for reading a value (read-only).
 -/
 def rvalue (b : β) : Component α β :=
-  ⟨λ _ ↦ b, λ _ a ↦ a⟩
+  ⟨fun _ ↦ b, fun _ a ↦ a⟩
 
 /--
 Component corresponding to a function with a BEq domain.
 -/
 def element [BEq α] (a : α) : Component (α → β) β :=
-  ⟨λ f ↦ f a, λ b f a' ↦ if a' == a then b else f a'⟩
+  ⟨fun f ↦ f a, fun b f a' ↦ if a' == a then b else f a'⟩
 
 /--
 Component that applies a pair of functions (f,g) to a component.
 -/
 @[simp]
 def through (f : α → β) (g : β → α) : Component α β :=
-  ⟨f, λ b _ ↦ g b⟩
+  ⟨f, fun b _ ↦ g b⟩
 
 end Component
 end Bignum

@@ -23,12 +23,12 @@ def Y := Component.mk (λ a : A ↦ a.y) (λ y a ↦ {a with y := y})
 def F := Component.mk (λ b : B ↦ b.f) (λ f b ↦ {b with f := f})
 def Z := Component.mk (λ b : B ↦ b.z) (λ z b ↦ {b with z := z})
 
-/-- info: X : Component A Nat     -/  #guard_msgs in #check X
-/-- info: Y : Component A Bool    -/  #guard_msgs in #check Y
-/-- info: F : Component B A       -/  #guard_msgs in #check F
-/-- info: Z : Component B Nat     -/  #guard_msgs in #check Z
-/-- info: F:>X : Component B Nat  -/  #guard_msgs in #check F:>X
-/-- info: F:>Y : Component B Bool -/  #guard_msgs in #check F:>Y
+/-- info: X : Component A Nat       -/  #guard_msgs in #check X
+/-- info: Y : Component A Bool      -/  #guard_msgs in #check Y
+/-- info: F : Component B A         -/  #guard_msgs in #check F
+/-- info: Z : Component B Nat       -/  #guard_msgs in #check Z
+/-- info: F :> X : Component B Nat  -/  #guard_msgs in #check F :> X
+/-- info: F :> Y : Component B Bool -/  #guard_msgs in #check F :> Y
 
 def aa : A := ⟨1, false⟩
 def bb : B := ⟨aa, 2⟩

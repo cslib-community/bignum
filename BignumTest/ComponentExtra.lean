@@ -67,36 +67,37 @@ example : tophalf.write 0xf 0#0 = 0#0 := by rfl
 example : tophalf.write 0x0 111#3 = 0b001#3 := by rfl
 end subword_NS
 
-/-! ## bottom_*, top_* -/
+/-! ## bottom*, top* -/
 
-namespace bottom_top_NS
-example : bottom_256.read f512 = f256 := by rfl
-example : bottom_128.read f256 = f128 := by rfl
-example : bottom_64.read f128 = f64 := by rfl
-example : bottom_32.read f64 = f32 := by rfl
-example : bottom_16.read f32 = f16 := by rfl
-example : bottom_8.read f16 = f8 := by rfl
-example : top_256.read f512 = f256 := by rfl
-example : top_128.read f256 = f128 := by rfl
-example : top_64.read f128 = f64 := by rfl
-example : top_32.read f64 = f32 := by rfl
-example : top_16.read f32 = f16 := by rfl
-example : top_8.read f16 = f8 := by rfl
-end bottom_top_NS
+namespace bottomtopNS
+example : bottom256.read f512 = f256 := by rfl
+example : bottom128.read f256 = f128 := by rfl
+example : bottom64.read f128 = f64 := by rfl
+example : bottom32.read f64 = f32 := by rfl
+example : bottom16.read f32 = f16 := by rfl
+example : bottom8.read f16 = f8 := by rfl
+example : top256.read f512 = f256 := by rfl
+example : top128.read f256 = f128 := by rfl
+example : top64.read f128 = f64 := by rfl
+example : top32.read f64 = f32 := by rfl
+example : top16.read f32 = f16 := by rfl
+example : top8.read f16 = f8 := by rfl
+end bottomtopNS
 
-/-! ## zerotop_* -/
+/-! ## zerotop* -/
 
-namespace zerotop_NS
-example : zerotop_256.read f512 = f256 := by rfl
-example : zerotop_256.write f256 f512 = z256 ++ f256 := by rfl
-example : zerotop_128.read f256 = f128 := by rfl
-example : zerotop_128.write f128 f256 = z128 ++ f128 := by rfl
-example : zerotop_64.read f128 = f64 := by rfl
-example : zerotop_64.write f64 f128 = z64 ++ f64 := by rfl
-example : zerotop_32.read f64 = f32 := by rfl
-example : zerotop_32.write f32 f64 = z32 ++ f32 := by rfl
-example : zerotop_16.read f32 = f16 := by rfl
-example : zerotop_16.write f16 f32 = z16 ++ f16 := by rfl
-example : zerotop_8.read f16 = f8 := by rfl
-example : zerotop_8.write f8 f16 = z8 ++ f8 := by rfl
-end zerotop_NS
+namespace zerotopNS
+example : zerotop256.read f512 = f256 := by rfl
+example : zerotop256.write f256 f512 = z256 ++ f256 := by rfl
+example : zerotop128.read f256 = f128 := by rfl
+example : zerotop128.write f128 f256 = z128 ++ f128 := by rfl
+example : zerotop64.read f128 = f64 := by rfl
+example : zerotop64.write f64 f128 = z64 ++ f64 := by rfl
+example : zerotop32.read f64 = f32 := by rfl
+example : zerotop32.write f32 f64 = z32 ++ f32 := by rfl
+example : zerotop16.read f32 = f16 := by rfl
+example : zerotop16.write f16 f32 = z16 ++ f16 := by rfl
+example : zerotop8.read f16 = f8 := by rfl
+example : zerotop8.write f8 f16 = z8 ++ f8 := by rfl
+example : zerotop8.write 0xff 0x1000 = 0x00ff := by rfl
+end zerotopNS
