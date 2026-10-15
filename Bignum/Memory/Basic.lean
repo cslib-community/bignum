@@ -163,5 +163,33 @@ instance {w : Nat} (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
   decidable_of_iff (bytesLE_loaded mem addr bs)
     (bytesLE_loaded_iff mem addr bs)
 
+/--
+Asserts that byte list `bs` is loaded at 4-byte aligned address `addr`.
+-/
+structure AlignedBytesLE_loaded {w : Nat}
+    (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Prop where
+  aligned : (4 ∣ addr.toNat)
+  loaded : mem.BytesLE_loaded addr bs
+
+/--
+Tests whether byte list `bs` is loaded at 4-byte aligned address `addr`.
+-/
+def aligned_bytesLE_loaded {w : Nat}
+    (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Bool :=
+  (4 ∣ addr.toNat) && mem.bytesLE_loaded addr bs
+
+theorem aligned_bytesLE_loaded_iff {w : Nat}
+    (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
+    mem.aligned_bytesLE_loaded addr bs ↔
+    mem.AlignedBytesLE_loaded addr bs := by
+  simp [aligned_bytesLE_loaded]; constructor <;> intro ⟨hl, hr⟩
+  · exact ⟨hl, (mem.bytesLE_loaded_iff _ _).mp hr⟩
+  · exact ⟨hl, (mem.bytesLE_loaded_iff _ _ ).mpr hr⟩
+
+instance {w : Nat} (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
+    Decidable (AlignedBytesLE_loaded mem addr bs) :=
+  decidable_of_iff (aligned_bytesLE_loaded mem addr bs)
+    (aligned_bytesLE_loaded_iff mem addr bs)
+
 end Memory
 end Bignum

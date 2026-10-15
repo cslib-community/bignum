@@ -59,3 +59,14 @@ example : (mem.write_bytesLE_Nat
 /-! ### BytesLE_loaded -/
 
 example : (.allZeros : Memory 64).BytesLE_loaded 0#64 [0#8,0#8] := by decide
+example : (.allOnes : Memory 64).BytesLE_loaded
+    0#64 [0xff#8,0xff#8] := by decide
+
+/-! ### AlignedBytesLE_loaded -/
+
+example : (.allZeros : Memory 64).AlignedBytesLE_loaded
+    0#64 [0#8,0#8] := by decide
+example : (.allZeros : Memory 64).AlignedBytesLE_loaded
+    4#64 [0#8,0#8] := by decide
+example : ¬(.allZeros : Memory 64).AlignedBytesLE_loaded
+    6#64 [0#8,0#8] := by decide
