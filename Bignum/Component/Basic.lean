@@ -9,10 +9,6 @@ module
 
 /-! # Basic components -/
 
--- Ported from HOL-Light (Library/components.ml).
-
-set_option autoImplicit false
-
 namespace Bignum
 
 universe u₁ u₂ u₃ u₄
