@@ -1,13 +1,14 @@
 name = "bignum"
 version = "0.1.0"
-defaultTargets = ["Bignum"]
 lintDriver = "batteries/runLinter"
 testDriver = "BignumTest"
+defaultTargets = ["Bignum"]
 requiresModuleSystem = true
 
 [leanOptions]
 autoImplicit = false
 relaxedAutoImplicit = false
+linter.missingDocs = false
 
 [[require]]
 name = "batteries"
