@@ -55,3 +55,7 @@ example : (mem.write_bytesLE_Nat'
 example : (mem.write_bytesLE_Nat
     (.allOnes 64) 3 0x010203).read_bytesLE (.allOnes 64) 3 =
     [0x03, 0x02, 0x01] := by rfl
+
+/-! ### BytesLE_loaded -/
+
+example : (.allZeros : Memory 64).BytesLE_loaded 0#64 [0#8,0#8] := by decide

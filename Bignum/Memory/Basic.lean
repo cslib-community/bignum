@@ -137,5 +137,31 @@ def write_bytesLE_Nat {w : Nat}
       (fun x ↦ if x == addr then .ofNat 8 (n % 256) else mem x)
       (addr + 1#w) k (n / 256)
 
+/--
+Asserts that byte list `bs` is loaded on memory at address `addr`.
+-/
+def BytesLE_loaded {w : Nat}
+    (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Prop :=
+  mem.read_bytesLE addr bs.length = bs
+
+/--
+Tests whether byte list `bs` is loaded on memory at address `addr`.
+-/
+def bytesLE_loaded {w : Nat}
+    (mem : Memory w) (addr : BitVec w) (bs : ByteList) : Bool :=
+  mem.read_bytesLE addr bs.length == bs
+
+theorem bytesLE_loaded_iff {w : Nat} (mem : Memory w) (addr : BitVec w)
+    (bs : ByteList) :
+    mem.bytesLE_loaded addr bs ↔ mem.BytesLE_loaded addr bs := by
+  unfold bytesLE_loaded BytesLE_loaded; constructor
+  · exact eq_of_beq
+  · intro h; simp [h]
+
+instance {w : Nat} (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
+    Decidable (BytesLE_loaded mem addr bs) :=
+  decidable_of_iff (bytesLE_loaded mem addr bs)
+    (bytesLE_loaded_iff mem addr bs)
+
 end Memory
 end Bignum
