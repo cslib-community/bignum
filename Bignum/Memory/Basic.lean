@@ -49,11 +49,15 @@ abbrev Memory (w : Nat) := BitVec w → BitVec 8
 
 namespace Memory
 
-/-- The all zeros memory. -/
+/--
+The all zeros memory.
+-/
 def allZeros {w : Nat} : Memory w :=
   λ _ ↦ 0#8
 
-/-- The all ones memory. -/
+/--
+The all ones memory.
+-/
 def allOnes {w : Nat} : Memory w :=
   λ _ ↦ .allOnes 8
 
