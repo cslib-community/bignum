@@ -210,11 +210,36 @@ SIMD lane replicating the `i`th byte 16 times (write is no-op).
 def LANE_B (i : Nat) : Component (BitVec 128) (BitVec 128) :=
   .through (λ bv ↦ .replicate 16 (bv.extractLsb' (8 * i) 8)) id
 
-/-! ## Memory components -/
+/-! ## Memory -/
 
-/-- Multi-byte chunk of memory in little-endian encoding. -/
+/-- Multi-byte chunk of memory (little-endian). -/
 def bytes (addr : BitVec 64) (len : Nat) :
     Component State ByteList :=
   memory :> .bytesLE addr len
 
+namespace State
+
+/-- Tests whether `bs` is loaded on memory at 4-byte aligned `addr`. -/
+def alignedBytesLoaded
+    (s : State) (addr : BitVec 64) (bs : ByteList) : Bool :=
+  s._memory.alignedBytesLoadedLE addr bs
+
+/-- Asserts that `bs` is loaded on memory at 4-byte aligned `addr`. -/
+def AlignedBytesLoaded
+    (s : State) (addr : BitVec 64) (bs : ByteList) : Prop :=
+  s._memory.AlignedBytesLoadedLE addr bs
+
+theorem alignedBytesLoaded_iff
+    (s : State) (addr : BitVec 64) (bs : ByteList) :
+    s.alignedBytesLoaded addr bs ↔
+    s.AlignedBytesLoaded addr bs := by
+  rw [alignedBytesLoaded, AlignedBytesLoaded,
+    Memory.alignedBytesLoadedLE_iff]
+
+instance (s : State) (addr : BitVec 64) (bs : ByteList) :
+    Decidable (AlignedBytesLoaded s addr bs) :=
+  decidable_of_iff (s.alignedBytesLoaded addr bs)
+    (s.alignedBytesLoaded_iff addr bs)
+
+end State
 end Bignum.Arm

@@ -184,9 +184,9 @@ theorem alignedBytesLoadedLE_iff {w : Nat}
   · exact ⟨hl, (mem.bytesLoadedLE_iff _ _ ).mpr hr⟩
 
 instance {w : Nat} (mem : Memory w) (addr : BitVec w) (bs : ByteList) :
-    Decidable (AlignedBytesLoadedLE mem addr bs) :=
-  decidable_of_iff (alignedBytesLoadedLE mem addr bs)
-    (alignedBytesLoadedLE_iff mem addr bs)
+    Decidable (mem.AlignedBytesLoadedLE addr bs) :=
+  decidable_of_iff (mem.alignedBytesLoadedLE addr bs)
+    (mem.alignedBytesLoadedLE_iff addr bs)
 
 end Memory
 end Bignum
