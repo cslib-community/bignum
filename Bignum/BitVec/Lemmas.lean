@@ -12,8 +12,6 @@ public import Bignum.BitVec.Basic
 
 /-! # More lemmas about bitvectors -/
 
-set_option autoImplicit false
-
 namespace BitVec
 
 theorem ofNat_mod_cancel {w : Nat} (n : Nat) :

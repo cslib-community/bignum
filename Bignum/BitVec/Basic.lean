@@ -10,8 +10,6 @@ module
 
 /-! # More operations on bitvectors -/
 
-set_option autoImplicit false
-
 namespace BitVec
 
 /--

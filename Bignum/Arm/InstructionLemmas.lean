@@ -12,8 +12,6 @@ public import Bignum.Arm.Instruction
 
 /-! # Theorems about ARM state -/
 
-set_option autoImplicit false
-
 namespace Bignum.Arm
 
 /-! ## Registers -/

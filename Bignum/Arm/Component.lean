@@ -12,8 +12,6 @@ public import Bignum.Arm.State
 
 /-! # ARM-specific components -/
 
-set_option autoImplicit false
-
 namespace Bignum.Component
 
 /--
@@ -28,7 +26,7 @@ Extended version of register `reg` (writes are undefined).
 -/
 def extended {n : Nat} (reg : Component Arm.State (BitVec n))
     (xty : Arm.ExtendedType) {m : Nat} : Component Arm.State (BitVec m) :=
-  -- We use of `default` on the right as a substitute for HOL Light's ARB.
+  -- We use `default` as a substitute for HOL Light's ARB (arbitrary).
   ⟨fun s ↦ xty.extend (Component.read reg s), default⟩
 
 end Bignum.Component

@@ -11,8 +11,6 @@ public import Bignum.Relational.Basic
 
 /-! # Lemmas about relations and rules -/
 
-set_option autoImplicit false
-
 namespace Bignum.Relational
 
 universe u₁ u₂ u₃ u₄

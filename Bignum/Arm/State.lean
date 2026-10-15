@@ -5,6 +5,7 @@ Author(s): Guilherme Lima
 -/
 module
 
+public import Bignum.Arm.Condition
 public import Bignum.BitVec
 public import Bignum.Component
 public import Bignum.Memory
@@ -118,6 +119,27 @@ def CF : Component State Bool :=
 def VF : Component State Bool :=
   flags :> .bitelement 0
 
+/--
+Tests whether the given condition holds in state `s`.
+-/
+def State.condition (s : State) : Condition → Bool
+  | .EQ => ZF.read s
+  | .NE => !ZF.read s
+  | .CS => CF.read s
+  | .CC => !CF.read s
+  | .MI => NF.read s
+  | .PL => !NF.read s
+  | .VS => VF.read s
+  | .VC => !VF.read s
+  | .HI => CF.read s && !ZF.read s
+  | .LS => !(CF.read s && !ZF.read s)
+  | .GE => NF.read s == VF.read s
+  | .LT => !(NF.read s == VF.read s)
+  | .GT => !ZF.read s && (NF.read s == VF.read s)
+  | .LE => !(!ZF.read s && (NF.read s == VF.read s))
+  | .AL => true
+  | .NV => true
+
 /-- Zero register: zero as source, ignored as destination. -/
 def XZR : Component State (BitVec 64) :=
   .rvalue 0#64
@@ -165,18 +187,34 @@ def BREG (n : Nat) : Component State (BitVec 8) :=
   HREG n :> .zerotop8
 
 /--
-SIMD register lanes (writes are no-ops).
+SIMD lane replicating the `i`th double twice (write is no-op).
+-/
+def LANE_D (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ .replicate 2 (bv.extractLsb' (64 * i) 64)) id
+
+/--
+SIMD lane replicating the `i`th word four times (write is no-op).
+-/
+def LANE_S (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ .replicate 4 (bv.extractLsb' (32 * i) 32)) id
+
+/--
+SIMD lane replicating the `i`th half-word 8 times (write is no-op).
+-/
+def LANE_H (i : Nat) : Component (BitVec 128) (BitVec 128) :=
+  .through (λ bv ↦ .replicate 8 (bv.extractLsb' (16 * i) 16)) id
+
+/--
+SIMD lane replicating the `i`th byte 16 times (write is no-op).
 -/
 def LANE_B (i : Nat) : Component (BitVec 128) (BitVec 128) :=
   .through (λ bv ↦ .replicate 16 (bv.extractLsb' (8 * i) 8)) id
 
-def LANE_H (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ .replicate 8 (bv.extractLsb' (16 * i) 16)) id
+/-! ## Memory components -/
 
-def LANE_S (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ .replicate 4 (bv.extractLsb' (32 * i) 32)) id
-
-def LANE_D (i : Nat) : Component (BitVec 128) (BitVec 128) :=
-  .through (λ bv ↦ .replicate 2 (bv.extractLsb' (64 * i) 64)) id
+/-- Multi-byte chunk of memory in little-endian encoding. -/
+def bytes (addr : BitVec 64) (len : Nat) :
+    Component State ByteList :=
+  memory :> .bytesLE addr len
 
 end Bignum.Arm

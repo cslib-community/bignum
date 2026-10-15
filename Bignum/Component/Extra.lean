@@ -13,8 +13,6 @@ public import Bignum.Memory
 
 /-! # More components -/
 
-set_option autoImplicit false
-
 namespace Bignum.Component
 
 /-! ## Bitvector -/

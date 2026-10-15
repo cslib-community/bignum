@@ -699,25 +699,25 @@ example : (DREG 31).read ((DREG 31).write 8 S₁) = 8 := by rfl
 
 /-! ## SIMD register lanes -/
 
-example : ((Q0 :> LANE_B 0).read (Q0.write 0x0a01 S₀))
-          = 0x01010101010101010101010101010101 := by rfl
-example : ((Q0 :> LANE_B 1).read (Q0.write 0xa001 S₀))
-          = 0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 := by rfl
-
-example : ((Q0 :> LANE_H 0).read (Q0.write 0xffff0a01 S₀))
-          = 0x0a010a010a010a010a010a010a010a01 := by rfl
-example : ((Q0 :> LANE_H 1).read (Q0.write 0xffff0a01 S₀))
-          = 0xffffffffffffffffffffffffffffffff := by rfl
+example : ((Q0 :> LANE_D 0).read (Q0.write 0xff00bb01ffff0a01 S₀))
+          = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
+example : ((Q0 :> LANE_D 1).read (Q0.write (0xff00bb01ffff0a01 <<< 64) S₀))
+          = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
 
 example : ((Q0 :> LANE_S 0).read (Q0.write 0xbb01ffff0a01 S₀))
           = 0xffff0a01ffff0a01ffff0a01ffff0a01 := by rfl
 example : ((Q0 :> LANE_S 1).read (Q0.write 0xbb01ffff0a01 S₀))
           = 0x0000bb010000bb010000bb010000bb01 := by rfl
 
-example : ((Q0 :> LANE_D 0).read (Q0.write 0xff00bb01ffff0a01 S₀))
-          = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
-example : ((Q0 :> LANE_D 1).read (Q0.write (0xff00bb01ffff0a01 <<< 64) S₀))
-          = 0xff00bb01ffff0a01ff00bb01ffff0a01 := by rfl
+example : ((Q0 :> LANE_H 0).read (Q0.write 0xffff0a01 S₀))
+          = 0x0a010a010a010a010a010a010a010a01 := by rfl
+example : ((Q0 :> LANE_H 1).read (Q0.write 0xffff0a01 S₀))
+          = 0xffffffffffffffffffffffffffffffff := by rfl
+
+example : ((Q0 :> LANE_B 0).read (Q0.write 0x0a01 S₀))
+          = 0x01010101010101010101010101010101 := by rfl
+example : ((Q0 :> LANE_B 1).read (Q0.write 0xa001 S₀))
+          = 0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 := by rfl
 
 /-! ## Memory components -/
 

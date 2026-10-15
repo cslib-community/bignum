@@ -9,8 +9,6 @@ module
 
 /-! # Memory operations -/
 
-set_option autoImplicit false
-
 namespace Bignum
 
 /-! ## Byte list -/
