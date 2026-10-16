@@ -124,5 +124,13 @@ def invert : Condition → Condition
   | AL => NV
   | NV => AL
 
+theorem invert_ofBitVec_toBitVec_xor (c : Condition) :
+    c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
+  cases c <;> simp [ofBitVec, toBitVec, invert]
+
+theorem invert_involutive (c : Condition) :
+    c.invert.invert = c := by
+  cases c <;> simp [invert]
+
 end Condition
 end Bignum.Arm

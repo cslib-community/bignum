@@ -6,4 +6,5 @@ Author(s): Guilherme Lima
 module
 
 public import Bignum.Arm.Instruction
-public import Bignum.Arm.InstructionLemmas
+public import Bignum.Arm.State
+public import Bignum.Arm.StateLemmas

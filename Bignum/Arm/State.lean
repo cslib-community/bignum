@@ -123,20 +123,20 @@ def VF : Component State Bool :=
 Tests whether the given condition holds in state `s`.
 -/
 def State.condition (s : State) : Condition → Bool
-  | .EQ => ZF.read s
-  | .NE => !ZF.read s
-  | .CS => CF.read s
-  | .CC => !CF.read s
-  | .MI => NF.read s
-  | .PL => !NF.read s
-  | .VS => VF.read s
-  | .VC => !VF.read s
-  | .HI => CF.read s && !ZF.read s
-  | .LS => !(CF.read s && !ZF.read s)
-  | .GE => NF.read s == VF.read s
-  | .LT => !(NF.read s == VF.read s)
-  | .GT => !ZF.read s && (NF.read s == VF.read s)
-  | .LE => !(!ZF.read s && (NF.read s == VF.read s))
+  | .EQ => s.read ZF
+  | .NE => !s.read ZF
+  | .CS => s.read CF
+  | .CC => !s.read CF
+  | .MI => s.read NF
+  | .PL => !s.read NF
+  | .VS => s.read VF
+  | .VC => !s.read VF
+  | .HI => s.read CF && !s.read ZF
+  | .LS => !(s.read CF && !s.read ZF)
+  | .GE => s.read NF == s.read VF
+  | .LT => !(s.read NF == s.read VF)
+  | .GT => !s.read ZF && (s.read NF == s.read VF)
+  | .LE => !(!s.read ZF && (s.read NF == s.read VF))
   | .AL => true
   | .NV => true
 

@@ -14,7 +14,7 @@ public import Bignum.Arm.Instruction
 
 namespace Bignum.Arm
 
-/-! ## Registers -/
+/-! ## Register components -/
 
 theorem XZR_zero : XZR = .rvalue 0 := by
   rfl
@@ -60,65 +60,53 @@ theorem shifted_ROR_zero {w : Nat} (reg : Component State (BitVec w)) :
 
 /-! ## Condition codes -/
 
-namespace Condition
-
-theorem invert_ofBitVec_toBitVec_xor (c : Condition) :
-    c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
-  cases c <;> simp [ofBitVec, toBitVec, invert]
-
-theorem invert_involutive (c : Condition) :
-    c.invert.invert = c := by
-  cases c <;> simp [invert]
-
-end Condition
-
 theorem condition_EQ (s : State) :
-    s.condition .EQ = ZF.read s := by rfl
+    s.condition .EQ = s.read ZF := by rfl
 
 theorem condition_NE (s : State) :
-    s.condition .NE = !ZF.read s := by rfl
+    s.condition .NE = !s.read ZF := by rfl
 
 theorem condition_CS (s : State) :
-    s.condition .CS = CF.read s := by rfl
+    s.condition .CS = s.read CF := by rfl
 
 theorem condition_HS (s : State) :
-    s.condition .HS = CF.read s := by rfl
+    s.condition .HS = s.read CF := by rfl
 
 theorem condition_CC (s : State) :
-    s.condition .CC = !CF.read s := by rfl
+    s.condition .CC = !s.read CF := by rfl
 
 theorem condition_LO (s : State) :
-    s.condition .LO = !CF.read s := by rfl
+    s.condition .LO = !s.read CF := by rfl
 
 theorem condition_MI (s : State) :
-    s.condition .MI = NF.read s := by rfl
+    s.condition .MI = s.read NF := by rfl
 
 theorem condition_PL (s : State) :
-    s.condition .PL = !NF.read s := by rfl
+    s.condition .PL = !s.read NF := by rfl
 
 theorem condition_VS (s : State) :
-    s.condition .VS = VF.read s := by rfl
+    s.condition .VS = s.read VF := by rfl
 
 theorem condition_VC (s : State) :
-    s.condition .VC = !VF.read s := by rfl
+    s.condition .VC = !s.read VF := by rfl
 
 theorem condition_HI (s : State) :
-    s.condition .HI = (CF.read s && !ZF.read s) := by rfl
+    s.condition .HI = (s.read CF && !s.read ZF) := by rfl
 
 theorem condition_LS (s : State) :
-    s.condition .LS = !(CF.read s && !ZF.read s) := by rfl
+    s.condition .LS = !(s.read CF && !s.read ZF) := by rfl
 
 theorem condition_GE (s : State) :
-    s.condition .GE = (NF.read s == VF.read s) := by rfl
+    s.condition .GE = (s.read NF == s.read VF) := by rfl
 
 theorem condition_LT (s : State) :
-    s.condition .LT = !(NF.read s == VF.read s) := by rfl
+    s.condition .LT = !(s.read NF == s.read VF) := by rfl
 
 theorem condition_GT (s : State) :
-    s.condition .GT = (!ZF.read s && (NF.read s == VF.read s)) := by rfl
+    s.condition .GT = (!s.read ZF && (s.read NF == s.read VF)) := by rfl
 
 theorem condition_LE (s : State) :
-    s.condition .LE = !(!ZF.read s && (NF.read s == VF.read s)) := by rfl
+    s.condition .LE = !(!s.read ZF && (s.read NF == s.read VF)) := by rfl
 
 theorem condition_AL (s : State) :
     s.condition .AL = true := by rfl
