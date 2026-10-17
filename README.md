@@ -14,6 +14,14 @@ This port will enable among other things the verification of the integer arithme
 lake build
 ```
 
+API docs:
+```bash
+cd docs
+lake build bignum:docs
+cd .lake/build/doc
+python3 -m http.server 8000
+```
+
 ## Testing
 
 ```bash

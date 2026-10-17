@@ -157,6 +157,12 @@ theorem readBytesLE_add (k₁ k₂ : Nat) :
       rw [BitVec.ofNat_add, BitVec.add_assoc, BitVec.add_comm _ 1#w]
     rw [h, ← ih]
 
+theorem readBytesLE_length_append (k : Nat) (bs₁ bs₂ : ByteList) :
+    mem.readBytesLE addr (bs₁ ++ bs₂).length =
+    (mem.readBytesLE addr bs₁.length) ++
+    mem.readBytesLE (addr + .ofNat w bs₁.length) bs₂.length := by
+  sorry
+
 theorem length_readBytesLE (k : Nat) :
     (mem.readBytesLE addr k).length = k := by
   induction k generalizing addr with
@@ -418,6 +424,12 @@ theorem writeBytesLE_ofNatLE_eq' (k n : Nat) (hk : k ≤ 2^w) :
 --     (mem.writeBytesLE addr k bs).readBytesLE addr k =
 --     (bs.take k).rightpad (k - bs.length) 0#8 := by
 --   sorry
+
+/-! ### BytesLoadedLE -/
+
+theorem BytesLoadedLE_nil :
+    mem.BytesLoadedLE addr [] := by
+  simp [BytesLoadedLE, readBytesLE_zero]
 
 end Memory
 end Bignum
