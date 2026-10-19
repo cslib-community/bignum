@@ -9,7 +9,6 @@ public import Bignum.Arm.Condition
 public import Bignum.BitVec
 public import Bignum.Component
 public import Bignum.Memory
-public import Bignum.Relational
 public import Bignum.Safety
 
 @[expose] public section
