@@ -22,13 +22,13 @@ variable {α : Type u} {β : Type v}
 /--
 Assignment of component as a functional relation.
 -/
-def Assign (cp : Component α β) (b : β) : α → α → Prop :=
+def Assign (cp : Component α β) (b : β) : Relation α α :=
   fun a a' ↦ cp.write b a = a'
 
 /--
 Non-deterministic assignment of component.
 -/
-def Assigns (cp : Component α β) : α → α → Prop :=
+def Assigns (cp : Component α β) : Relation α α :=
   fun a a' ↦ ∃ b, (cp.Assign b) a a'
 
 end Component
