@@ -145,6 +145,11 @@ theorem readBytesLE_succ (k : Nat) :
     mem addr :: mem.readBytesLE (addr + 1#w) k := by
   rw [readBytesLE]
 
+theorem readBytesLE_succ' (k : Nat) :
+    mem.readBytesLE addr (k + 1) =
+    mem.readBytesLE addr 1 ++ mem.readBytesLE (addr + 1#w) k := by
+  rw [readBytesLE_succ]; congr
+
 theorem readBytesLE_add (k₁ k₂ : Nat) :
     mem.readBytesLE addr (k₁ + k₂) =
     mem.readBytesLE addr k₁ ++ mem.readBytesLE (addr + .ofNat w k₁) k₂ := by
@@ -174,8 +179,14 @@ theorem readBytesLE_length_append_eq_append_iff (bs₁ bs₂ : ByteList) :
     mem.readBytesLE (addr + .ofNat w bs₁.length) bs₂.length = bs₂ := by
   rw [readBytesLE_length_append]
   constructor
-  · intro h; sorry
-  · intro ⟨hl, hr⟩; congr
+  · induction bs₁ generalizing mem addr bs₂ with
+    | nil => simp [readBytesLE_zero]
+    | cons _ bs₁' ih =>
+      simp [readBytesLE_succ]; intro hb; simp [hb]
+      simp [← BitVec.ofNat_add_ofNat,
+        BitVec.add_comm (.ofNat _ bs₁'.length), ← BitVec.add_assoc]
+      intro h; apply ih _ _ _ h
+  · intro ⟨_, _⟩; congr
 
 theorem length_readBytesLE (k : Nat) :
     (mem.readBytesLE addr k).length = k := by
@@ -445,11 +456,11 @@ theorem BytesLoadedLE_nil :
     mem.BytesLoadedLE addr [] := by
   simp [BytesLoadedLE, readBytesLE_zero]
 
--- theorem BytesLoadedLE_append (bs₁ bs₂ : ByteList) :
---     mem.BytesLoadedLE addr (bs₁ ++ bs₂) ↔
---     mem.BytesLoadedLE addr bs₁ ∧
---     mem.BytesLoadedLE (addr + .ofNat w bs₁.length) bs₂ := by
---   sorry
+theorem BytesLoadedLE_append (bs₁ bs₂ : ByteList) :
+    mem.BytesLoadedLE addr (bs₁ ++ bs₂) ↔
+    mem.BytesLoadedLE addr bs₁ ∧
+    mem.BytesLoadedLE (addr + .ofNat w bs₁.length) bs₂ := by
+  apply readBytesLE_length_append_eq_append_iff
 
 end Memory
 end Bignum
