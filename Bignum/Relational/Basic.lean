@@ -29,9 +29,9 @@ def seq (r₁ : α → β → Prop) (r₂ : β → γ → Prop) : α → γ → 
 Subsumption of relations.
 -/
 def subsumed (r r' : α → β → Prop) : Prop :=
-  forall a b, r a b → r' a b
+  ∀ a b, r a b → r' a b
 
-@[inherit_doc] infixl:50 " ⊑ " => subsumed
+@[inherit_doc] infixr:50 " ⊑ " => subsumed
 
 /--
 Assignment of component as a (functional) relation.
@@ -39,6 +39,6 @@ Assignment of component as a (functional) relation.
 def assign (cp : Component α β) (b : β) : α → α → Prop :=
   fun a a' ↦ cp.write b a = a'
 
-@[inherit_doc] infixl:70 " ≔ " => assign
+@[inherit_doc] infixr:70 " ≔ " => assign
 
 end Bignum.Relational

@@ -36,7 +36,8 @@ theorem seq_id_right (r : α → β → Prop) : r ,, Eq = r := by
   · intro; exists b
 
 theorem seq_trivial [Inhabited β] :
-    (λ (_ : α) _ ↦ True) ,, (λ (_ : β) (_ : γ) ↦ True) = (λ _ _ ↦ True) := by
+    (fun (_ : α) _ ↦ True) ,, (fun (_ : β) (_ : γ) ↦ True) =
+    (fun _ _ ↦ True) := by
   unfold seq; simp
 
 theorem seq_preserves_component (cp : Component α β)
@@ -65,7 +66,7 @@ theorem subsumed_id_seq (r r' : α → α → Prop) (h₁ : Eq ⊑ r) (h₂ : Eq
   exact ⟨a, h₁ _ _ (@Eq.refl _ a), h₂ _ _ (@Eq.refl _ a)⟩
 
 theorem subsumed_refl (r : α → β → Prop) : r ⊑ r := by
-  unfold subsumed; exact (λ _ _ h ↦ h)
+  unfold subsumed; exact (fun _ _ h ↦ h)
 
 theorem subsumed_seq_left (r r' : α → β → Prop) (rb : β → β → Prop)
     (h₁ : r ⊑ r') (h₂ : Eq ⊑ rb) :
@@ -79,7 +80,7 @@ theorem subsumed_seq_right (r r' : α → β → Prop) (ra : α → α → Prop)
   unfold subsumed seq at *
   intro a _ hab; exact ⟨a, h₁ _ _ (@Eq.refl _ a), h₂ _ _ hab⟩
 
-theorem subsumed_triival (r : α → α → Prop) : r ⊑ (λ _ _ ↦ True) := by
+theorem subsumed_trivial (r : α → α → Prop) : r ⊑ (fun _ _ ↦ True) := by
   unfold subsumed; intros; exact True.intro
 
 /-! ## assign (≔) -/
@@ -108,7 +109,7 @@ theorem assign_zerotop128 (cp : Component α (BitVec 256)) (bv : BitVec 128) :
     ((cp :> .zerotop128) ≔ bv) = (cp ≔ bv.zeroExtend 256) := by
   unfold assign; simp [Component.zerotop128]
 
-theorem assign_zerotop512 (cp : Component α (BitVec 512)) (bv : BitVec 256) :
+theorem assign_zerotop256 (cp : Component α (BitVec 512)) (bv : BitVec 256) :
     ((cp :> .zerotop256) ≔ bv) = (cp ≔ bv.zeroExtend 512) := by
   unfold assign; simp [Component.zerotop256]
 
