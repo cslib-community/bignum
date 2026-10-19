@@ -31,6 +31,13 @@ Non-deterministic assignment of component.
 def Assigns (cp : Component α β) : Relation α α :=
   fun a a' ↦ ∃ b, (cp.Assign b) a a'
 
+/--
+Expresses "a step only (possibly) changes these components".
+-/
+def MayChange : List (Component α β) → Relation α α
+  | [] => Eq
+  | cp :: cps => cp.Assigns ,, MayChange cps
+
 end Component
 
 @[inherit_doc] scoped infixr:70 " ≔ " => Component.Assign

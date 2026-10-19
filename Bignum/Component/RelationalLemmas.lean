@@ -56,7 +56,7 @@ theorem Assign_zerotop256 (cp : Component α (BitVec 512)) (bv : BitVec 256) :
 
 /-! ## Assigns -/
 
-theorem Assigns_eq (cp : Component α β) :
+theorem Assigns_def (cp : Component α β) :
     cp.Assigns = fun a a' ↦ ∃ b, cp.write b a = a' := by
   unfold Assigns Assign; rfl
 
@@ -64,17 +64,17 @@ theorem Assigns_Seq (cp : Component α β) (r : Relation α β) :
     (cp.Assigns ,, r) = fun a a' ↦ ∃ b, r (cp.write b a) a' := by
   unfold Relation.Seq Assigns Assign; funext a b; grind
 
-theorem Subsumed_Assigns_Subcomponents
+theorem Assigns_compose_Subsumed_Assings_compose
     (cp₁ : Component α β) (cp₂ : Component β γ) (cp₂' : Component β δ)
     (h : cp₂.Assigns ⊑ cp₂'.Assigns) :
     (cp₁ :> cp₂).Assigns ⊑ (cp₁ :> cp₂').Assigns := by
-  simp [Assigns_eq, Relation.Subsumed] at *
+  simp [Assigns_def, Relation.Subsumed] at *
   intro a c; rcases h (cp₁.read a) c with ⟨d, h'⟩
   exists d; rw [h']
 
-theorem Subsumed_Assigns_Subcomponent
+theorem Assigns_compose_Subsumed_Assings
     (cp₁ : Component α β) (cp₂ : Component β γ) :
     (cp₁ :> cp₂).Assigns ⊑ cp₁.Assigns := by
-  simp [Relation.Subsumed, Assigns_eq]
+  simp [Relation.Subsumed, Assigns_def]
 
 end Bignum.Component
