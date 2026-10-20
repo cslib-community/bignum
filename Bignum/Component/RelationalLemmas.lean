@@ -32,27 +32,27 @@ theorem Assign_Seq (cp : Component α β) (b : β) (r : Relation α β) (a : α)
 
 theorem Assign_zerotop8 (cp : Component α (BitVec 16)) (bv : BitVec 8) :
     ((cp :> .zerotop8) ≔ bv) = (cp ≔ bv.zeroExtend 16) := by
-  unfold Assign; simp [Component.zerotop8]
+  unfold Assign; simp [compose, through, zerotop8]
 
 theorem Assign_zerotop16 (cp : Component α (BitVec 32)) (bv : BitVec 16) :
     ((cp :> .zerotop16) ≔ bv) = (cp ≔ bv.zeroExtend 32) := by
-  unfold Assign; simp [Component.zerotop16]
+  unfold Assign; simp [compose, through, zerotop16]
 
 theorem Assign_zerotop32 (cp : Component α (BitVec 64)) (bv : BitVec 32) :
     ((cp :> .zerotop32) ≔ bv) = (cp ≔ bv.zeroExtend 64) := by
-  unfold Assign; simp [Component.zerotop32]
+  unfold Assign; simp [compose, through, zerotop32]
 
 theorem Assign_zerotop64 (cp : Component α (BitVec 128)) (bv : BitVec 64) :
     ((cp :> .zerotop64) ≔ bv) = (cp ≔ bv.zeroExtend 128) := by
-  unfold Assign; simp [Component.zerotop64]
+  unfold Assign; simp [compose, through, zerotop64]
 
 theorem Assign_zerotop128 (cp : Component α (BitVec 256)) (bv : BitVec 128) :
     ((cp :> .zerotop128) ≔ bv) = (cp ≔ bv.zeroExtend 256) := by
-  unfold Assign; simp [Component.zerotop128]
+  unfold Assign; simp [compose, through, zerotop128]
 
 theorem Assign_zerotop256 (cp : Component α (BitVec 512)) (bv : BitVec 256) :
     ((cp :> .zerotop256) ≔ bv) = (cp ≔ bv.zeroExtend 512) := by
-  unfold Assign; simp [Component.zerotop256]
+  unfold Assign; simp [compose, through, zerotop256]
 
 /-! ## Assigns -/
 
@@ -70,11 +70,11 @@ theorem Assigns_compose_Subsumed_Assings_compose
     (cp₁ :> cp₂).Assigns ⊑ (cp₁ :> cp₂').Assigns := by
   simp [Assigns_def, Relation.Subsumed] at *
   intro a c; rcases h (cp₁.read a) c with ⟨d, h'⟩
-  exists d; rw [h']
+  exists d; simp [compose, h']
 
 theorem Assigns_compose_Subsumed_Assings
     (cp₁ : Component α β) (cp₂ : Component β γ) :
     (cp₁ :> cp₂).Assigns ⊑ cp₁.Assigns := by
-  simp [Relation.Subsumed, Assigns_def]
+  simp [compose, Relation.Subsumed, Assigns_def]
 
 end Bignum.Component

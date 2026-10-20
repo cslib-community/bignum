@@ -14,7 +14,7 @@ namespace Bignum
 universe u₁ u₂ u₃ u₄
 
 /--
-Component of type `b` in a composite of type `a`.
+Component of type `β` in a larger state space `a`.
 -/
 structure Component (α : Type u₁) (β : Type u₂) where
   /-- Reader function. -/
@@ -24,81 +24,99 @@ structure Component (α : Type u₁) (β : Type u₂) where
 
 namespace Component
 
-variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
+/--
+Type class stating that writing to then reading from `cp`
+yields the written value.
+-/
+class ReadOverWrite
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
+  /-- Reading after writing `b` to `a` yields `b`. -/
+  read_over_write : ∀ b a, cp.read (cp.write b a) = b
+
+/--
+Type class stating that writing then reading from `cp`
+yields a function of the written value.
+-/
+class WeakReadOverWrite
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
+  /-- Reading after writing `b` to `a` yields `f b` for some `f`. -/
+  weak_read_over_write : ∃ (f : β → β), ∀ b a, cp.read (cp.write b a) = f b
+
+/--
+Type class stating that reading then writing the value just
+read to `cp` cancels the write.
+-/
+class WriteOverRead
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
+  /-- Writing the current of the component value to `a` yields `a`. -/
+  write_over_read : ∀ a, cp.write (cp.read a) a = a
+
+/--
+Type class stating that writing to `cp` twice cancels the first write.
+-/
+class WriteOverWrite
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
+  /-- Writing `b₂` after writing `b₁` to `a` is
+      the same as to writing `b₂` to `a`. -/
+  write_over_write : ∀ b₁ b₂ a, cp.write b₂ (cp.write b₁ a) = cp.write b₂ a
+
+/--
+Type class stating that `cp` is valid, i.e., satisfies the `ReadOverWrite`
+and `WriteOverWrite`.
+-/
+class abbrev Valid
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop :=
+  ReadOverWrite cp, WriteOverWrite cp
+
+/--
+Type class stating that `cp` is weakly valid, i.e., satisfies
+`WeakReadOverWrite` and `WriteOverWrite`.
+-/
+class abbrev WeaklyValid
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop :=
+  WeakReadOverWrite cp, WriteOverWrite cp
+
+/--
+Type class stating that `cp` is strongly valid, i.e., satisfies
+`ReadOverWrite`, `WriteOverWrite`, and `WriteOverRead`.
+-/
+class abbrev StronglyValid
+    {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop :=
+  Valid cp, WriteOverRead cp
 
 /--
 Composition of components.
 -/
-@[simp]
-def Component.compose
+def compose {α : Type u₁} {β : Type u₂} {γ : Type u₃}
     (cp₁ : Component α β) (cp₂ : Component β γ) : Component α γ :=
   ⟨cp₂.read ∘ cp₁.read, fun c a ↦ cp₁.write (cp₂.write c (cp₁.read a)) a⟩
 
 @[inherit_doc] infixr:90 " :> " => Component.compose
 
-theorem compose_assoc
-    (cp₁ : Component α β) (cp₂ : Component β γ) (cp₃ : Component γ δ) :
-    cp₁ :> (cp₂ :> cp₃) = (cp₁ :> cp₂) :> cp₃ := by
-  rfl
-
-theorem compose_read (cp₁ : Component α β) (cp₂ : Component β γ) (a : α) :
-    (cp₁ :> cp₂).read a = cp₂.read (cp₁.read a) := by
-  rfl
-
-theorem compose_write
-    (cp₁ : Component α β) (cp₂ : Component β γ) (a : α) (c : γ) :
-    (cp₁ :> cp₂).write c a = cp₁.write (cp₂.write c (cp₁.read a)) a := by
-  rfl
-
-theorem read_write_compose
-    (cp₁ : Component α β) (cp₂ : Component β γ)
-    (h₁ : ∀ b a, cp₁.read (cp₁.write b a) = b)
-    (h₂ : ∀ c b, cp₂.read (cp₂.write c b) = c)
-    (c : γ) (a : α) :
-    (cp₁ :> cp₂).read ((cp₁ :> cp₂).write c a) = c := by
-  rw [compose_read, compose_write, h₁, h₂]
-
 /--
 "Identity" for components.
 -/
-def entirety : Component α α :=
+def entirety {α : Type u₁} : Component α α :=
   ⟨id, fun x _ ↦ x⟩
 
-theorem entirety_read (a : α) : entirety.read a = a := by
-  rfl
-
-theorem entirety_write (a a' : α) : entirety.write a' a = a' := by
-  rfl
-
-theorem entirety_read_write (a a' : α) :
-    entirety.read (entirety.write a' a) = a' := by
-  rfl
-
-theorem compose_entirety (cp : Component α β) :
-    cp :> entirety = cp := by
-  rfl
-
-theorem entirety_compose (cp : Component α β) :
-    entirety :> cp = cp := by
-  rfl
-
 /--
-Pseudo-component for reading a value (read-only).
+Pseudo-component for reading a value (write is no-op).
 -/
-def rvalue (b : β) : Component α β :=
+def rvalue {α : Type u₁} {β : Type u₂} (b : β) : Component α β :=
   ⟨fun _ ↦ b, fun _ a ↦ a⟩
 
 /--
-Component corresponding to a function with a BEq domain.
+Component for a function with a BEq domain.
 -/
-def element [BEq α] (a : α) : Component (α → β) β :=
+def element {α : Type u₁} [BEq α] {β : Type u₂} (a : α)
+    : Component (α → β) β :=
   ⟨fun f ↦ f a, fun b f a' ↦ if a' == a then b else f a'⟩
 
 /--
-Component that applies a pair of functions (f,g) to a component.
+Component for applying a pair of functions (f,g) to a component.
 -/
-@[simp]
-def through (f : α → β) (g : β → α) : Component α β :=
+def through {α : Type u₁} {β : Type u₂} (f : α → β) (g : β → α)
+    : Component α β :=
   ⟨f, fun b _ ↦ g b⟩
 
 end Component
