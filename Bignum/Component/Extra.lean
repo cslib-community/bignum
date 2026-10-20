@@ -118,37 +118,37 @@ def top8 : Component (BitVec 16) (BitVec 8) :=
 The bottom 256 bits of 512-bit bitvector, zeroing the top 256 bits on write.
 -/
 def zerotop256 : Component (BitVec 512) (BitVec 256) :=
-  .through (BitVec.truncate 256) (BitVec.truncate 512)
+  .through (.truncate 256) (.truncate 512)
 
 /--
 The bottom 128 bits of 256-bit bitvector, zeroing the top 128 bits on write.
 -/
 def zerotop128 : Component (BitVec 256) (BitVec 128) :=
-  .through (BitVec.truncate 128) (BitVec.truncate 256)
+  .through (.truncate 128) (.truncate 256)
 
 /--
 The bottom 64 bits of 128-bit bitvector, zeroing the top 64 bits on write.
 -/
 def zerotop64 : Component (BitVec 128) (BitVec 64) :=
-  .through (BitVec.truncate 64) (BitVec.truncate 128)
+  .through (.truncate 64) (.truncate 128)
 
 /--
 The bottom 32 bits of 64-bit bitvector, zeroing the top 32 bits on write.
 -/
 def zerotop32 : Component (BitVec 64) (BitVec 32) :=
-  .through (BitVec.truncate 32) (BitVec.truncate 64)
+  .through (.truncate 32) (.truncate 64)
 
 /--
 The bottom 16 bits of 32-bit bitvector, zeroing the top 16 bits on write.
 -/
 def zerotop16 : Component (BitVec 32) (BitVec 16) :=
-  .through (BitVec.truncate 16) (BitVec.truncate 32)
+  .through (.truncate 16) (.truncate 32)
 
 /--
 The bottom 8 bits of 16-bit bitvector, zeroing the top 8 bits on write.
 -/
 def zerotop8 : Component (BitVec 16) (BitVec 8) :=
-  .through (BitVec.truncate 8) (BitVec.truncate 16)
+  .through (.truncate 8) (.truncate 16)
 
 /-! ## Memory -/
 

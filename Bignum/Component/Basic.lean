@@ -25,7 +25,7 @@ structure Component (α : Type u₁) (β : Type u₂) where
 namespace Component
 
 /--
-Type class stating that writing to then reading from `cp`
+Type class stating that writing then reading from `cp`
 yields the written value.
 -/
 class ReadOverWrite
@@ -35,7 +35,7 @@ class ReadOverWrite
 
 /--
 Type class stating that writing then reading from `cp`
-yields a function of the written value.
+yields a function of the written value (e.g., the truncated value).
 -/
 class WeakReadOverWrite
     {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
@@ -43,8 +43,8 @@ class WeakReadOverWrite
   weak_read_over_write : ∃ (f : β → β), ∀ b a, cp.read (cp.write b a) = f b
 
 /--
-Type class stating that reading then writing the value just
-read to `cp` cancels the write.
+Type class stating that reading then writing to `cp` the value just
+read cancels the write.
 -/
 class WriteOverRead
     {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
@@ -52,7 +52,7 @@ class WriteOverRead
   write_over_read : ∀ a, cp.write (cp.read a) a = a
 
 /--
-Type class stating that writing to `cp` twice cancels the first write.
+Type class stating that writing to `cp` twice overwrites the first write.
 -/
 class WriteOverWrite
     {α : Type u₁} {β : Type u₂} (cp : Component α β) : Prop where
