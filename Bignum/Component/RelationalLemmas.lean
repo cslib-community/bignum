@@ -85,8 +85,6 @@ theorem Assigns_compose_Subsumed_Assings
 
 /-! ## MayChange -/
 
-#check MayChange []
-
 theorem MayChange_nil (a : α) :
     MayChange (.nil : List (Component α β)) a a := by
   rw [MayChange]
