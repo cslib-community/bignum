@@ -46,6 +46,42 @@ def cc : C := ⟨λ _ ↦ 0⟩
 example : G.read cc 42 = 0 := by rfl
 example : G13.read cc = 0 := by rfl
 example :  G13.read (G13.write 11 cc) = 11 := by rfl
+
+/-- info: instReadOverWriteForallElement 8 -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).ReadOverWrite
+
+/-- info: instWeakReadOverWriteOfReadOverWrite (element 8) -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).WeakReadOverWrite
+
+/--  info: instWriteOverReadForallElement 8 -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).WriteOverRead
+
+/-- info: instWriteOverWriteForallElement 8 -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).WriteOverWrite
+
+/-- info: { toReadOverWrite := instReadOverWriteForallElement 8,
+toWriteOverWrite := instWriteOverWriteForallElement 8 } -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).Valid
+
+/-- info: instWeaklyValidOfValid (element 8) -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).WeaklyValid
+
+/-- info: { toReadOverWrite := instReadOverWriteForallElement 8,
+toWriteOverWrite := instWriteOverWriteForallElement 8,
+  toWriteOverRead := instWriteOverReadForallElement 8 } -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).StronglyValid
+
+/-- info: instExtensionallyValidOfStronglyValid (element 8) -/
+#guard_msgs in
+#synth (@Component.element _ _ Nat 8).ExtensionallyValid
+
 end elementNS
 
 /-! ## through -/

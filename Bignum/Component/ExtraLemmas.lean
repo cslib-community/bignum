@@ -17,6 +17,26 @@ namespace Bignum.Component
 universe u₁ u₂ u₃ u₄
 variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
+/-! ## element -/
+
+instance [DecidableEq α] (a : α) : (@element _ _ β a).ReadOverWrite := by
+  constructor; simp [element]
+
+instance [DecidableEq α] (a : α) : (@element _ _ β a).WriteOverRead := by
+  unfold element; constructor; grind
+
+instance [DecidableEq α] (a : α) : (@element _ _ β a).WriteOverWrite := by
+  unfold element; constructor; grind
+
+theorem read_element [DecidableEq α] (f : α → β) (a : α) :
+    (element a).read f = f a := by
+  rfl
+
+theorem read_write_element [DecidableEq α] (f : α → β) (a a' : α) (b : β) :
+    (element a).read ((element a').write b f) =
+    if a = a' then b else (element a).read f := by
+  rfl
+
 /-! ## rvalue -/
 
 theorem read_rvalue (a : α) (b : β) :
@@ -62,5 +82,11 @@ instance (b : β) (cp₂ : Component β γ) (cp₁ : Component α β) :
   · simp [write_rvalue]
   · simp [write_rvalue]
   · simp [read_rvalue]
+
+/-! ## through -/
+
+theorem read_write_through (f : α → β) (g : β → α) (a : α) (b : β) :
+    (through f g).read ((through f g).write b a) = (f ∘ g) b := by
+  rfl
 
 end Bignum.Component

@@ -20,17 +20,17 @@ universe u v
 /-! ## General -/
 
 /--
+Component for a function with a BEq domain.
+-/
+def element {α : Type u} [DecidableEq α] {β : Type v} (a : α)
+    : Component (α → β) β :=
+  ⟨fun f ↦ f a, fun b f a' ↦ if a' = a then b else f a'⟩
+
+/--
 Pseudo-component for reading a value (write is no-op).
 -/
 def rvalue {α : Type u} {β : Type v} (b : β) : Component α β :=
   ⟨fun _ ↦ b, fun _ a ↦ a⟩
-
-/--
-Component for a function with a BEq domain.
--/
-def element {α : Type u} [BEq α] {β : Type v} (a : α)
-    : Component (α → β) β :=
-  ⟨fun f ↦ f a, fun b f a' ↦ if a' == a then b else f a'⟩
 
 /--
 Component for applying a pair of functions (f,g) to a component.

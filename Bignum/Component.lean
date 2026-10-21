@@ -8,5 +8,6 @@ module
 public import Bignum.Component.Basic
 public import Bignum.Component.BasicLemmas
 public import Bignum.Component.Extra
+public import Bignum.Component.ExtraLemmas
 public import Bignum.Component.Relational
 public import Bignum.Component.RelationalLemmas
