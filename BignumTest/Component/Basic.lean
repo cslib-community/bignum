@@ -87,8 +87,7 @@ toWriteOverWrite := Component.instWriteOverWriteEntirety } -/
 #guard_msgs in
 #synth Component.entirety.Valid
 
-/-- info: { toWeakReadOverWrite := Component.instWeakReadOverWriteEntirety,
-  toWriteOverWrite := Component.instWriteOverWriteEntirety } -/
+/-- info: Component.instWeaklyValidOfValid Component.entirety -/
 #guard_msgs in
 #synth Component.entirety.WeaklyValid
 
@@ -98,9 +97,8 @@ toWriteOverWrite := Component.instWriteOverWriteEntirety,
 #guard_msgs in
 #synth Component.entirety.StronglyValid
 
-/-- info: { toWeakReadOverWrite := Component.instWeakReadOverWriteEntirety,
-  toWriteOverWrite := Component.instWriteOverWriteEntirety,
-toWriteOverRead := Component.instWriteOverReadEntirety } -/
+/-- info: Component.instExtensionallyValidOfStronglyValid
+Component.entirety -/
 #guard_msgs in
 #synth Component.entirety.ExtensionallyValid
 
@@ -108,6 +106,11 @@ toWriteOverRead := Component.instWriteOverReadEntirety } -/
 Component.entirety -/
 #guard_msgs in
 #synth (.entirety :> .entirety).ReadOverWrite
+
+/-- info: Component.instWeakReadOverWriteOfReadOverWrite
+(Component.entirety :> Component.entirety) -/
+#guard_msgs in
+#synth (.entirety :> .entirety).WeakReadOverWrite
 
 /-- info: Component.instWriteOverReadCompose Component.entirety
 Component.entirety -/
@@ -124,10 +127,20 @@ Component.entirety -/
 #guard_msgs in
 #synth (.entirety :> .entirety).Valid
 
+/-- info: Component.instWeaklyValidOfValid
+(Component.entirety :> Component.entirety) -/
+#guard_msgs in
+#synth (.entirety :> .entirety).WeaklyValid
+
 /-- info: Component.instStronglyValidCompose Component.entirety
 Component.entirety -/
 #guard_msgs in
 #synth (.entirety :> .entirety).StronglyValid
+
+/-- info: Component.instExtensionallyValidOfStronglyValid
+(Component.entirety :> Component.entirety) -/
+#guard_msgs in
+#synth (.entirety :> .entirety).ExtensionallyValid
 
 /-! ## rvalue -/
 

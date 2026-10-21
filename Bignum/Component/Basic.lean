@@ -42,11 +42,6 @@ class WeakReadOverWrite {α : Type u₁} {β : Type u₂}
   /-- Reading after writing `b` to `a` yields `f b` for some `f`. -/
   weak_read_over_write : ∃ (f : β → β), ∀ b a, cp.read (cp.write b a) = f b
 
-theorem WeakReadOverWrite.of_ReadOverWrite {α : Type u₁} {β : Type u₂}
-    (cp : Component α β) [h : cp.ReadOverWrite] :
-    cp.WeakReadOverWrite := by
-  constructor; exists id; apply h.read_over_write
-
 /--
 Type class stating that reading then writing to component `cp`
 the value just read cancels the write.
@@ -82,12 +77,6 @@ class abbrev WeaklyValid {α : Type u₁} {β : Type u₂}
     (cp : Component α β) : Prop :=
   WeakReadOverWrite cp, WriteOverWrite cp
 
-theorem WeaklyValid.of_Valid {α : Type u₁} {β : Type u₂}
-    (cp : Component α β) [cp.Valid] :
-    cp.WeaklyValid := by
-  apply @WeaklyValid.mk _ _ cp ?_
-  apply WeakReadOverWrite.of_ReadOverWrite
-
 /--
 Type class stating that component `cp` is strongly valid, i.e.,
 satisfies `ReadOverWrite`, `WriteOverWrite`, and `WriteOverRead`.
@@ -103,12 +92,6 @@ satisfies `WeaklyValid` and `WriteOverRead`.
 class abbrev ExtensionallyValid {α : Type u₁} {β : Type u₂}
     (cp : Component α β) : Prop :=
   WeaklyValid cp, WriteOverRead cp
-
-theorem ExtensionallyValid.of_StronglyValid {α : Type u₁} {β : Type u₂}
-    (cp : Component α β) [cp.StronglyValid] :
-    cp.ExtensionallyValid := by
-  apply @ExtensionallyValid.mk _ _ cp ?_
-  apply WeaklyValid.of_Valid
 
 /--
 Type class stating that components `cp₁` and `cp₂` are orthogonal, i.e.,

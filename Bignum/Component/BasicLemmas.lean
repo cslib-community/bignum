@@ -16,6 +16,17 @@ namespace Bignum.Component
 universe u₁ u₂ u₃ u₄
 variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
+instance (cp : Component α β) [h : cp.ReadOverWrite] :
+    cp.WeakReadOverWrite := by
+  constructor; exists id; apply h.read_over_write
+
+instance (cp : Component α β) [cp.Valid] : cp.WeaklyValid := by
+  constructor
+
+instance (cp : Component α β) [cp.StronglyValid] :
+    cp.ExtensionallyValid := by
+  constructor
+
 /-! ## compose -/
 
 theorem compose_assoc
