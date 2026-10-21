@@ -40,38 +40,37 @@ theorem read_write_compose
     (cp₁ :> cp₂).read ((cp₁ :> cp₂).write c a) = c := by
   rw [read_compose, write_compose, h₁, h₂]
 
-theorem ReadOverWrite.compose (cp₁ : Component α β) (cp₂ : Component β γ)
-    [hr₁ : cp₁.ReadOverWrite] [hr₂ : cp₂.ReadOverWrite] :
-    (cp₁ :> cp₂).ReadOverWrite := by
-  constructor; intros c a
-  apply read_write_compose _ _ hr₁.read_over_write hr₂.read_over_write
+instance (cp₁ : Component α β) (cp₂ : Component β γ)
+    [h₁ : cp₁.ReadOverWrite] [h₂ : cp₂.ReadOverWrite] :
+    ReadOverWrite (cp₁ :> cp₂) where
+  read_over_write := by
+    intros; apply read_write_compose
+    · apply h₁.read_over_write
+    · apply h₂.read_over_write
 
-theorem WriteOverRead.compose (cp₁ : Component α β) (cp₂ : Component β γ)
-    [hw₁ : cp₁.WriteOverRead] [hw₂ : cp₂.WriteOverRead] :
-    (cp₁ :> cp₂).WriteOverRead := by
-  constructor; intro a; rw [write_compose, read_compose,
-    hw₂.write_over_read, hw₁.write_over_read]
+instance (cp₁ : Component α β) (cp₂ : Component β γ)
+    [h₁ : cp₁.WriteOverRead] [h₂ : cp₂.WriteOverRead] :
+    (cp₁ :> cp₂).WriteOverRead where
+  write_over_read := by
+    intros; rw [write_compose, read_compose, h₂.write_over_read,
+      h₁.write_over_read]
 
-theorem WriteOverWrite.compose (cp₁ : Component α β) (cp₂ : Component β γ)
+instance (cp₁ : Component α β) (cp₂ : Component β γ)
     [hr₁ : cp₁.ReadOverWrite] [hw₁ : cp₁.WriteOverWrite]
     [hw₂ : cp₂.WriteOverWrite] :
     (cp₁ :> cp₂).WriteOverWrite := by
-  constructor; intros c c' a; simp [write_compose,
-    hr₁.read_over_write, hw₁.write_over_write, hw₂.write_over_write]
+    constructor; intros; simp [write_compose, hr₁.read_over_write,
+      hw₁.write_over_write, hw₂.write_over_write]
 
-theorem Valid.compose (cp₁ : Component α β) (cp₂ : Component β γ)
-    [hv₁ : cp₁.Valid] [hv₂ : cp₂.Valid] :
+instance (cp₁ : Component α β) (cp₂ : Component β γ)
+    [cp₁.Valid] [cp₂.Valid] :
     (cp₁ :> cp₂).Valid := by
-  refine @Valid.mk _ _ (cp₁ :> cp₂) ?r ?w
-  · apply ReadOverWrite.compose
-  · apply WriteOverWrite.compose
+  constructor
 
-theorem StronglyValid.compose (cp₁ : Component α β) (cp₂ : Component β γ)
-    [hs₁ : cp₁.StronglyValid] [hs₂ : cp₂.StronglyValid] :
+instance (cp₁ : Component α β) (cp₂ : Component β γ)
+    [cp₁.StronglyValid] [cp₂.StronglyValid] :
     (cp₁ :> cp₂).StronglyValid := by
-  apply @StronglyValid.mk _ _ (cp₁ :> cp₂) ?v ?w
-  · apply Valid.compose
-  · apply WriteOverRead.compose
+  constructor
 
 /-! ## entirety -/
 
@@ -85,12 +84,17 @@ theorem read_write_entirety (a a' : α) :
     entirety.read (entirety.write a a') = a := by
   rfl
 
-instance {α : Type u₁} : Valid (@entirety α) where
+instance : ReadOverWrite (@entirety α) where
   read_over_write := read_write_entirety
-  write_over_write := by simp [write_entirety]
 
-instance {α : Type u₁} : StronglyValid (@entirety α) where
+instance : WeakReadOverWrite (@entirety α) where
+  weak_read_over_write := by exists id; apply read_write_entirety
+
+instance : WriteOverRead (@entirety α) where
   write_over_read := by simp [write_entirety, read_entirety]
+
+instance : WriteOverWrite (@entirety α) where
+  write_over_write := by simp [write_entirety]
 
 theorem compose_entirety_right (cp : Component α β) :
     cp :> entirety = cp := by
