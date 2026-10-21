@@ -7,7 +7,7 @@ module
 
 @[expose] public section
 
-/-! # Operations on binary relations -/
+/-! # Relational model of programs and Hoare-rules -/
 
 namespace Bignum
 

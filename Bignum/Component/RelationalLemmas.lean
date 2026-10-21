@@ -10,7 +10,7 @@ public import Bignum.Component.Relational
 
 @[expose] public section
 
-/-! # Lemmas about relations and rules -/
+/-! # Lemmas about relations and Hoare-type rules -/
 
 namespace Bignum.Component
 

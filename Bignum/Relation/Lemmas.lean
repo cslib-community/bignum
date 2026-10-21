@@ -9,7 +9,7 @@ public import Bignum.Relation.Basic
 
 @[expose] public section
 
-/-! # Lemmas about operations on binary relations -/
+/-! # Lemmas about relations and Hoare-type rules -/
 
 namespace Bignum.Relation
 
