@@ -166,7 +166,7 @@ structure AlignedBytesLoadedLE {w : Nat}
   /-- Address `addr` is 4-byte aligned. -/
   aligned : (4 ∣ addr.toNat)
   /-- Byte list `bs` is loaded at address `addr`. -/
-  loaded : mem.BytesLoadedLE addr bs
+  bytes_loaded : mem.BytesLoadedLE addr bs
 
 /--
 Tests whether byte list `bs` is loaded at 4-byte aligned address `addr`.

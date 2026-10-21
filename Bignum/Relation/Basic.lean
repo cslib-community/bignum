@@ -34,6 +34,30 @@ Subsumption of relations.
 def Subsumed (r r' : Relation α β) : Prop :=
   ∀ a b, r a b → r' a b
 
+/--
+`(Eventually step P a)` iff `P` is always reachable from state `a` via `step`.
+-/
+inductive Eventually (step : Relation α α) (P : α → Prop) : α → Prop where
+  /-- `P` holds in the initial state. -/
+  | base a (ha : P a) : step.Eventually P a
+  /-- `P` holds on along every possible path from the initial state. -/
+  | step a (hs : ∃ a', step a a')
+      (hss : ∀ a', step a a' → step.Eventually P a') :
+      step.Eventually P a
+
+/--
+Traditional Hoare triple.
+-/
+def Hoare (step : Relation α α) (pre post : α → Prop) (a : α) : Prop :=
+  pre a → step.Eventually post a
+
+/--
+Hoare triple with an explicit frame condition.
+-/
+def Ensures (step : Relation α α) (pre post : α → Prop)
+    (frame : Relation α α) (a : α) : Prop :=
+  pre a → step.Eventually (fun a' ↦ post a' ∧ frame a a') a
+
 end Relation
 
 @[inherit_doc] scoped infixr:62 " ,, " => Relation.Seq

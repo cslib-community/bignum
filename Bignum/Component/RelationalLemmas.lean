@@ -26,7 +26,7 @@ theorem Seq_preserves_component (cp : Component α β)
 
 /-! ## Assign (≔) -/
 
-theorem Assign_Seq (cp : Component α β) (b : β) (r : Relation α β) (a : α) :
+theorem Seq_Assign (cp : Component α β) (b : β) (r : Relation α β) (a : α) :
     ((cp ≔ b) ,, r) a = r (cp.write b a) := by
   unfold Relation.Seq Assign; simp
 
@@ -60,9 +60,15 @@ theorem Assigns_def (cp : Component α β) :
     cp.Assigns = fun a a' ↦ ∃ b, cp.write b a = a' := by
   unfold Assigns Assign; rfl
 
-theorem Assigns_Seq (cp : Component α β) (r : Relation α β) :
+theorem Seq_Assigns (cp : Component α β) (r : Relation α β) :
     (cp.Assigns ,, r) = fun a a' ↦ ∃ b, r (cp.write b a) a' := by
   unfold Relation.Seq Assigns Assign; funext a b; grind
+
+theorem Eq_Subsumed_Assigns (cp : Component α β)
+    [h : cp.ExtensionallyValid] :
+    Eq ⊑ cp.Assigns := by
+  simp [Assigns, Assign, Relation.Subsumed]; intro a
+  exists cp.read a; apply h.write_over_read
 
 theorem Assigns_compose_Subsumed_Assings_compose
     (cp₁ : Component α β) (cp₂ : Component β γ) (cp₂' : Component β δ)
@@ -76,5 +82,17 @@ theorem Assigns_compose_Subsumed_Assings
     (cp₁ : Component α β) (cp₂ : Component β γ) :
     (cp₁ :> cp₂).Assigns ⊑ cp₁.Assigns := by
   simp [compose, Relation.Subsumed, Assigns_def]
+
+/-! ## MayChange -/
+
+#check MayChange []
+
+theorem MayChange_nil (a : α) :
+    MayChange (.nil : List (Component α β)) a a := by
+  rw [MayChange]
+
+theorem MayChange_singleton (cp : Component α β) :
+    MayChange [cp] = Assigns cp := by
+  simp [MayChange, Relation.Seq_Eq_right]
 
 end Bignum.Component

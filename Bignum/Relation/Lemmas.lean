@@ -76,4 +76,23 @@ theorem Subsumed_Seq_right (r r' : α → β → Prop) (ra : α → α → Prop)
 theorem Subsumed_trivial (r : α → α → Prop) : r ⊑ (fun _ _ ↦ True) := by
   unfold Subsumed; intros; exact True.intro
 
+/-! ## Eventually -/
+
+theorem Eventually_mono (step : Relation α α) (P Q : α → Prop)
+    (hPQ : ∀ a, P a → Q a) (a : α) (hE : step.Eventually P a) :
+    step.Eventually Q a := by
+  induction hE with
+  | base _ _ => apply Eventually.base; apply hPQ; assumption
+  | step _ hs _ ih =>
+    apply Eventually.step _ hs ih
+
+theorem Eventually_imp_Eventualy (step : Relation α α) (P Q : α → Prop) :
+    (∀ a, step.Eventually P a → step.Eventually Q a) ↔
+    (∀ a, P a → step.Eventually Q a) := by
+  constructor
+  · intro h _ hP; apply h; apply Eventually.base _ hP
+  · intro h a hE; induction hE with
+    | base _ hP => apply h _ hP
+    | step _ hs _ ih => apply Eventually.step _ hs ih
+
 end Bignum.Relation
