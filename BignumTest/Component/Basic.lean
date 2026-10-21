@@ -142,35 +142,3 @@ Component.entirety -/
 #guard_msgs in
 #synth (.entirety :> .entirety).ExtensionallyValid
 
-/-! ## rvalue -/
-
-example : (.rvalue 42 : Component Bool Nat).read true = 42 := by rfl
-example : ((.rvalue 42 : Component Bool Nat).write 33 false) = false := by
-  rfl
-
-/-! ## element -/
-
-structure C where
-  g : Nat → Nat
-
-def G := Component.mk (λ c : C ↦ c.g) (λ g c ↦ {c with g := g})
-def G13 := (G :> .element 13)
-def cc : C := ⟨λ _ ↦ 0⟩
-
-example : G.read cc 42 = 0 := by rfl
-example : G13.read cc = 0 := by rfl
-example :  G13.read (G13.write 11 cc) = 11 := by rfl
-
-/-! ## through -/
-
-def Xr := X :> .through Nat.succ id
-def Xw := X :> .through id Nat.pred
-
-example : X.read aa = 1 := by rfl
-example : Xr.read aa = 2 := by rfl
-example : Xr.read (Xr.write 8 aa) = 9 := by rfl
-
-example : X.write 2 aa = {aa with x := 2} := by rfl
-example : (Xw.write 8 aa) = {aa with x := 7} := by rfl
-example : X.read (Xw.write 8 aa) = 7 := by rfl
-example : Xr.read (Xw.write 8 aa) = 8 := by rfl

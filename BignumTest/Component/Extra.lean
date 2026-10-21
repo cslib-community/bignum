@@ -5,12 +5,64 @@ Author(s): Guilherme Lima
 -/
 module
 
-import Bignum.Component.Extra
-open Bignum.Component
+import Bignum.Component
+open Bignum Bignum.Component
 
 set_option exponentiation.threshold 512
 
 /-! # Unit test for extra components -/
+
+structure A where
+  x : Nat
+  y : Bool
+
+structure B where
+  f : A
+  z : Nat
+
+def X := Component.mk (λ a : A ↦ a.x) (λ x a ↦ {a with x := x})
+def Y := Component.mk (λ a : A ↦ a.y) (λ y a ↦ {a with y := y})
+def F := Component.mk (λ b : B ↦ b.f) (λ f b ↦ {b with f := f})
+def Z := Component.mk (λ b : B ↦ b.z) (λ z b ↦ {b with z := z})
+def aa : A := ⟨1, false⟩
+def bb : B := ⟨aa, 2⟩
+
+/-! ## rvalue -/
+
+namespace rvalueNS
+example : (.rvalue 42 : Component Bool Nat).read true = 42 := by rfl
+example : ((.rvalue 42 : Component Bool Nat).write 33 false) = false := by
+  rfl
+end rvalueNS
+
+/-! ## element -/
+
+namespace elementNS
+structure C where
+  g : Nat → Nat
+def G := Component.mk (λ c : C ↦ c.g) (λ g c ↦ {c with g := g})
+def G13 := (G :> .element 13)
+def cc : C := ⟨λ _ ↦ 0⟩
+example : G.read cc 42 = 0 := by rfl
+example : G13.read cc = 0 := by rfl
+example :  G13.read (G13.write 11 cc) = 11 := by rfl
+end elementNS
+
+/-! ## through -/
+
+namespace throughNS
+def Xr := X :> .through Nat.succ id
+def Xw := X :> .through id Nat.pred
+example : X.read aa = 1 := by rfl
+example : Xr.read aa = 2 := by rfl
+example : Xr.read (Xr.write 8 aa) = 9 := by rfl
+example : X.write 2 aa = {aa with x := 2} := by rfl
+example : (Xw.write 8 aa) = {aa with x := 7} := by rfl
+example : X.read (Xw.write 8 aa) = 7 := by rfl
+example : Xr.read (Xw.write 8 aa) = 8 := by rfl
+end throughNS
+
+/-! ## bitelement -/
 
 def f512 : BitVec 512 := .allOnes 512
 def f256 : BitVec 256 := .allOnes 256
@@ -27,8 +79,6 @@ def z64  : BitVec 64  := 0
 def z32  : BitVec 32  := 0
 def z16  : BitVec 16  := 0
 def z8   : BitVec 8   := 0
-
-/-! ## bitelement -/
 
 namespace bitelement_NS
 def bv : BitVec 8 := 0b01001011#8

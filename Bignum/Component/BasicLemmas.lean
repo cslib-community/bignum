@@ -9,7 +9,7 @@ public import Bignum.Component.Basic
 
 @[expose] public section
 
-/-! # Lemmas about components -/
+/-! # Lemmas about the basic components -/
 
 namespace Bignum.Component
 
