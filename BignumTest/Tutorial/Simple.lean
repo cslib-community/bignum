@@ -17,6 +17,7 @@ def simple : ByteList :=
 theorem simple_spec : forall pc a b,
     arm.Ensures
     (fun s ↦                    -- precondition
+      s.AlignedBytesLoaded pc simple ∧
       s.read PC = pc ∧
       s.read X0 = a ∧
       s.read X1 = b)
