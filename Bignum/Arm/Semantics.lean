@@ -29,8 +29,9 @@ structure State.decode (s : State) (addr : BitVec 64) : Type where
   /-- When decoded, `data` produces instruction `instr`. -/
   decode : Decode.decode data = .some instr
 
-/-
-The basic fetch-decode-execute cycle.
+/--
+The basic fetch-decode-execute cycle.  Fetching, decoding, and executing the
+current instruction in state `s` leads to state `s'`.
 -/
 def arm : Relation State State := fun s s' ↦
   ∃ d : s.decode (s.read PC), (PC ≔ (s.read PC + 4#64) ,, d.instr) s s'

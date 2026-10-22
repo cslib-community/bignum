@@ -13,9 +13,10 @@ public import Bignum.Component.Basic
 /-! # Relational model of programs and Hoare-type rules -/
 
 namespace Bignum
-namespace Component
 
 universe u v
+
+namespace Component
 
 variable {α : Type u} {β : Type v}
 
@@ -31,14 +32,15 @@ Non-deterministic assignment of component.
 def Assigns (cp : Component α β) : Relation α α :=
   fun a a' ↦ ∃ b, (cp.Assign b) a a'
 
+end Component
+
 /--
 Expresses "a step only (possibly) changes these components".
 -/
-def MayChange : List (Component α β) → Relation α α
+def MayChange {α : Type u} {β : Type v} :
+    List (Component α β) → Relation α α
   | [] => Eq
   | cp :: cps => cp.Assigns ,, MayChange cps
-
-end Component
 
 @[inherit_doc] scoped infixr:70 " ≔ " => Component.Assign
 

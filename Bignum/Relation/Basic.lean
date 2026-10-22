@@ -55,8 +55,8 @@ def Hoare (step : Relation α α) (pre post : α → Prop) (a : α) : Prop :=
 Hoare triple with an explicit frame condition.
 -/
 def Ensures (step : Relation α α) (pre post : α → Prop)
-    (frame : Relation α α) (a : α) : Prop :=
-  pre a → step.Eventually (fun a' ↦ post a' ∧ frame a a') a
+    (frame : Relation α α) : Prop :=
+  forall a, pre a → step.Eventually (fun a' ↦ post a' ∧ frame a a') a
 
 end Relation
 
