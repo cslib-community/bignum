@@ -10,7 +10,7 @@ public import Bignum.Arm.State
 
 @[expose] public section
 
-/-! # The ARM (aarch64) instructions -/
+/-! # ARM instructions -/
 
 namespace Bignum.Arm
 

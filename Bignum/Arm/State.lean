@@ -13,7 +13,7 @@ public import Bignum.Safety
 
 @[expose] public section
 
-/-! # The ARM (aarch64) state -/
+/-! # The ARM state -/
 
 namespace Bignum.Arm
 

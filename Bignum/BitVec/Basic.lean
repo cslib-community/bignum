@@ -13,6 +13,12 @@ module
 namespace BitVec
 
 /--
+Coercion of 1-bit bitvector to boolean.
+-/
+instance : Coe (BitVec 1) Bool :=
+  ⟨fun x ↦ x != 0#1⟩
+
+/--
 Converts bitvector to bitstring.
 -/
 def toBitString {w : Nat} (x : BitVec w) : String :=
