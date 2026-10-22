@@ -15,13 +15,11 @@ public import Bignum.BitVec
 
 namespace Bignum.Arm
 
-universe u
-
 /--
 Asserts that the 32-bit data corresponding to instruction `instr` is
 loaded 4-byte-aligned into state's `s` memory at address `addr`.
 -/
-structure State.decode (s : State) (addr : BitVec 64) : Type u where
+structure State.decode (s : State) (addr : BitVec 64) : Type where
   /-- Instruction. -/
   instr : Relation State State
   /-- Encoded instruction. -/
@@ -34,7 +32,7 @@ structure State.decode (s : State) (addr : BitVec 64) : Type u where
 /-
 The basic fetch-decode-execute cycle.
 -/
--- def arm : Relation State State := fun s s' ↦
---   ∃ d : s.decode (s.read PC), ((PC ≔ (s.read PC + 4#64)) ,, d.instr) s s'
+def arm : Relation State State := fun s s' ↦
+  ∃ d : s.decode (s.read PC), (PC ≔ (s.read PC + 4#64) ,, d.instr) s s'
 
 end Bignum.Arm
