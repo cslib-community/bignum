@@ -10,7 +10,7 @@ import Lean
 
 set_option linter.missingDocs false
 
-@[expose] public section
+public section
 
 /-! # Pattern matching over `BitVec` -/
 
