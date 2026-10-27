@@ -75,7 +75,7 @@ theorem Assigns_compose_Subsumed_Assings_compose
     (h : cp₂.Assigns ⊑ cp₂'.Assigns) :
     (cp₁ :> cp₂).Assigns ⊑ (cp₁ :> cp₂').Assigns := by
   simp [Assigns_def, Relation.Subsumed] at *
-  intro a c; rcases h (cp₁.read a) c with ⟨d, h'⟩
+  intro a c; rcases @h (cp₁.read a) c with ⟨d, h'⟩
   exists d; simp [compose, h']
 
 theorem Assigns_compose_Subsumed_Assings

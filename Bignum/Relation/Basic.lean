@@ -13,7 +13,7 @@ namespace Bignum
 
 universe u v
 
-/-- Binary relation -/
+/-- Binary relation. -/
 abbrev Relation (α : Type u) (β : Type v) := α → β → Prop
 
 namespace Relation
@@ -32,16 +32,16 @@ def Seq (r₁ : Relation α β) (r₂ : Relation β γ) : Relation α γ :=
 Subsumption of relations.
 -/
 def Subsumed (r r' : Relation α β) : Prop :=
-  ∀ a b, r a b → r' a b
+  ∀ {a} {b}, r a b → r' a b
 
 /--
 `(Eventually step P a)` iff `P` is always reachable from state `a` via `step`.
 -/
 inductive Eventually (step : Relation α α) (P : α → Prop) : α → Prop where
   /-- `P` holds in the initial state. -/
-  | base a (ha : P a) : step.Eventually P a
+  | base {a} (ha : P a) : step.Eventually P a
   /-- `P` holds on along every possible path from the initial state. -/
-  | step a (hs : ∃ a', step a a')
+  | step {a} (hs : ∃ a', step a a')
       (hss : ∀ a', step a a' → step.Eventually P a') :
       step.Eventually P a
 
