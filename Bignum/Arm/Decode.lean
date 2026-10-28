@@ -6,10 +6,10 @@ Author(s): Guilherme Lima
 module
 
 public import Bignum.Arm.Instruction
-public import Bignum.Arm.State
-public import Bignum.BitVec
+import Bignum.Arm.State
+import Bignum.BitVec
 
-@[expose] public section
+section
 
 /-! # ARM instruction decoding -/
 
@@ -34,7 +34,7 @@ def addOp (op : Bool) (S : Bool) {α : Type u} {w : Nat} :
 /--
 Decodes the 4-byte word `x`.
 -/
-def decode (x : BitVec 32) : Option (Relation State State) :=
+public def decode (x : BitVec 32) : Option (Relation State State) :=
   match_bv x with
   | [sf:1, op:1, S:1, 100010, sh:1, imm12:12, Rn:5, Rd:5] =>
     let val := if sh then imm12.toNat <<< 12 else imm12.toNat

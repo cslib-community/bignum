@@ -91,6 +91,6 @@ theorem MayChange_nil (a : α) :
 
 theorem MayChange_singleton (cp : Component α β) :
     MayChange [cp] = Assigns cp := by
-  simp [MayChange, Relation.Seq_Eq_right]
+  simp [MayChange, Relation.seq_eq_right]
 
 end Bignum.Component
