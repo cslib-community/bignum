@@ -83,7 +83,7 @@ inductive Eventually (step : Relation α α) (P : Predicate α) :
   | base {a} (ha : P a) : step.Eventually P a
   /-- `P` holds on along every possible path from the initial state. -/
   | step {a} (hs : ∃ a', step a a')
-      (hss : Predicate.Subsumed (step a) (step.Eventually P)) :
+      (hss : ∀ a', step a a' → step.Eventually P a') :
       step.Eventually P a
 
 /--

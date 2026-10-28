@@ -129,7 +129,7 @@ theorem subsumed_seq_eq_left (r r' : Relation α β) (ra : Relation α α)
 /-! ### Eventually -/
 
 variable {step : Relation α α}
-variable {P P' Q Q' J : Predicate α} {C C' : Relation α α}
+variable {P P' Q Q' R J : Predicate α} {C C' : Relation α α}
 
 theorem eventually_mono (hPQ : P ⊑ Q) :
     step.Eventually P ⊑ step.Eventually Q := by
@@ -166,8 +166,8 @@ theorem hoare_def : step.Hoare P Q ↔
   exact subsumed_eventually_iff.symm
 
 theorem hoare_trans :
-    step.Hoare P P' → step.Hoare P' Q → step.Hoare P Q := by
-  simp [hoare_def]; intro hP hQ _ _; apply hQ; apply hP; assumption
+    step.Hoare P Q → step.Hoare Q R → step.Hoare P R := by
+  simp [hoare_def]; intro PQ QR _ _; apply QR; apply PQ; assumption
 
 /-! ### Ensures -/
 
@@ -216,11 +216,21 @@ theorem ensures_frame (hC : C ⊑ C') :
     step.Ensures P Q C → step.Ensures P Q C' := by
   apply ensures_pre_gen (hP := Predicate.subsumed_refl _) (hC := hC)
 
-theorem ensures_frame_invariant (hJ : ∀ a a', J a ∧ C a a' → J a') :
+theorem ensures_frame_invariant (hJ : ∀ a a', C a a' → J a → J a') :
     step.Ensures P Q C →
     step.Ensures (fun a ↦ P a ∧ J a) (fun a ↦ Q a ∧ J a) C := by
   simp [Ensures]; intro h a hP hJa
   apply eventually_mono _ (h _ hP); intro; simp
-  intro hQ hC; exact ⟨⟨hQ, (hJ a _) ⟨hJa, hC⟩⟩, hC⟩
+  intro hQ hC; exact ⟨⟨hQ, hJ _ _ hC hJa⟩, hC⟩
+
+theorem ensures_trans :
+    step.Ensures P Q C → step.Ensures Q R C' →
+    step.Ensures P R (C ,, C') := by
+  unfold Ensures Seq
+  intro hP hQ _ ha; apply subsumed_eventually_iff.mpr _ (hP _ ha)
+  intro a' ⟨ha', _⟩; apply eventually_mono _ (hQ _ ha')
+  intro _ ⟨_, _⟩; constructor
+  · assumption
+  · exists a'
 
 end Bignum.Relation
