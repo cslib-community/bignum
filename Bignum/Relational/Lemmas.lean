@@ -36,7 +36,11 @@ theorem subsumed_antisymm (p₁ p₂ : Predicate α)
   funext; exact propext ⟨hl, hr⟩
 
 instance : Std.Antisymm (@Subsumed α) where
-  antisymm p₁ p₂ := fun hl hr ↦ subsumed_antisymm p₁ p₂ hl hr
+  antisymm p₁ p₂ := subsumed_antisymm p₁ p₂
+
+theorem subsumed_trans (p₁ p₂ p₃ : Predicate α) :
+    p₁ ⊑ p₂ → p₂ ⊑ p₃ → p₁ ⊑ p₃ := by
+  unfold Subsumed; intro ab cd _ _; apply cd; apply ab; assumption
 
 end Bignum.Predicate
 
@@ -66,7 +70,11 @@ theorem subsumed_antisymm (r₁ r₂ : Relation α β)
   funext; exact propext ⟨hl, hr⟩
 
 instance : Std.Antisymm (@Subsumed α β) where
-  antisymm r₁ r₂ := fun hl hr ↦ subsumed_antisymm r₁ r₂ hl hr
+  antisymm r₁ r₂ := @subsumed_antisymm _ _ r₁ r₂
+
+theorem subsumed_trans (r₁ r₂ r₃ : Relation α β) :
+    r₁ ⊑ r₂ → r₂ ⊑ r₃ → r₁ ⊑ r₃ := by
+  unfold Subsumed; intro ab cd _ _ _; apply cd; apply ab; assumption
 
 /-! ### Seq (,,) -/
 
@@ -87,10 +95,8 @@ theorem seq_eq_right (r : Relation α β) : r ,, Eq = r := by
   · intro ⟨_, _, h⟩; rw [← h]; assumption
   · intro; exists b
 
-theorem seq_true_true [Inhabited β] :
-    (fun (_ : α) _ ↦ True) ,, (fun (_ : β) (_ : γ) ↦ True) =
-    (fun _ _ ↦ True) := by
-  unfold Seq; simp
+theorem seq_full_full [Inhabited β] : @.Full α β ,, @.Full β γ = .Full := by
+  unfold Seq Full; simp
 
 theorem subsumed_seq_seq (r₁ r₂ : Relation α β) (t₁ t₂ : Relation β γ)
     (h₁ : r₁ ⊑ r₂) (h₂ : t₁ ⊑ t₂) : r₁ ,, t₁ ⊑ r₂ ,, t₂ := by
@@ -123,7 +129,7 @@ theorem subsumed_seq_eq_left (r r' : Relation α β) (ra : Relation α α)
 /-! ### Eventually -/
 
 variable {step : Relation α α}
-variable {P P' Q Q' : Predicate α} {C C' : Relation α α}
+variable {P P' Q Q' J : Predicate α} {C C' : Relation α α}
 
 theorem eventually_mono (hPQ : P ⊑ Q) :
     step.Eventually P ⊑ step.Eventually Q := by
@@ -133,8 +139,7 @@ theorem eventually_mono (hPQ : P ⊑ Q) :
   | step hs _ ih =>
     apply Eventually.step hs ih
 
-theorem subsumed_eventually_iff (step : Relation α α) (P Q : Predicate α) :
-    step.Eventually P ⊑ step.Eventually Q ↔
+theorem subsumed_eventually_iff : step.Eventually P ⊑ step.Eventually Q ↔
     P ⊑ step.Eventually Q := by
   constructor
   · intro h _ hP; apply h; apply Eventually.base hP
@@ -144,48 +149,78 @@ theorem subsumed_eventually_iff (step : Relation α α) (P Q : Predicate α) :
 
 /-! ### Hoare -/
 
+theorem hoare_pre (hP : P' ⊑ P) :
+    step.Hoare P Q → step.Hoare P' Q := by
+  unfold Hoare; intro h a ha
+  apply eventually_mono _ (h (hP ha))
+  apply Predicate.subsumed_refl
+
+theorem hoare_post (hQ : Q ⊑ Q') :
+    step.Hoare P Q → step.Hoare P Q' := by
+  unfold Hoare; intro h a ha
+  apply eventually_mono _ (h ha)
+  assumption
+
+theorem hoare_def : step.Hoare P Q ↔
+    step.Eventually P ⊑ step.Eventually Q := by
+  exact subsumed_eventually_iff.symm
+
+theorem hoare_trans :
+    step.Hoare P P' → step.Hoare P' Q → step.Hoare P Q := by
+  simp [hoare_def]; intro hP hQ _ _; apply hQ; apply hP; assumption
+
 /-! ### Ensures -/
 
-theorem ensures_pre_post_gen (step : Relation α α) (P P' Q Q' : Predicate α)
-    (C C' : Relation α α) (hP' : P' ⊑ P) (hQ : Q ⊑ Q') (hC : C ⊑ C')
-    (h : step.Ensures P Q C) :
-    step.Ensures P' Q' C' := by
-  unfold Ensures at *; intro a ha
-  apply eventually_mono _ (h _ (hP' ha))
+theorem ensures_pre_empty : step.Ensures .Empty Q C := by
+  unfold Ensures Predicate.Empty; intro _ contra; contradiction
+
+theorem ensures_already (hPQ : P ⊑ Q) (hC : Eq ⊑ C) :
+    step.Ensures P Q C := by
+  unfold Ensures; intro a hP
+  apply Eventually.base; constructor
+  · apply hPQ hP
+  · apply hC; rfl
+
+theorem ensures_pre_post_gen (hP : P' ⊑ P) (hQ : Q ⊑ Q') (hC : C ⊑ C') :
+    step.Ensures P Q C → step.Ensures P' Q' C' := by
+  unfold Ensures; intro h a ha
+  apply eventually_mono _ (h _ (hP ha))
   intro _ ⟨hl, hr⟩; constructor
   · apply hQ hl
   · apply hC hr
 
-theorem ensures_pre_post (step : Relation α α) (P P' Q Q' : Predicate α)
-    (C : Relation α α) (hP' : P' ⊑ P) (hQ : Q ⊑ Q')
-    (h : step.Ensures P Q C) :
-    step.Ensures P' Q' C := by
+theorem ensures_pre_post (hP : P' ⊑ P) (hQ : Q ⊑ Q') :
+    step.Ensures P Q C → step.Ensures P' Q' C := by
   apply ensures_pre_post_gen
-    (hP' := hP') (hQ := hQ) (hC := subsumed_refl _) (h := h)
+    (hP := hP) (hQ := hQ) (hC := subsumed_refl _)
 
-theorem ensures_pre_gen (step : Relation α α) (P P' Q : Predicate α)
-    (C C' : Relation α α) (hP' : P' ⊑ P) (hC : C ⊑ C')
-    (h : step.Ensures P Q C) :
-    step.Ensures P' Q C' := by
+theorem ensures_pre_gen (hP : P' ⊑ P) (hC : C ⊑ C') :
+    step.Ensures P Q C → step.Ensures P' Q C' := by
   apply ensures_pre_post_gen
-    (hP' := hP') (hQ := Predicate.subsumed_refl _) (hC := hC) (h := h)
+    (hP := hP) (hQ := Predicate.subsumed_refl _) (hC := hC)
 
-theorem ensures_pre (step : Relation α α) (P P' Q : Predicate α)
-    (C : Relation α α) (hP' : P' ⊑ P)
-    (h : step.Ensures P Q C) :
-    step.Ensures P' Q C := by
-  apply ensures_pre_gen (hP' := hP') (hC := subsumed_refl _) (h := h)
+theorem ensures_pre (hP : P' ⊑ P) :
+    step.Ensures P Q C → step.Ensures P' Q C := by
+  apply ensures_pre_gen (hP := hP) (hC := subsumed_refl _)
 
-theorem ensures_post_gen (step : Relation α α) (P Q Q' : Predicate α)
-    (C C' : Relation α α) (hQ : Q ⊑ Q') (hC : C ⊑ C')
-    (h : step.Ensures P Q C) :
-    step.Ensures P Q' C' := by
+theorem ensures_post_gen (hQ : Q ⊑ Q') (hC : C ⊑ C') :
+    step.Ensures P Q C → step.Ensures P Q' C' := by
   apply ensures_pre_post_gen
-    (hP' := Predicate.subsumed_refl _) (hQ := hQ) (hC := hC) (h := h)
+    (hP := Predicate.subsumed_refl _) (hQ := hQ) (hC := hC)
 
-theorem ensures_post (step : Relation α α) (P Q Q' : Predicate α)
-    (C : Relation α α) (hQ : Q ⊑ Q') (h : step.Ensures P Q C) :
-    step.Ensures P Q' C := by
-  apply ensures_post_gen (hQ := hQ) (hC := subsumed_refl _) (h := h)
+theorem ensures_post (hQ : Q ⊑ Q') :
+    step.Ensures P Q C → step.Ensures P Q' C := by
+  apply ensures_post_gen (hQ := hQ) (hC := subsumed_refl _)
+
+theorem ensures_frame (hC : C ⊑ C') :
+    step.Ensures P Q C → step.Ensures P Q C' := by
+  apply ensures_pre_gen (hP := Predicate.subsumed_refl _) (hC := hC)
+
+theorem ensures_frame_invariant (hJ : ∀ a a', J a ∧ C a a' → J a') :
+    step.Ensures P Q C →
+    step.Ensures (fun a ↦ P a ∧ J a) (fun a ↦ Q a ∧ J a) C := by
+  simp [Ensures]; intro h a hP hJa
+  apply eventually_mono _ (h _ hP); intro; simp
+  intro hQ hC; exact ⟨⟨hQ, (hJ a _) ⟨hJa, hC⟩⟩, hC⟩
 
 end Bignum.Relation
