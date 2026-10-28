@@ -5,5 +5,5 @@ Author(s): Guilherme Lima
 -/
 module
 
-public import Bignum.Relation.Basic
-public import Bignum.Relation.Lemmas
+public import Bignum.Relational.Basic
+public import Bignum.Relational.Lemmas

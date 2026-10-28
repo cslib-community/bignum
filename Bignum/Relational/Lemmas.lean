@@ -5,7 +5,7 @@ Author(s): Guilherme Lima
 -/
 module
 
-public import Bignum.Relation.Basic
+public import Bignum.Relational.Basic
 
 @[expose] public section
 

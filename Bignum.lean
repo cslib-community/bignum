@@ -6,4 +6,4 @@ Author(s): Alexandre Rademaker, Guilherme Lima
 module
 
 public import Bignum.Arm
-public import Bignum.Relation
+public import Bignum.Relational
