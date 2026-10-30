@@ -11,159 +11,139 @@ public import Bignum.Relational.Basic
 
 /-! # Lemmas about relations and Hoare-type rules -/
 
-/-! ## Predicate -/
+/-! ## Set -/
 
-namespace Bignum.Predicate
+namespace Bignum.Set
 
 universe u
 
 variable {α : Type u}
 
-theorem empty_subsumed (p : Predicate α) : .Empty ⊑ p := by
-  unfold Subsumed Empty; intros; contradiction
+theorem empty_subset (p : Set α) : ∅ ⊆ p := by
+  intro _ _; contradiction
 
-theorem subsumed_full (p : Predicate α) : p ⊑ .Full := by
-  unfold Subsumed; intros; exact True.intro
+theorem subset_full (p : Set α) : p ⊆ .Full :=
+  fun _ _ ↦ True.intro
 
-theorem subsumed_refl (p : Predicate α) : p ⊑ p := by
-  unfold Subsumed; exact (fun h ↦ h)
+theorem subset_refl (p : Set α) : p ⊆ p :=
+  fun _ h ↦ h
 
-instance : Std.Refl (@Subsumed α) where
-  refl r := subsumed_refl r
+instance : @Std.Refl (Set α) (· ⊆ ·) where
+  refl r := subset_refl r
 
-theorem subsumed_antisymm (p₁ p₂ : Predicate α)
-    (hl : p₁ ⊑ p₂) (hr : p₂ ⊑ p₁) : p₁ = p₂ := by
-  funext; exact propext ⟨hl, hr⟩
+theorem subset_antisymm (p q : Set α) : p ⊆ q → q ⊆ p → p = q := by
+  intro ab ba; funext; exact propext ⟨@ab _, @ba _⟩
 
-instance : Std.Antisymm (@Subsumed α) where
-  antisymm p₁ p₂ := subsumed_antisymm p₁ p₂
+instance : @Std.Antisymm (Set α) (· ⊆ ·) where
+  antisymm p q := subset_antisymm p q
 
-theorem subsumed_trans (p₁ p₂ p₃ : Predicate α) :
-    p₁ ⊑ p₂ → p₂ ⊑ p₃ → p₁ ⊑ p₃ := by
-  unfold Subsumed; intro ab cd _ _; apply cd; apply ab; assumption
+theorem subset_trans (p q r : Set α) : p ⊆ q → q ⊆ r → p ⊆ r :=
+  fun ab cd _ ha ↦ cd (ab ha)
 
-end Bignum.Predicate
+end Bignum.Set
 
-/-! ## Relation -/
+/-! ## Rel -/
 
-namespace Bignum.Relation
+namespace Bignum.Rel
 
 universe u₁ u₂ u₃ u₄
 variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
-/-! ### Subsumed (⊑) -/
+/-! ### Subset (⊆) -/
 
-theorem empty_subsumed (r : Relation α β) : .Empty ⊑ r := by
-  unfold Subsumed Empty; intros; contradiction
+theorem empty_subset (r : Rel α β) : ∅ ⊆ r := by
+  intro _ _ _; contradiction
 
-theorem subsumed_full (r : Relation α β) : r ⊑ .Full := by
-  unfold Subsumed; intros; exact True.intro
+theorem subset_full (r : Rel α β) : r ⊆ .Full :=
+  fun _ _ _ ↦ True.intro
 
-theorem subsumed_refl (r : Relation α β) : r ⊑ r := by
-  unfold Subsumed; exact (fun h ↦ h)
+theorem subset_refl (r : Rel α β) : r ⊆ r :=
+  fun _ _ h ↦ h
 
-instance : Std.Refl (@Subsumed α β) where
-  refl r := subsumed_refl r
+instance : @Std.Refl (Rel α β) (· ⊆ ·) where
+  refl r := subset_refl r
 
-theorem subsumed_antisymm (r₁ r₂ : Relation α β)
-    (hl : r₁ ⊑ r₂) (hr : r₂ ⊑ r₁) : r₁ = r₂ := by
-  funext; exact propext ⟨hl, hr⟩
+theorem subset_antisymm (r s : Rel α β) : r ⊆ s → s ⊆ r → r = s := by
+  intro ab ba; funext; apply propext ⟨@ab _ _, @ba _ _⟩
 
-instance : Std.Antisymm (@Subsumed α β) where
-  antisymm r₁ r₂ := @subsumed_antisymm _ _ r₁ r₂
+instance : @Std.Antisymm (Rel α β) (· ⊆ ·) where
+  antisymm r s := subset_antisymm r s
 
-theorem subsumed_trans (r₁ r₂ r₃ : Relation α β) :
-    r₁ ⊑ r₂ → r₂ ⊑ r₃ → r₁ ⊑ r₃ := by
-  unfold Subsumed; intro ab cd _ _ _; apply cd; apply ab; assumption
+theorem subsumed_trans (r s t : Rel α β) : r ⊆ s → s ⊆ t → r ⊆ t :=
+  fun ab cd _ _ ha ↦ cd (ab ha)
 
 /-! ### Seq (,,) -/
 
-theorem seq_assoc
-    (r₁ : Relation α β) (r₂ : Relation β γ) (r₃ : Relation γ δ) :
-    r₁ ,, r₂ ,, r₃ = (r₁ ,, r₂) ,, r₃ := by
-  unfold Seq; ext a d; constructor
-  · intro ⟨b, hab, c, hbc, hcd⟩; exact ⟨c, ⟨b, hab, hbc⟩, hcd⟩
-  · intro ⟨c, ⟨b, hab, hbc⟩, hcd⟩; exact ⟨b, hab, c, hbc, hcd⟩
+theorem seq_assoc (r : Rel α β) (s : Rel β γ) (t : Rel γ δ) :
+    r ,, s ,, t = (r ,, s) ,, t := by
+  ext a d; constructor
+  · intro ⟨b, ab, c, bc, cd⟩; exact ⟨c, ⟨b, ab, bc⟩, cd⟩
+  · intro ⟨c, ⟨b, ab, bc⟩, cd⟩; exact ⟨b, ab, c, bc, cd⟩
 
-theorem seq_eq_left (r : Relation α β) : Eq ,, r = r := by
-  unfold Seq; ext a b; constructor
+theorem seq_eq_left (r : Rel α β) : Eq ,, r = r := by
+  ext a b; constructor
   · intro ⟨_, h, _⟩; rw [h]; assumption
   · intro; exists a
 
-theorem seq_eq_right (r : Relation α β) : r ,, Eq = r := by
-  unfold Seq; ext a b; constructor
+theorem seq_eq_right (r : Rel α β) : r ,, Eq = r := by
+  ext a b; constructor
   · intro ⟨_, _, h⟩; rw [← h]; assumption
   · intro; exists b
 
 theorem seq_full_full [Inhabited β] : @.Full α β ,, @.Full β γ = .Full := by
   unfold Seq Full; simp
 
-theorem subsumed_seq_seq (r₁ r₂ : Relation α β) (t₁ t₂ : Relation β γ)
-    (h₁ : r₁ ⊑ r₂) (h₂ : t₁ ⊑ t₂) : r₁ ,, t₁ ⊑ r₂ ,, t₂ := by
-  unfold Subsumed Seq at *
-  intro _ _ ⟨b', hr₁, ht₁⟩; exact ⟨b', h₁ hr₁, h₂ ht₁⟩
+theorem subset_seq_seq (r s : Rel α β) (t₁ t₂ : Rel β γ) :
+    r ⊆ s → t₁ ⊆ t₂ → r ,, t₁ ⊆ s ,, t₂ := by
+  simp [Subset, Seq]; exact fun hr ht a c b ab bc ↦ ⟨b, hr ab, ht bc⟩
 
-theorem subsumed_seq_left (r s t : Relation α α)
-    (hr : r ⊑ t) (hs : s ⊑ t) (ht : t ,, t = t) : r ,, s ⊑ t := by
-  unfold Subsumed Seq at *
-  intro a b ⟨c, hac, hcb⟩; rw [← ht]; exact ⟨c, hr hac, hs hcb⟩
+theorem subset_seq_left (r s t : Rel α α) :
+    r ⊆ t → s ⊆ t → t ,, t = t → r ,, s ⊆ t := by
+  simp [Subset, Seq]; intro rt st tt _ _ c ac cb; rw [← tt]
+  exact ⟨c, rt ac, st cb⟩
 
-theorem subsumed_eq_seq (r r' : Relation α α) (h₁ : Eq ⊑ r) (h₂ : Eq ⊑ r') :
-    Eq ⊑ r ,, r' := by
-  unfold Subsumed Seq at *
-  intro a a' _; subst a'
-  exact ⟨a, h₁ (@Eq.refl _ a), h₂ (@Eq.refl _ a)⟩
+theorem subset_eq_seq (r s : Rel α α) :
+    Eq ⊆ r → Eq ⊆ s → Eq ⊆ r ,, s := by
+  simp [Subset, Seq]; exact fun hr hs a ↦ ⟨a, @hr _, @hs _⟩
 
-theorem subsumed_seq_eq_right (r r' : Relation α β) (rb : Relation β β)
-    (h₁ : r ⊑ r') (h₂ : Eq ⊑ rb) :
-    r ⊑ r' ,, rb := by
-  unfold Subsumed Seq at *
-  intro _ b hab; exact ⟨b, h₁ hab, h₂ (@Eq.refl _ b)⟩
+theorem subset_seq_eq_right (r s : Rel α β) (rb : Rel β β) :
+    r ⊆ s → Eq ⊆ rb → r ⊆ s ,, rb := by
+  simp [Subset, Seq]; exact fun hl hr _ b ab ↦ ⟨b, hl ab, @hr _⟩
 
-theorem subsumed_seq_eq_left (r r' : Relation α β) (ra : Relation α α)
-    (h₁ : Eq ⊑ ra) (h₂ : r ⊑ r') :
-    r ⊑ ra ,, r' := by
-  unfold Subsumed Seq at *
-  intro a _ hab; exact ⟨a, h₁ (@Eq.refl _ a), h₂ hab⟩
+theorem subset_seq_eq_left (r s : Rel α β) (ra : Rel α α) :
+    Eq ⊆ ra → r ⊆ s → r ⊆ ra ,, s := by
+  simp [Subset, Seq]; exact fun hl hr a _ ab ↦ ⟨a, @hl _, hr ab⟩
 
 /-! ### Eventually -/
 
-variable {step : Relation α α}
-variable {P P' Q Q' R J : Predicate α} {C C' : Relation α α}
+variable {step : Rel α α}
+variable {P P' Q Q' R J : Set α} {C C' : Rel α α}
 
-theorem eventually_mono (hPQ : P ⊑ Q) :
-    step.Eventually P ⊑ step.Eventually Q := by
-  intros _ h
+theorem eventually_mono : P ⊆ Q → step.Eventually P ⊆ step.Eventually Q := by
+  intros PQ _ h
   induction h with
-  | base => apply Eventually.base; apply hPQ; assumption
-  | step hs _ ih =>
-    apply Eventually.step hs ih
+  | base => apply Eventually.base; apply PQ; assumption
+  | step _ hs _ ih =>
+    apply Eventually.step _ hs ih
 
-theorem subsumed_eventually_iff : step.Eventually P ⊑ step.Eventually Q ↔
-    P ⊑ step.Eventually Q := by
+theorem subsumed_eventually_iff : step.Eventually P ⊆ step.Eventually Q ↔
+    P ⊆ step.Eventually Q := by
   constructor
-  · intro h _ hP; apply h; apply Eventually.base hP
+  · intro h _ hP; apply h; apply Eventually.base _ hP
   · intro h a hE; induction hE with
-    | base hP => apply h hP
-    | step hs _ ih => apply Eventually.step hs ih
+    | base _ hP => apply h hP
+    | step _ hs _ ih => apply Eventually.step _ hs ih
 
 /-! ### Hoare -/
 
-theorem hoare_pre (hP : P' ⊑ P) :
-    step.Hoare P Q → step.Hoare P' Q := by
-  unfold Hoare; intro h a ha
-  apply eventually_mono _ (h (hP ha))
-  apply Predicate.subsumed_refl
+theorem hoare_pre : P' ⊆ P → step.Hoare P Q → step.Hoare P' Q :=
+  fun hP hH _ ha ↦ hH (hP ha)
 
-theorem hoare_post (hQ : Q ⊑ Q') :
-    step.Hoare P Q → step.Hoare P Q' := by
-  unfold Hoare; intro h a ha
-  apply eventually_mono _ (h ha)
-  assumption
+theorem hoare_post (hQ : Q ⊆ Q') : step.Hoare P Q → step.Hoare P Q' :=
+  fun h _ ha ↦ step.eventually_mono hQ (h ha)
 
-theorem hoare_def : step.Hoare P Q ↔
-    step.Eventually P ⊑ step.Eventually Q := by
-  exact subsumed_eventually_iff.symm
+theorem hoare_def : step.Hoare P Q ↔ step.Eventually P ⊆ step.Eventually Q :=
+  subsumed_eventually_iff.symm
 
 theorem hoare_trans :
     step.Hoare P Q → step.Hoare Q R → step.Hoare P R := by
@@ -171,56 +151,50 @@ theorem hoare_trans :
 
 /-! ### Ensures -/
 
-theorem ensures_pre_empty : step.Ensures .Empty Q C := by
-  unfold Ensures Predicate.Empty; intro _ contra; contradiction
+theorem ensures_pre_empty : step.Ensures ∅ Q C := by
+  intro _ _; contradiction
 
-theorem ensures_already (hPQ : P ⊑ Q) (hC : Eq ⊑ C) :
-    step.Ensures P Q C := by
-  unfold Ensures; intro a hP
-  apply Eventually.base; constructor
+theorem ensures_already : P ⊆ Q → Eq ⊆ C → step.Ensures P Q C := by
+  intro hPQ hC _ hP; apply Eventually.base; constructor
   · apply hPQ hP
   · apply hC; rfl
 
-theorem ensures_pre_post_gen (hP : P' ⊑ P) (hQ : Q ⊑ Q') (hC : C ⊑ C') :
+theorem ensures_pre_post_gen (hP : P' ⊆ P) (hQ : Q ⊆ Q') (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P' Q' C' := by
-  unfold Ensures; intro h a ha
-  apply eventually_mono _ (h _ (hP ha))
+  intro h a ha
+  apply step.eventually_mono _ (h _ (hP ha))
   intro _ ⟨hl, hr⟩; constructor
   · apply hQ hl
   · apply hC hr
 
-theorem ensures_pre_post (hP : P' ⊑ P) (hQ : Q ⊑ Q') :
+theorem ensures_pre_post (hP : P' ⊆ P) (hQ : Q ⊆ Q') :
     step.Ensures P Q C → step.Ensures P' Q' C := by
-  apply ensures_pre_post_gen
-    (hP := hP) (hQ := hQ) (hC := subsumed_refl _)
+  apply ensures_pre_post_gen (hP := hP) (hQ := hQ) (hC := C.subset_refl)
 
-theorem ensures_pre_gen (hP : P' ⊑ P) (hC : C ⊑ C') :
+theorem ensures_pre_gen (hP : P' ⊆ P) (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P' Q C' := by
-  apply ensures_pre_post_gen
-    (hP := hP) (hQ := Predicate.subsumed_refl _) (hC := hC)
+  apply ensures_pre_post_gen (hP := hP) (hQ := Q.subset_refl) (hC := hC)
 
-theorem ensures_pre (hP : P' ⊑ P) :
+theorem ensures_pre (hP : P' ⊆ P) :
     step.Ensures P Q C → step.Ensures P' Q C := by
-  apply ensures_pre_gen (hP := hP) (hC := subsumed_refl _)
+  apply ensures_pre_gen (hP := hP) (hC := C.subset_refl)
 
-theorem ensures_post_gen (hQ : Q ⊑ Q') (hC : C ⊑ C') :
+theorem ensures_post_gen (hQ : Q ⊆ Q') (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P Q' C' := by
-  apply ensures_pre_post_gen
-    (hP := Predicate.subsumed_refl _) (hQ := hQ) (hC := hC)
+  apply ensures_pre_post_gen (hP := P.subset_refl) (hQ := hQ) (hC := hC)
 
-theorem ensures_post (hQ : Q ⊑ Q') :
+theorem ensures_post (hQ : Q ⊆ Q') :
     step.Ensures P Q C → step.Ensures P Q' C := by
-  apply ensures_post_gen (hQ := hQ) (hC := subsumed_refl _)
+  apply ensures_post_gen (hQ := hQ) (hC := subset_refl _)
 
-theorem ensures_frame (hC : C ⊑ C') :
+theorem ensures_frame (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P Q C' := by
-  apply ensures_pre_gen (hP := Predicate.subsumed_refl _) (hC := hC)
+  apply ensures_pre_gen (hP := P.subset_refl) (hC := hC)
 
 theorem ensures_frame_invariant (hJ : ∀ a a', C a a' → J a → J a') :
-    step.Ensures P Q C →
-    step.Ensures (fun a ↦ P a ∧ J a) (fun a ↦ Q a ∧ J a) C := by
-  simp [Ensures]; intro h a hP hJa
-  apply eventually_mono _ (h _ hP); intro; simp
+    step.Ensures P Q C → step.Ensures (P ∩ J) (Q ∩ J) C := by
+  simp [Ensures]; intro h a ⟨hP, hJa⟩
+  apply step.eventually_mono _ (h _ hP); intro; simp
   intro hQ hC; exact ⟨⟨hQ, hJ _ _ hC hJa⟩, hC⟩
 
 theorem ensures_trans :
@@ -228,9 +202,9 @@ theorem ensures_trans :
     step.Ensures P R (C ,, C') := by
   unfold Ensures Seq
   intro hP hQ _ ha; apply subsumed_eventually_iff.mpr _ (hP _ ha)
-  intro a' ⟨ha', _⟩; apply eventually_mono _ (hQ _ ha')
+  intro a' ⟨ha', _⟩; apply step.eventually_mono _ (hQ _ ha')
   intro _ ⟨_, _⟩; constructor
   · assumption
   · exists a'
 
-end Bignum.Relation
+end Bignum.Rel

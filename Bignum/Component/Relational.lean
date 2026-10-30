@@ -23,13 +23,13 @@ variable {α : Type u} {β : Type v}
 /--
 Assignment of component as a functional relation.
 -/
-def Assign (cp : Component α β) (b : β) : Relation α α :=
+def Assign (cp : Component α β) (b : β) : Rel α α :=
   fun a a' ↦ cp.write b a = a'
 
 /--
 Non-deterministic assignment of component.
 -/
-def Assigns (cp : Component α β) : Relation α α :=
+def Assigns (cp : Component α β) : Rel α α :=
   fun a a' ↦ ∃ b, (cp.Assign b) a a'
 
 end Component
@@ -38,7 +38,7 @@ end Component
 Expresses "a step only (possibly) changes these components".
 -/
 def MayChange {α : Type u} {β : Type v} :
-    List (Component α β) → Relation α α
+    List (Component α β) → Rel α α
   | [] => Eq
   | cp :: cps => cp.Assigns ,, MayChange cps
 

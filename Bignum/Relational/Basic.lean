@@ -11,12 +11,12 @@ module
 
 namespace Bignum
 
-universe u v
+universe u v w
 
-/-- Unary predicate. -/
-abbrev Predicate (α : Type u) := α → Prop
+/-- Predicate (unary relation). -/
+abbrev Set (α : Type u) := α → Prop
 
-namespace Predicate
+namespace Set
 
 variable {α : Type u}
 
@@ -26,29 +26,35 @@ The empty predicate.
 def Empty : α → Prop :=
   fun _ ↦ False
 
+instance : EmptyCollection (Set α) where
+  emptyCollection := Empty
+
 /--
 The full predicate.
 -/
 def Full : α → Prop :=
   fun _ ↦ True
 
-/--
-Subsumption of predicates.
--/
-def Subsumed (p p' : Predicate α) : Prop :=
-  ∀ {a}, p a → p' a
+instance : HasSubset (Set α) where
+  Subset p q := ∀ ⦃a⦄, p a → q a
 
+instance : Union (Set α) where
+  union p q := fun a ↦ p a ∨ q a
 
-end Predicate
+instance : Inter (Set α) where
+  inter p q := fun a ↦ p a ∧ q a
+
+instance : SDiff (Set α) where
+  sdiff p q := fun a ↦ p a ∧ ¬q a
+
+end Set
 
 /-- Binary relation. -/
-abbrev Relation (α : Type u) (β : Type v) := α → β → Prop
+abbrev Rel (α : Type u) (β : Type v) := α → β → Prop
 
-namespace Relation
+namespace Rel
 
-universe u₁ u₂ u₃ u₄
-
-variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
+variable {α : Type u} {β : Type v} {γ : Type w}
 
 /--
 The empty relation.
@@ -56,53 +62,53 @@ The empty relation.
 def Empty : α → β → Prop :=
   fun _ _ ↦ False
 
+instance : EmptyCollection (Rel α β) := ⟨Empty⟩
+
 /--
 The full relation.
 -/
 def Full : α → β → Prop :=
   fun _ _ ↦ True
 
-/--
-Subsumption of relations.
--/
-def Subsumed (r r' : Relation α β) : Prop :=
-  ∀ {a} {b}, r a b → r' a b
+instance : HasSubset (Rel α β) where
+  Subset r₁ r₂ := ∀ ⦃a : α⦄ ⦃b : β⦄ , r₁ a b → r₂ a b
 
 /--
 Composition of relations (sequencing).
 -/
-def Seq (r₁ : Relation α β) (r₂ : Relation β γ) : Relation α γ :=
+def Seq (r₁ : Rel α β) (r₂ : Rel β γ) : Rel α γ :=
   fun a c ↦ ∃ b, r₁ a b ∧ r₂ b c
 
 /--
-`(Eventually step P a)` iff `P` is always reachable from state `a` via `step`.
+A state in which `P` holds is always reachable via `step` from
+a given initial state `a`.
 -/
-inductive Eventually (step : Relation α α) (P : Predicate α) :
+inductive Eventually (step : Rel α α) (P : Set α) :
     α → Prop where
   /-- `P` holds in the initial state. -/
-  | base {a} (ha : P a) : step.Eventually P a
+  | base : ∀ a, P a →
+      step.Eventually P a
   /-- `P` holds on along every possible path from the initial state. -/
-  | step {a} (hs : ∃ a', step a a')
-      (hss : ∀ a', step a a' → step.Eventually P a') :
+  | step : ∀ a, (∃ a', step a a') → (step a ⊆ step.Eventually P) →
       step.Eventually P a
 
 /--
 Traditional Hoare triple.
 -/
-def Hoare (step : Relation α α) (pre post : Predicate α) : Prop :=
-  pre.Subsumed (step.Eventually post)
+def Hoare (step : Rel α α) (pre post : Set α) : Prop :=
+  pre ⊆ (step.Eventually post)
 
 /--
 Hoare triple with an explicit frame condition.
 -/
-def Ensures (step : Relation α α) (pre post : Predicate α)
-    (frame : Relation α α) : Prop :=
+def Ensures (step : Rel α α) (pre post : Set α)
+    (frame : Rel α α) : Prop :=
   forall a, pre a → step.Eventually (fun a' ↦ post a' ∧ frame a a') a
 
-end Relation
+end Rel
 
-@[inherit_doc] scoped infixr:50 " ⊑ " => Predicate.Subsumed
-@[inherit_doc] scoped infixr:50 " ⊑ " => Relation.Subsumed
-@[inherit_doc] scoped infixr:64 " ,, " => Relation.Seq
+#check HasSubset
+
+@[inherit_doc] scoped infixr:64 " ,, " => Rel.Seq
 
 end Bignum

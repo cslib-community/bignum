@@ -21,7 +21,7 @@ loaded 4-byte-aligned into state's `s` memory at address `addr`.
 -/
 structure State.decode (s : State) (addr : BitVec 64) : Type where
   /-- Instruction. -/
-  instr : Relation State State
+  instr : Rel State State
   /-- Encoded instruction. -/
   data : BitVec 32
   /-- `data` is 4-byte-aligned and loaded at address `addr`. -/
@@ -33,7 +33,7 @@ structure State.decode (s : State) (addr : BitVec 64) : Type where
 The basic fetch-decode-execute cycle.  Fetching, decoding, and executing the
 current instruction in state `s` leads to state `s'`.
 -/
-def arm : Relation State State := fun s s' ↦
+def arm : Rel State State := fun s s' ↦
   ∃ d : s.decode (s.read PC), (PC ≔ (s.read PC + 4#64) ,, d.instr) s s'
 
 end Bignum.Arm
