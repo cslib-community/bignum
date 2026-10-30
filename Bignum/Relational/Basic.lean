@@ -86,10 +86,9 @@ a given initial state `a`.
 inductive Eventually (step : Rel α α) (P : Set α) :
     α → Prop where
   /-- `P` holds in the initial state. -/
-  | base : ∀ a, P a →
-      step.Eventually P a
+  | base ⦃a : α⦄ (ha : P a) : step.Eventually P a
   /-- `P` holds on along every possible path from the initial state. -/
-  | step : ∀ a, (∃ a', step a a') → (step a ⊆ step.Eventually P) →
+  | step ⦃a : α⦄ (hs : ∃ a', step a a') (hss : step a ⊆ step.Eventually P) :
       step.Eventually P a
 
 /--
@@ -103,7 +102,7 @@ Hoare triple with an explicit frame condition.
 -/
 def Ensures (step : Rel α α) (pre post : Set α)
     (frame : Rel α α) : Prop :=
-  forall a, pre a → step.Eventually (fun a' ↦ post a' ∧ frame a a') a
+  ∀ ⦃a : α⦄, pre a → step.Eventually (fun a' ↦ post a' ∧ frame a a') a
 
 end Rel
 

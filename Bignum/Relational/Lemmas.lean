@@ -117,22 +117,21 @@ theorem subset_seq_eq_left (r s : Rel α β) (ra : Rel α α) :
 /-! ### Eventually -/
 
 variable {step : Rel α α}
-variable {P P' Q Q' R J : Set α} {C C' : Rel α α}
+variable {P P' Q Q' R : Set α} {C C' : Rel α α}
 
 theorem eventually_mono : P ⊆ Q → step.Eventually P ⊆ step.Eventually Q := by
   intros PQ _ h
   induction h with
   | base => apply Eventually.base; apply PQ; assumption
-  | step _ hs _ ih =>
-    apply Eventually.step _ hs ih
+  | step hs _ ih => apply Eventually.step hs ih
 
 theorem subsumed_eventually_iff : step.Eventually P ⊆ step.Eventually Q ↔
     P ⊆ step.Eventually Q := by
   constructor
-  · intro h _ hP; apply h; apply Eventually.base _ hP
-  · intro h a hE; induction hE with
-    | base _ hP => apply h hP
-    | step _ hs _ ih => apply Eventually.step _ hs ih
+  · intro h _ hP; apply h; apply Eventually.base hP
+  · intro h _ hE; induction hE with
+    | base ha => apply h ha
+    | step hs _ ih => apply Eventually.step hs ih
 
 /-! ### Hoare -/
 
@@ -162,7 +161,7 @@ theorem ensures_already : P ⊆ Q → Eq ⊆ C → step.Ensures P Q C := by
 theorem ensures_pre_post_gen (hP : P' ⊆ P) (hQ : Q ⊆ Q') (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P' Q' C' := by
   intro h a ha
-  apply step.eventually_mono _ (h _ (hP ha))
+  apply step.eventually_mono _ (h (hP ha))
   intro _ ⟨hl, hr⟩; constructor
   · apply hQ hl
   · apply hC hr
@@ -191,20 +190,47 @@ theorem ensures_frame (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P Q C' := by
   apply ensures_pre_gen (hP := P.subset_refl) (hC := hC)
 
-theorem ensures_frame_invariant (hJ : ∀ a a', C a a' → J a → J a') :
+theorem ensures_frame_invariant
+    (J : Set α) (hJ : ∀ a a', C a a' → J a → J a') :
     step.Ensures P Q C → step.Ensures (P ∩ J) (Q ∩ J) C := by
   simp [Ensures]; intro h a ⟨hP, hJa⟩
-  apply step.eventually_mono _ (h _ hP); intro; simp
+  apply step.eventually_mono _ (h hP); intro; simp
   intro hQ hC; exact ⟨⟨hQ, hJ _ _ hC hJa⟩, hC⟩
 
-theorem ensures_trans :
+theorem ensures_seq :
     step.Ensures P Q C → step.Ensures Q R C' →
     step.Ensures P R (C ,, C') := by
   unfold Ensures Seq
-  intro hP hQ _ ha; apply subsumed_eventually_iff.mpr _ (hP _ ha)
-  intro a' ⟨ha', _⟩; apply step.eventually_mono _ (hQ _ ha')
+  intro hP hQ _ ha; apply subsumed_eventually_iff.mpr _ (hP ha)
+  intro a' ⟨ha', _⟩; apply step.eventually_mono _ (hQ ha')
   intro _ ⟨_, _⟩; constructor
   · assumption
   · exists a'
+
+theorem ensures_pre_constant (A : Prop) :
+    (step.Ensures (fun _ ↦ A) Q C ↔ A) → step.Ensures .Full Q C := by
+  intro ⟨hl, hr⟩; apply ensures_pre (P := fun _ ↦ A)
+  · intro _ _; apply hl; intro _ hA; apply hr hA hA
+  · intro _ hA; apply hr hA hA
+
+theorem ensures_pre_constant_left (A : Prop) :
+    (step.Ensures (A ∧ P ·) Q C ↔ A) → step.Ensures P Q C := by
+  intro ⟨hl, hr⟩; apply ensures_pre (P := (A ∧ P ·))
+  · intro _ _; constructor
+    · apply hl; intro _ ⟨hP, hA⟩; apply hr hP ⟨hP, hA⟩
+    · assumption
+  · intro _ ⟨hP, hA⟩; apply hr hP ⟨hP, hA⟩
+
+theorem ensures_pre_constant_right (A : Prop) :
+    (step.Ensures (P · ∧ A) Q C ↔ A) → step.Ensures P Q C := by
+  suffices h : (P · ∧ A) = (A ∧ P ·) from by
+    exact h ▸ ensures_pre_constant_left A
+  funext; apply propext and_comm
+
+theorem ensures_sublemma (hP : P' ⊆ P) (hC : C ⊆ C')
+    (h : ∀ a a', P' a → Q a' → C a a' → Q' a') :
+    step.Ensures P Q C → step.Ensures P' Q' C' := by
+  intro hE _ ha; apply step.eventually_mono _ (hE (hP ha))
+  intro _ ⟨hQ, h'⟩; exact ⟨h _ _ ha hQ h', hC h'⟩
 
 end Bignum.Rel

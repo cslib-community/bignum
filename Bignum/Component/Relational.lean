@@ -37,8 +37,7 @@ end Component
 /--
 Expresses "a step only (possibly) changes these components".
 -/
-def MayChange {α : Type u} {β : Type v} :
-    List (Component α β) → Rel α α
+def MayChange {α : Type u} {β : Type v} : List (Component α β) → Rel α α
   | [] => Eq
   | cp :: cps => cp.Assigns ,, MayChange cps
 

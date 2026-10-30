@@ -91,4 +91,19 @@ theorem mayChange_singleton (cp : Component α β) :
     MayChange [cp] = Assigns cp := by
   simp [MayChange, Rel.seq_eq_right]
 
+-- theorem ensures_mayChange_preserved
+--     (cp : Component α β) [h : cp.ExtensionallyValid]
+--     (step : Rel α α) (P Q : Set α) (R : Rel α α)
+--     (hR : ∀ a a', R a a' → cp.read a = cp.read a') :
+--     (∀ b, step.Ensures (fun x ↦ P x ∧ cp.read x = b)
+--                        (fun x ↦ Q x ∧ cp.read x = b)
+--                        (R ,, MayChange [cp])) →
+--     step.Ensures P Q R := by
+--   simp [Rel.Ensures, mayChange_singleton, assigns_def]
+--   intro hE a hP
+--   have X := (hE (cp.read a) hP rfl)
+--   apply step.eventually_mono _ X
+--   intro a₁ ⟨⟨hQ, haa⟩, a₂, ⟨Raa, ⟨b, hM⟩⟩⟩
+--   sorry
+
 end Bignum.Component
