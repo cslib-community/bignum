@@ -102,6 +102,8 @@ theorem subset_seq_left (r s t : Rel α α) :
   simp [Subset, Seq]; intro rt st tt _ _ c ac cb; rw [← tt]
   exact ⟨c, rt ac, st cb⟩
 
+-- TODO: Refl?
+
 theorem subset_eq_seq (r s : Rel α α) :
     Eq ⊆ r → Eq ⊆ s → Eq ⊆ r ,, s := by
   simp [Subset, Seq]; exact fun hr hs a ↦ ⟨a, @hr _, @hs _⟩

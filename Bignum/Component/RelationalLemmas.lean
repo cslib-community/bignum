@@ -60,13 +60,16 @@ theorem assigns_def (cp : Component α β) :
     cp.Assigns = fun a a' ↦ ∃ b, cp.write b a = a' := by
   rfl
 
+theorem assigns_refl (cp : Component α β) [h : cp.WriteOverRead] (a : α) :
+    cp.Assigns a a := by
+  rw [assigns_def]; exists cp.read a; apply h.write_over_read
+
+instance (cp : Component α β) [cp.WriteOverRead] : Std.Refl cp.Assigns where
+  refl a := cp.assigns_refl a
+
 theorem seq_assigns (cp : Component α β) (r : Rel α β) :
     (cp.Assigns ,, r) = fun a a' ↦ ∃ b, r (cp.write b a) a' := by
   unfold Rel.Seq Assigns Assign; funext a b; grind
-
-theorem eq_subset_assigns (cp : Component α β) [h : cp.ExtensionallyValid] :
-    Eq ⊆ cp.Assigns := by
-  intro a b _; subst b; exists cp.read a; apply h.write_over_read
 
 theorem subset_assigns_compose
     (cp₁ : Component α β) (cp₂ : Component β γ) (cp₂' : Component β δ) :
