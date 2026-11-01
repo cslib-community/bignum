@@ -9,6 +9,8 @@ public import Bignum.Relational.Basic
 
 @[expose] public section
 
+open Std
+
 /-! # Lemmas about relations and Hoare-type rules -/
 
 /-! ## Set -/
@@ -28,13 +30,13 @@ theorem subset_full (p : Set α) : p ⊆ .Full :=
 theorem subset_refl (p : Set α) : p ⊆ p :=
   fun _ h ↦ h
 
-instance : @Std.Refl (Set α) (· ⊆ ·) where
+instance : @Refl (Set α) (· ⊆ ·) where
   refl r := subset_refl r
 
 theorem subset_antisymm (p q : Set α) : p ⊆ q → q ⊆ p → p = q := by
   intro ab ba; funext; exact propext ⟨@ab _, @ba _⟩
 
-instance : @Std.Antisymm (Set α) (· ⊆ ·) where
+instance : @Antisymm (Set α) (· ⊆ ·) where
   antisymm p q := subset_antisymm p q
 
 theorem subset_trans (p q r : Set α) : p ⊆ q → q ⊆ r → p ⊆ r :=
@@ -60,19 +62,25 @@ theorem subset_full (r : Rel α β) : r ⊆ .Full :=
 theorem subset_refl (r : Rel α β) : r ⊆ r :=
   fun _ _ h ↦ h
 
-instance : @Std.Refl (Rel α β) (· ⊆ ·) where
+instance : @Refl (Rel α β) (· ⊆ ·) where
   refl r := subset_refl r
 
 theorem subset_antisymm (r s : Rel α β) : r ⊆ s → s ⊆ r → r = s := by
   intro ab ba; funext; apply propext ⟨@ab _ _, @ba _ _⟩
 
-instance : @Std.Antisymm (Rel α β) (· ⊆ ·) where
+instance : @Antisymm (Rel α β) (· ⊆ ·) where
   antisymm r s := subset_antisymm r s
 
 theorem subsumed_trans (r s t : Rel α β) : r ⊆ s → s ⊆ t → r ⊆ t :=
   fun ab cd _ _ ha ↦ cd (ab ha)
 
 /-! ### Seq (,,) -/
+
+theorem seq_refl (r s : Rel α α) [Refl r] [Refl s] (a : α) :
+    (r ,, s) a a := ⟨a, ⟨Refl.refl _, Refl.refl _⟩⟩
+
+instance (r s : Rel α α) [Refl r] [Refl s] : Refl (r ,, s) where
+  refl a := seq_refl _ _ a
 
 theorem seq_assoc (r : Rel α β) (s : Rel β γ) (t : Rel γ δ) :
     r ,, s ,, t = (r ,, s) ,, t := by
@@ -97,24 +105,17 @@ theorem subset_seq_seq (r s : Rel α β) (t₁ t₂ : Rel β γ) :
     r ⊆ s → t₁ ⊆ t₂ → r ,, t₁ ⊆ s ,, t₂ := by
   simp [Subset, Seq]; exact fun hr ht a c b ab bc ↦ ⟨b, hr ab, ht bc⟩
 
-theorem subset_seq_left (r s t : Rel α α) :
-    r ⊆ t → s ⊆ t → t ,, t = t → r ,, s ⊆ t := by
-  simp [Subset, Seq]; intro rt st tt _ _ c ac cb; rw [← tt]
-  exact ⟨c, rt ac, st cb⟩
+theorem subset_seq_left (r s t : Rel α α) (ht : t ,, t = t) :
+    r ⊆ t → s ⊆ t → r ,, s ⊆ t := by
+  unfold Seq; intro rt st _ _ ⟨c, ac, cb⟩; rw [← ht]; exact ⟨c, rt ac, st cb⟩
 
--- TODO: Refl?
+theorem subset_seq_refl_right (r s : Rel α β) (rb : Rel β β) [Refl rb] :
+    r ⊆ s → r ⊆ s ,, rb :=
+  fun rs _ b ab ↦ ⟨b, rs ab, Refl.refl _⟩
 
-theorem subset_eq_seq (r s : Rel α α) :
-    Eq ⊆ r → Eq ⊆ s → Eq ⊆ r ,, s := by
-  simp [Subset, Seq]; exact fun hr hs a ↦ ⟨a, @hr _, @hs _⟩
-
-theorem subset_seq_eq_right (r s : Rel α β) (rb : Rel β β) :
-    r ⊆ s → Eq ⊆ rb → r ⊆ s ,, rb := by
-  simp [Subset, Seq]; exact fun hl hr _ b ab ↦ ⟨b, hl ab, @hr _⟩
-
-theorem subset_seq_eq_left (r s : Rel α β) (ra : Rel α α) :
-    Eq ⊆ ra → r ⊆ s → r ⊆ ra ,, s := by
-  simp [Subset, Seq]; exact fun hl hr a _ ab ↦ ⟨a, @hl _, hr ab⟩
+theorem subset_seq_refl_left (r s : Rel α β) (ra : Rel α α) [Refl ra] :
+    r ⊆ s → r ⊆ ra ,, s :=
+  fun rs a _ ab ↦ ⟨a, Refl.refl _, rs ab⟩
 
 /-! ### Eventually -/
 

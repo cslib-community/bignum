@@ -106,8 +106,6 @@ def Ensures (step : Rel α α) (pre post : Set α)
 
 end Rel
 
-#check HasSubset
-
 @[inherit_doc] scoped infixr:64 " ,, " => Rel.Seq
 
 end Bignum

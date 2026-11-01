@@ -91,22 +91,21 @@ theorem mayChange_nil (a : α) :
   rw [MayChange]
 
 theorem mayChange_singleton (cp : Component α β) :
-    MayChange [cp] = Assigns cp := by
-  simp [MayChange, Rel.seq_eq_right]
+    MayChange [cp] = Assigns cp :=
+  Rel.seq_eq_right _
 
--- theorem ensures_mayChange_preserved
---     (cp : Component α β) [h : cp.ExtensionallyValid]
---     (step : Rel α α) (P Q : Set α) (R : Rel α α)
---     (hR : ∀ a a', R a a' → cp.read a = cp.read a') :
---     (∀ b, step.Ensures (fun x ↦ P x ∧ cp.read x = b)
---                        (fun x ↦ Q x ∧ cp.read x = b)
---                        (R ,, MayChange [cp])) →
---     step.Ensures P Q R := by
---   simp [Rel.Ensures, mayChange_singleton, assigns_def]
---   intro hE a hP
---   have X := (hE (cp.read a) hP rfl)
---   apply step.eventually_mono _ X
---   intro a₁ ⟨⟨hQ, haa⟩, a₂, ⟨Raa, ⟨b, hM⟩⟩⟩
---   sorry
+theorem ensures_mayChange_preserved
+    (cp : Component α β) [h : cp.ExtensionallyValid]
+    (step : Rel α α) (P Q : Set α) (R : Rel α α)
+    (hR : R ⊆ (cp.read · = cp.read ·)) :
+    (∀ b, step.Ensures
+      (P ∩ (cp.read · = b)) (Q ∩ (cp.read · = b)) (R ,, MayChange [cp])) →
+    step.Ensures P Q R := by
+  simp [Rel.Ensures, mayChange_singleton, assigns_def]; intro hE a hP
+  apply step.eventually_mono _ (hE (cp.read a) ⟨hP, rfl⟩)
+  intro x ⟨⟨hQ, hxa⟩, y, ⟨Raa, ⟨b, _⟩⟩⟩; subst x
+  refine ⟨hQ, ?_⟩; suffices hy : y = (cp.write b y) from hy ▸ Raa
+  rw [← h.write_over_read (cp.write b y), hxa, hR Raa,
+    h.write_over_write, h.write_over_read]
 
 end Bignum.Component
