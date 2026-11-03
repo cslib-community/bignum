@@ -10,6 +10,8 @@ public import Bignum.Component.Relational
 
 @[expose] public section
 
+open Std
+
 /-! # Lemmas about relations and Hoare-type rules -/
 
 namespace Bignum.Component
@@ -27,7 +29,8 @@ theorem seq_preserves_component (cp : Component α β)
 /-! ## Assign (≔) -/
 
 theorem assign_func (cp : Component α β) (a a₁ a₂ : α) (b : β) :
-    (cp ≔ b) a a₁ → (cp ≔ b) a a₂ → a₁ = a₂ := fun ha₁ ha₂ ↦ ha₁ ▸ ha₂
+    (cp ≔ b) a a₁ → (cp ≔ b) a a₂ → a₁ = a₂ :=
+  fun ha₁ ha₂ ↦ ha₁ ▸ ha₂
 
 theorem seq_assign (cp : Component α β) (b : β) (r : Rel α β) (a : α) :
     ((cp ≔ b) ,, r) a = r (cp.write b a) := by
@@ -63,11 +66,11 @@ theorem assigns_def (cp : Component α β) :
     cp.Assigns = fun a a' ↦ ∃ b, cp.write b a = a' := by
   rfl
 
-theorem assigns_refl (cp : Component α β) [h : cp.WriteOverRead] (a : α) :
+theorem assigns_refl (cp : Component α β) [cp.WriteOverRead] (a : α) :
     cp.Assigns a a := by
-  rw [assigns_def]; exists cp.read a; apply h.write_over_read
+  rw [assigns_def]; exists cp.read a; apply WriteOverRead.write_over_read
 
-instance (cp : Component α β) [cp.WriteOverRead] : Std.Refl cp.Assigns where
+instance (cp : Component α β) [cp.WriteOverRead] : Refl cp.Assigns where
   refl a := cp.assigns_refl a
 
 theorem seq_assigns (cp : Component α β) (r : Rel α β) :
@@ -98,7 +101,7 @@ theorem mayChange_singleton (cp : Component α β) :
   Rel.seq_eq_right _
 
 theorem ensures_mayChange_preserved
-    (cp : Component α β) [h : cp.ExtensionallyValid]
+    (cp : Component α β) [hwr : cp.WriteOverRead] [hww : cp.WriteOverWrite]
     (step : Rel α α) (P Q : Set α) (R : Rel α α)
     (hR : R ⊆ (cp.read · = cp.read ·)) :
     (∀ b, step.Ensures
@@ -108,7 +111,7 @@ theorem ensures_mayChange_preserved
   apply step.eventually_mono _ (hE (cp.read a) ⟨hP, rfl⟩)
   intro x ⟨⟨hQ, hxa⟩, y, ⟨Raa, ⟨b, _⟩⟩⟩; subst x
   refine ⟨hQ, ?_⟩; suffices hy : y = (cp.write b y) from hy ▸ Raa
-  rw [← h.write_over_read (cp.write b y), hxa, hR Raa,
-    h.write_over_write, h.write_over_read]
+  rw [← hwr.write_over_read (cp.write b y), hxa, hR Raa,
+    hww.write_over_write, hwr.write_over_read]
 
 end Bignum.Component
