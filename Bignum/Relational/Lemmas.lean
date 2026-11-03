@@ -156,10 +156,10 @@ theorem hoare_trans :
 theorem ensures_pre_empty : step.Ensures ∅ Q C := by
   intro _ _; contradiction
 
-theorem ensures_already : P ⊆ Q → Eq ⊆ C → step.Ensures P Q C := by
-  intro hPQ hC _ hP; apply Eventually.base; constructor
+theorem ensures_already [Refl C] : P ⊆ Q → step.Ensures P Q C := by
+  intro hPQ _ hP; apply Eventually.base; constructor
   · apply hPQ hP
-  · apply hC; rfl
+  · apply Refl.refl
 
 theorem ensures_pre_post_gen (hP : P' ⊆ P) (hQ : Q ⊆ Q') (hC : C ⊆ C') :
     step.Ensures P Q C → step.Ensures P' Q' C' := by
