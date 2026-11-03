@@ -114,4 +114,18 @@ theorem ensures_mayChange_preserved
   rw [← hwr.write_over_read (cp.write b y), hxa, hR Raa,
     hww.write_over_write, hwr.write_over_read]
 
+theorem ensures_mayChange_existing_preserved
+    (cp : Component α β) [hwr : cp.WriteOverRead] [hww : cp.WriteOverWrite]
+    (step : Rel α α) (P Q : Set α) (R : Rel α α)
+    (hR : R ⊆ (cp.read · = cp.read ·)) (b : β)
+    (hP : P ⊆ (cp.read · = b)) :
+    step.Ensures P (Q ∩ (cp.read · = b)) (R ,, MayChange [cp]) →
+    step.Ensures P Q R := by
+  simp [Rel.Ensures, mayChange_singleton, assigns_def]; intro hE a Pa
+  apply step.eventually_mono _ (hE Pa)
+  intro x ⟨⟨hQ, hxb⟩, y, ⟨Ray, ⟨b', hh⟩⟩⟩; subst x
+  refine ⟨hQ, ?_⟩; suffices hy : y = (cp.write b' y) from hy ▸ Ray
+  rw [← hwr.write_over_read (cp.write b' y), hxb, hww.write_over_write,
+    ← hP Pa, hR Ray, hwr.write_over_read]
+
 end Bignum.Component
