@@ -26,6 +26,9 @@ theorem seq_preserves_component (cp : Component α β)
 
 /-! ## Assign (≔) -/
 
+theorem assign_func (cp : Component α β) (a a₁ a₂ : α) (b : β) :
+    (cp ≔ b) a a₁ → (cp ≔ b) a a₂ → a₁ = a₂ := fun ha₁ ha₂ ↦ ha₁ ▸ ha₂
+
 theorem seq_assign (cp : Component α β) (b : β) (r : Rel α β) (a : α) :
     ((cp ≔ b) ,, r) a = r (cp.write b a) := by
   unfold Rel.Seq Assign; simp

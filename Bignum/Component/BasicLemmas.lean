@@ -16,9 +16,9 @@ namespace Bignum.Component
 universe u₁ u₂ u₃ u₄
 variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
-instance (cp : Component α β) [h : cp.ReadOverWrite] :
+instance (cp : Component α β) [cp.ReadOverWrite] :
     cp.WeakReadOverWrite := by
-  constructor; exists id; apply h.read_over_write
+  constructor; exists id; apply ReadOverWrite.read_over_write
 
 instance (cp : Component α β) [cp.Valid] : cp.WeaklyValid := by
   constructor
@@ -52,26 +52,25 @@ theorem read_write_compose
   rw [read_compose, write_compose, h₁, h₂]
 
 instance (cp₁ : Component α β) (cp₂ : Component β γ)
-    [h₁ : cp₁.ReadOverWrite] [h₂ : cp₂.ReadOverWrite] :
+    [cp₁.ReadOverWrite] [cp₂.ReadOverWrite] :
     ReadOverWrite (cp₁ :> cp₂) where
   read_over_write := by
     intros; apply read_write_compose
-    · apply h₁.read_over_write
-    · apply h₂.read_over_write
+    · apply ReadOverWrite.read_over_write
+    · apply ReadOverWrite.read_over_write
 
 instance (cp₁ : Component α β) (cp₂ : Component β γ)
-    [h₁ : cp₁.WriteOverRead] [h₂ : cp₂.WriteOverRead] :
+    [cp₁.WriteOverRead] [cp₂.WriteOverRead] :
     (cp₁ :> cp₂).WriteOverRead where
   write_over_read := by
-    intros; rw [write_compose, read_compose, h₂.write_over_read,
-      h₁.write_over_read]
+    intros; rw [write_compose, read_compose,
+      WriteOverRead.write_over_read, WriteOverRead.write_over_read]
 
 instance (cp₁ : Component α β) (cp₂ : Component β γ)
-    [hr₁ : cp₁.ReadOverWrite] [hw₁ : cp₁.WriteOverWrite]
-    [hw₂ : cp₂.WriteOverWrite] :
+    [cp₁.ReadOverWrite] [cp₁.WriteOverWrite] [cp₂.WriteOverWrite] :
     (cp₁ :> cp₂).WriteOverWrite := by
-    constructor; intros; simp [write_compose, hr₁.read_over_write,
-      hw₁.write_over_write, hw₂.write_over_write]
+    constructor; intros; simp [write_compose, ReadOverWrite.read_over_write,
+      WriteOverWrite.write_over_write]
 
 instance (cp₁ : Component α β) (cp₂ : Component β γ)
     [cp₁.Valid] [cp₂.Valid] :

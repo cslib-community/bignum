@@ -52,10 +52,10 @@ theorem compose_rvalue_left (b : β) (cp : Component β γ) :
   rw [compose, rvalue]; funext; rfl
 
 theorem compose_rvalue_right
-    (cp : Component α β) [h : cp.ExtensionallyValid] (c : γ) :
+    (cp : Component α β) [cp.ExtensionallyValid] (c : γ) :
     cp :> (rvalue c) = rvalue c := by
   simp [compose, rvalue]; constructor <;>
-  funext; rfl; apply h.write_over_read
+  funext; rfl; apply WriteOverRead.write_over_read
 
 instance (cp : Component α β) (c : γ) : cp.Orthogonal (rvalue c) := by
   constructor <;> intros
