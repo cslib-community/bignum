@@ -17,7 +17,9 @@ namespace Bignum.Component
 universe u₁ u₂ u₃ u₄
 variable {α : Type u₁} {β : Type u₂} {γ : Type u₃} {δ : Type u₄}
 
-/-! ## element -/
+/-! ## General -/
+
+/-! ### element -/
 
 instance [DecidableEq α] (a : α) : (@element _ _ β a).ReadOverWrite := by
   constructor; simp [element]
@@ -37,7 +39,7 @@ theorem read_write_element [DecidableEq α] (f : α → β) (a a' : α) (b : β)
     if a = a' then b else (element a).read f := by
   rfl
 
-/-! ## rvalue -/
+/-! ### rvalue -/
 
 theorem read_rvalue (a : α) (b : β) :
     (rvalue b).read a = b := by
@@ -83,10 +85,27 @@ instance (b : β) (cp₂ : Component β γ) (cp₁ : Component α β) :
   · simp [write_rvalue]
   · simp [read_rvalue]
 
-/-! ## through -/
+/-! ### through -/
 
 theorem read_write_through (f : α → β) (g : β → α) (a : α) (b : β) :
     (through f g).read ((through f g).write b a) = (f ∘ g) b := by
   rfl
+
+/-! ## BitVector -/
+
+theorem read_subword (start len : Nat) {n : Nat} (x : BitVec n) :
+    (subword start len).read x = x.extractLsb' start len := by
+  rfl
+
+-- theorem read_write_subword {n m : Nat} (x : BitVec n) (y : BitVec m)
+--     (start len : Nat) (hn : start + len ≤ n) (hm : m ≤ len) :
+--     (subword start len).read
+--       ((subword start len).write (y.setWidth len) x) = y.setWidth len := by
+--   sorry
+
+-- theorem read_tophalf_write_tophalf
+--     {n : Nat} (x : BitVec n) (y : BitVec (n.succ / 2)) :
+--     tophalf.read (tophalf.write y x) = y := by
+--   sorry
 
 end Bignum.Component

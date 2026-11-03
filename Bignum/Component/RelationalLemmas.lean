@@ -90,15 +90,37 @@ theorem subset_assigns_compose_left
     (cp₁ :> cp₂).Assigns ⊆ cp₁.Assigns := by
   simp [Subset, assigns_def, compose]
 
+-- theorem assings_tophalf_bottomhalf
+--     {w : Nat} (cp : Component α (BitVec w)) [hv : cp.Valid] :
+--     (cp :> tophalf).Assigns ,, (cp :> bottomhalf).Assigns = cp.Assigns := by
+--   funext a₁ a₂; simp [assigns_def, Rel.Seq, compose]
+--   constructor
+--   · intro ⟨a₃, ⟨b, hl⟩, ⟨b', hr⟩⟩
+--     exists tophalf.write b (bottomhalf.write b' (cp.read a₃))
+--     sorry
+--   · intro h
+--     sorry
+
 /-! ## MayChange -/
 
 theorem mayChange_nil (a : α) :
     MayChange (.nil : List (Component α β)) a a := by
   rw [MayChange]
 
+instance : Refl (MayChange (.nil : List (Component α β))) where
+  refl a := mayChange_nil a
+
 theorem mayChange_singleton (cp : Component α β) :
     MayChange [cp] = Assigns cp :=
   Rel.seq_eq_right _
+
+theorem subset_seq_mayChange_write
+    (R : Rel α β) (cp : Component β γ) (c : γ) :
+    R ⊆ fun a b ↦ (R ,, MayChange [cp]) a (cp.write c b) := by
+  simp [mayChange_singleton, Rel.Seq, Assigns, Assign]; intro a b Rab
+  exists b; constructor
+  · assumption
+  · exists c
 
 theorem ensures_mayChange_preserved
     (cp : Component α β) [hwr : cp.WriteOverRead] [hww : cp.WriteOverWrite]
