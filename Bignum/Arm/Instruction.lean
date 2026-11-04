@@ -73,34 +73,52 @@ def State.offset_writeback (s : State) (oty : OffsetType) : BitVec 64 :=
 /-! ## General register-register instructions -/
 
 /--
+Adds with carry.
+-/
+def ADC {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let c := if CF.read s then 1#w else 0#w
+  let d : BitVec w := m + n + c
+  (Rd ≔ d) s
+
+/--
+Adds with carry, setting flags.
+-/
+def ADCS {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let c := if CF.read s then 1#w else 0#w
+  let d : BitVec w := m + n + c
+  (Rd ≔ d ,,
+   NF ≔ (d.toInt < 0) ,,
+   ZF ≔ (d = 0) ,,
+   CF ≔ (m.toNat + n.toNat ≠ d.toNat) ,,
+   VF ≔ (m.toInt + n.toInt ≠ d.toInt)) s
+
+/--
 Adds `Rm` and `Rn` and writes the result to `Rd`.
 -/
-def ADD {α : Type u} {w : Nat}
-    (Rd : Component α (BitVec w))
-    (Rm : Component α (BitVec w))
-    (Rn : Component α (BitVec w))
-    (s : α) : α → Prop :=
+def ADD {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
   let m := Rm.read s
   let n := Rn.read s
   let d : BitVec w := m + n
   (Rd ≔ d) s
 
 /--
-Subtracts `Rm` from `Rn` and writes the result to `Rd`.
--/
-def SUB {α : Type u} {w : Nat}
-    (Rd : Component α (BitVec w))
-    (Rm : Component α (BitVec w))
-    (Rn : Component α (BitVec w))
-    (s : α) : α → Prop :=
-  let m := Rm.read s
-  let n := Rn.read s
-  let d : BitVec w := m - n
-  (Rd ≔ d) s
-
-/--
-Adds `Rm` and `Rn` as integers and writes the result to `Rd`.
-Updates the NZCV flags accordingly.
+Add, setting flags.
 -/
 def ADDS {w : Nat}
     (Rd : Component State (BitVec w))
@@ -117,8 +135,52 @@ def ADDS {w : Nat}
    VF ≔ (m.toInt + n.toInt ≠ d.toInt)) s
 
 /--
-Subtracts `Rm` from `Rn` as integers and writes the result to `Rd`.
-Updates the NZCV flags accordingly.
+Subtract with carry.
+-/
+def SBC {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let c := if CF.read s then 0#w else 1#w
+  let d : BitVec w := m - (n + c)
+  (Rd ≔ d) s
+
+/--
+Subtracts with carry, setting flags.
+-/
+def SBCS {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let c := if CF.read s then 0#w else 1#w
+  let d : BitVec w := m - (n + c)
+  (Rd ≔ d ,,
+   NF ≔ (d.toInt < 0) ,,
+   ZF ≔ (d = 0) ,,
+   CF ≔ (m.toNat - (n.toNat + c) = d.toNat) ,,
+   VF ≔ (m.toInt - (n.toInt + c) ≠ d.toInt)) s
+
+/--
+Subtracts `Rm` from `Rn` and writes the result to `Rd`.
+-/
+def SUB {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let d : BitVec w := m - n
+  (Rd ≔ d) s
+
+/--
+Sub, settings flags.
 -/
 def SUBS {w : Nat}
     (Rd : Component State (BitVec w))
