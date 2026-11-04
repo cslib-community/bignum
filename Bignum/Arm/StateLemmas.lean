@@ -25,10 +25,10 @@ theorem WZR_zero : WZR = .rvalue 0 := by
 theorem ZR_zero (w : Nat) : @ZR w = .rvalue 0 := by
   rfl
 
-theorem XREG31_zero : XREG 31 = .rvalue 0 := by
+theorem XREG31_zero : XREG 31#5 = .rvalue 0 := by
   rfl
 
-theorem WREG31_zero : WREG 31 = .rvalue 0 := by
+theorem WREG31_zero : WREG 31#5 = .rvalue 0 := by
   rfl
 
 theorem zero_register {n : Nat} : @ZR n = (.rvalue 0) ∧

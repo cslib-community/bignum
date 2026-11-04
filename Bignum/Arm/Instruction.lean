@@ -72,7 +72,9 @@ def State.offset_writeback (s : State) (oty : OffsetType) : BitVec 64 :=
 
 /-! ## General register-register instructions -/
 
-/-- Adds `Rm` and `Rn` and writes the result to `Rd`. -/
+/--
+Adds `Rm` and `Rn` and writes the result to `Rd`.
+-/
 def ADD {α : Type u} {w : Nat}
     (Rd : Component α (BitVec w))
     (Rm : Component α (BitVec w))
@@ -83,7 +85,9 @@ def ADD {α : Type u} {w : Nat}
   let d : BitVec w := m + n
   (Rd ≔ d) s
 
-/-- Subtracts `Rm` from `Rn` and writes the result to `Rd`. -/
+/--
+Subtracts `Rm` from `Rn` and writes the result to `Rd`.
+-/
 def SUB {α : Type u} {w : Nat}
     (Rd : Component α (BitVec w))
     (Rm : Component α (BitVec w))
@@ -93,5 +97,41 @@ def SUB {α : Type u} {w : Nat}
   let n := Rn.read s
   let d : BitVec w := m - n
   (Rd ≔ d) s
+
+/--
+Adds `Rm` and `Rn` as integers and writes the result to `Rd`.
+Updates the NZCV flags accordingly.
+-/
+def ADDS {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let d : BitVec w := m + n
+  (Rd ≔ d ,,
+   NF ≔ (d.toInt < 0) ,,
+   ZF ≔ (d = 0) ,,
+   CF ≔ (m.toNat + n.toNat ≠ d.toNat) ,,
+   VF ≔ (m.toInt + n.toInt ≠ d.toInt)) s
+
+/--
+Subtracts `Rm` from `Rn` as integers and writes the result to `Rd`.
+Updates the NZCV flags accordingly.
+-/
+def SUBS {w : Nat}
+    (Rd : Component State (BitVec w))
+    (Rm : Component State (BitVec w))
+    (Rn : Component State (BitVec w))
+    (s : State) : State → Prop :=
+  let m := Rm.read s
+  let n := Rn.read s
+  let d : BitVec w := m - n
+  (Rd ≔ d ,,
+   NF ≔ (d.toInt < 0) ,,
+   ZF ≔ (d = 0) ,,
+   CF ≔ (m.toNat - n.toNat = d.toNat) ,,
+   VF ≔ (m.toInt - n.toInt ≠ d.toInt)) s
 
 end Bignum.Arm

@@ -151,12 +151,12 @@ def WZR : Component State (BitVec 32) :=
 def ZR {w : Nat} : Component State (BitVec w) :=
   .rvalue 0
 
-/-- Main register `n`. -/
-def XREG (n : Nat) : Component State (BitVec 64) :=
-  if n ≥ 31 then XZR else registers :> .element n
+/-- Main register `n` (disallows direct access `SP`). -/
+def XREG (n : BitVec 5) : Component State (BitVec 64) :=
+  if n == .allOnes 5 then XZR else registers :> .element n
 
 /-- Zero-topped lower 32-bit version of main register `n`. -/
-def WREG (n : Nat) : Component State (BitVec 32) :=
+def WREG (n : BitVec 5) : Component State (BitVec 32) :=
   XREG n :> .zerotop32
 
 /-- Stack pointer. -/
@@ -166,23 +166,23 @@ def SP := registers :> .element 31
 def WSP := SP :> .zerotop32
 
 /-- SIMD register `n`. -/
-def QREG (n : Nat) : Component State (BitVec 128) :=
+def QREG (n : BitVec 5) : Component State (BitVec 128) :=
   simdregisters :> .element n
 
 /-- Zero-topped lower 64-bit version of SIMD register `n`. -/
-def DREG (n : Nat) : Component State (BitVec 64) :=
+def DREG (n : BitVec 5) : Component State (BitVec 64) :=
   QREG n :> .zerotop64
 
 /-- Zero-topped lower 32-bit version of SIMD register `n`. -/
-def SREG (n : Nat) : Component State (BitVec 32) :=
+def SREG (n : BitVec 5) : Component State (BitVec 32) :=
   DREG n :> .zerotop32
 
 /-- Zero-topped lower 16-bit version of SIMD register `n`. -/
-def HREG (n : Nat) : Component State (BitVec 16) :=
+def HREG (n : BitVec 5) : Component State (BitVec 16) :=
   SREG n :> .zerotop16
 
 /-- Zero-topped lower 8-bit version of SIMD register `n`. -/
-def BREG (n : Nat) : Component State (BitVec 8) :=
+def BREG (n : BitVec 5) : Component State (BitVec 8) :=
   HREG n :> .zerotop8
 
 /--
