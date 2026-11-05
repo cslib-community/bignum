@@ -5,7 +5,7 @@ Author(s): Guilherme Lima
 -/
 module
 
-public import Bignum.BitVec
+import Bignum.BitVec
 
 @[expose] public section
 
@@ -60,28 +60,7 @@ abbrev HS := CS
 abbrev LO := CC
 
 /--
-Converts condition code to 4-bit encoding.
--/
-def toBitVec :  Condition → BitVec 4
-  | EQ => 0b0000
-  | NE => 0b0001
-  | CS => 0b0010
-  | CC => 0b0011
-  | MI => 0b0100
-  | PL => 0b0101
-  | VS => 0b0110
-  | VC => 0b0111
-  | HI => 0b1000
-  | LS => 0b1001
-  | GE => 0b1010
-  | LT => 0b1011
-  | GT => 0b1100
-  | LE => 0b1101
-  | AL => 0b1110
-  | NV => 0b1111
-
-/--
-Converts 4-bit encoding to condition code.
+Converts 4-bit bitvector to condition code.
 -/
 def ofBitVec (bv : BitVec 4) : Condition :=
   match_bv bv with
@@ -102,6 +81,31 @@ def ofBitVec (bv : BitVec 4) : Condition :=
   | [1110] => AL
   | [1111] => NV
   | _ => panic! "should not get here"
+
+/--
+Converts condition code to 4-bit bitvector.
+-/
+def toBitVec : Condition → BitVec 4
+  | EQ => 0b0000
+  | NE => 0b0001
+  | CS => 0b0010
+  | CC => 0b0011
+  | MI => 0b0100
+  | PL => 0b0101
+  | VS => 0b0110
+  | VC => 0b0111
+  | HI => 0b1000
+  | LS => 0b1001
+  | GE => 0b1010
+  | LT => 0b1011
+  | GT => 0b1100
+  | LE => 0b1101
+  | AL => 0b1110
+  | NV => 0b1111
+
+theorem ofBitVec_toBitVec :
+    ∀ bv, (Condition.ofBitVec bv).toBitVec = bv := by
+  decide
 
 /--
 Inverts condition code.
@@ -125,7 +129,7 @@ def invert : Condition → Condition
   | NV => AL
 
 theorem invert_ofBitVec_toBitVec_xor (c : Condition) :
-    c.invert = Condition.ofBitVec (c.toBitVec.xor 1) := by
+    c.invert = .ofBitVec (c.toBitVec.xor 1) := by
   cases c <;> simp [ofBitVec, toBitVec, invert]
 
 theorem invert_involutive (c : Condition) :

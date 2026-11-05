@@ -5,6 +5,8 @@ Author(s): Guilherme Lima
 -/
 module
 
+import Bignum.BitVec
+
 @[expose] public section
 
 /-! # Register operands -/
@@ -23,7 +25,7 @@ inductive ShiftType where
   | ASR
   /-- Rotate right. -/
   | ROR
-deriving DecidableEq, Repr
+deriving DecidableEq, Inhabited, Repr
 
 instance : ToString ShiftType where
   toString a := toString (repr a)
@@ -31,12 +33,34 @@ instance : ToString ShiftType where
 namespace ShiftType
 
 /--
-Perform the shift operation indicated by `sty` on `bv` by amount `sa`.
+Converts 2-bit bitvector to shift type.
+-/
+def ofBitVec (bv : BitVec 2) : ShiftType :=
+  match_bv bv with
+  | [00] => .LSL
+  | [01] => .LSR
+  | [10] => .ASR
+  | [11] => .ROR
+  | _ => panic! "should not get here"
+
+/--
+Converts shift type to 2-bit bitvector.
+-/
+def toBitVec : ShiftType → BitVec 2
+  | .LSL => 0b00
+  | .LSR => 0b01
+  | .ASR => 0b10
+  | .ROR => 0b11
+
+theorem ofBitVec_toBitVec :
+    ∀ bv, (ShiftType.ofBitVec bv).toBitVec = bv := by
+  decide
+
+/--
+Perform the given shift operation on `bv` by amount `sa`.
 -/
 @[simp]
-def shift (sty : ShiftType) (sa : BitVec 6) {n : Nat} (bv : BitVec n) :
-    BitVec n :=
-  match sty with
+def shift (sa : BitVec 6) {n : Nat} (bv : BitVec n) : ShiftType → BitVec n
   | .LSL => bv.shiftLeft sa.toNat
   | .LSR => bv.ushiftRight sa.toNat
   | .ASR => bv.sshiftRight sa.toNat
