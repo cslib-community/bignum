@@ -5,10 +5,10 @@ Author(s): Guilherme Lima
 -/
 module
 
+public import Bignum.Arm.Component
 public import Bignum.Arm.Instruction
-import Bignum.Arm.Component
-import Bignum.Arm.State
-import Bignum.BitVec
+public import Bignum.Arm.State
+public import Bignum.BitVec
 
 @[expose] public section
 
@@ -36,7 +36,8 @@ Calls ADC/SBC or ADCS/SBCS.
 def adcOp (op : Bool) (S : Bool) {w : Nat} :
     Component State (BitVec w) →
     Component State (BitVec w) →
-    Component State (BitVec w) → State → State → Prop :=
+    Component State (BitVec w) →
+    State → State → Prop :=
   if op then if S then SBCS else SBC
         else if S then ADCS else ADC
 
@@ -46,7 +47,8 @@ Calls ADD/SUB or ADDS/SUBS.
 def addOp (op : Bool) (S : Bool) {w : Nat} :
     Component State (BitVec w) →
     Component State (BitVec w) →
-    Component State (BitVec w) → State → State → Prop :=
+    Component State (BitVec w) →
+    State → State → Prop :=
   if op then if S then SUBS else SUB
         else if S then ADDS else ADD
 
@@ -68,15 +70,17 @@ def decode (x : BitVec 32) : Option (Rel State State) :=
       else addOp op S (if S then WREG Rd else WREG_SP Rd)
         (WREG_SP Rn) (.rvalue val))
   -- ADD(S)/SUB(S) (shifted register)
-  -- | [sf:1, op:1, S:1, 01011, sty:2, 0, Rm:5, sam:6, Rn:5, Rd:5] =>
-  --   if sty = 0b11 then
-  --     none
-  --   else if sf then
-  --      some (addOp op S (XREG Rd) (XREG Rn) ((XREG Rm).shifted sty) sam)
-  --   else if sam < 32 then
-  --      some (addOp op S (WREG Rd) (WREG Rn) ((WREG Rm).shifted sty) sam)
-  --   else
-  --     none
+  | [sf:1, op:1, S:1, 01011, sty:2, 0, Rm:5, sam:6, Rn:5, Rd:5] =>
+    if sty = 0b11 then
+      none
+    else if sf then
+       some (addOp op S (XREG Rd) (XREG Rn)
+         ((XREG Rm).shifted sty sam.toNat))
+    else if sam < 32 then
+       some (addOp op S (WREG Rd) (WREG Rn)
+         ((WREG Rm).shifted sty sam.toNat))
+    else
+      none
   | _ => none
 
 end Bignum.Arm.Decode

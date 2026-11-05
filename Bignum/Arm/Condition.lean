@@ -82,6 +82,9 @@ def ofBitVec (bv : BitVec 4) : Condition :=
   | [1111] => NV
   | _ => panic! "should not get here"
 
+instance : Coe (BitVec 4) Condition :=
+  ⟨.ofBitVec⟩
+
 /--
 Converts condition code to 4-bit bitvector.
 -/

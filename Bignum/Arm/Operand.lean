@@ -43,6 +43,9 @@ def ofBitVec (bv : BitVec 2) : ShiftType :=
   | [11] => .ROR
   | _ => panic! "should not get here"
 
+instance : Coe (BitVec 2) ShiftType :=
+  ⟨.ofBitVec⟩
+
 /--
 Converts shift type to 2-bit bitvector.
 -/
@@ -88,9 +91,47 @@ inductive ExtendedType where
   | SXTW
   /-- Signed double word. -/
   | SXTX
-deriving DecidableEq, Repr
+deriving DecidableEq, Inhabited, Repr
+
+instance : ToString ExtendedType where
+  toString a := toString (repr a)
 
 namespace ExtendedType
+
+/--
+Converts 3-bit bitvector to extended type.
+-/
+def ofBitVec (bv : BitVec 3) : ExtendedType :=
+  match_bv bv with
+  | [000] => .UXTB
+  | [001] => .UXTH
+  | [010] => .UXTW
+  | [011] => .UXTX
+  | [100] => .SXTB
+  | [101] => .SXTH
+  | [110] => .SXTW
+  | [111] => .SXTX
+  | _ => panic! "should not get here"
+
+instance : Coe (BitVec 3) ExtendedType :=
+  ⟨.ofBitVec⟩
+
+/--
+Converts extended type to 3-bit bitvector.
+-/
+def toBitVec : ExtendedType → BitVec 3
+  | .UXTB => 0b000
+  | .UXTH => 0b001
+  | .UXTW => 0b010
+  | .UXTX => 0b011
+  | .SXTB => 0b100
+  | .SXTH => 0b101
+  | .SXTW => 0b110
+  | .SXTX => 0b111
+
+theorem ofBitVec_toBitVec :
+    ∀ bv, (ExtendedType.ofBitVec bv).toBitVec = bv := by
+  decide
 
 /--
 Perform the extension operation indicated by `xty` on `bv`.
