@@ -68,8 +68,7 @@ theorem toNatLE_lt (bs : ByteList) : bs.toNatLE < 256^bs.length := by
   | cons b bs ih =>
     rw [bs.foldr_cons, bs.length_cons, Nat.pow_add_one (m:=bs.length),
       Nat.mul_comm _ 256, Nat.mul_comm _ 256]
-    have h : b.toNat < 2^8 := by
-      apply b.toNat_lt_twoPow_of_le; decide
+    have _ := b.toNat_lt_twoPow_length
     apply Nat.add_mul_lt_mul_of_lt_of_lt <;> assumption
 
 theorem ofNatLE_zero (n : Nat) : ByteList.ofNatLE 0 n = [] := by
@@ -127,6 +126,58 @@ theorem ofIntLE_ofNat (k : Nat) (n : Nat) :
     ByteList.ofIntLE k (.ofNat n) = .ofNatLE k n := by
   rw [ofIntLE, Int.natAbs_emod_of_nonneg] <;> try lia
   simp; apply ofNatLE_mod_cancel
+
+theorem toBitVecLE_nil : ByteList.toBitVecLE [] = 0#0 := by
+  rfl
+
+theorem toBitVecLE_cons (b : BitVec 8) (bs : ByteList) :
+    ByteList.toBitVecLE (b :: bs) = (bs.toBitVecLE ++ b).cast (
+      by rw [List.length_cons, Nat.add_mul]) := by
+  rw [toBitVecLE]
+
+theorem ofBitVecLE_zero {w : Nat} (bv : BitVec w) :
+    ByteList.ofBitVecLE 0 bv = [] := by
+  rfl
+
+theorem ofBitVecLE_succ (k : Nat) {w : Nat} (bv : BitVec w) :
+    ByteList.ofBitVecLE k.succ bv =
+    bv.extractLsb' 0 8 :: ofBitVecLE k (bv.extractLsb' 8 w) := by
+  rfl
+
+theorem length_ofBitVecLE (k : Nat) {w : Nat} (bv : BitVec w) :
+    (ofBitVecLE k bv).length = k := by
+  induction k generalizing w bv with
+  | zero => rfl
+  | succ _ ih => rw [ofBitVecLE, List.length_cons, ih]
+
+theorem toBitVecLE_toNat (bs : ByteList) :
+    bs.toBitVecLE.toNat = bs.toNatLE := by
+  induction bs with
+  | nil => simp [toBitVecLE_nil, toNatLE_nil]
+  | cons b bs ih =>
+    simp [toBitVecLE_cons, ih, toNatLE_cons,
+      ← Nat.shiftLeft_add_eq_or_of_lt b.toNat_lt_twoPow_length]
+    rw [Nat.shiftLeft_eq, Nat.add_comm]
+
+theorem ofNatLE_toNat (k : Nat) {w : Nat} (bv : BitVec w) :
+    ByteList.ofNatLE k bv.toNat = ByteList.ofBitVecLE k bv := by
+  induction k generalizing w bv with
+  | zero => rfl
+  | succ k ih =>
+    rw [ofNatLE_succ, ofBitVecLE_succ, ← ih]; congr
+    simp [BitVec.extractLsb', Nat.shiftRight_eq_div_pow,
+      Nat.mod_eq_of_lt (Nat.lt_of_le_of_lt (Nat.div_le_self _ _) bv.isLt)]
+
+theorem ofBitVecLE_toBitVecLE (bs : ByteList) :
+    .ofBitVecLE bs.length bs.toBitVecLE = bs := by
+  rw [← ofNatLE_toNat, toBitVecLE_toNat, ofNatLE_toNatLE]
+
+theorem toBitVecLE_ofBitVecLE (k : Nat) {w : Nat} (bv : BitVec w) :
+    ByteList.toBitVecLE (.ofBitVecLE k bv) = (bv.setWidth (k * 8)).cast (by
+      rw [length_ofBitVecLE]) := by
+  apply BitVec.eq_of_toNat_eq
+  rw [toBitVecLE_toNat, BitVec.toNat_cast, BitVec.toNat_setWidth,
+    ← ofNatLE_toNat, toNatLE_ofNatLE, Nat.mul_comm, Nat.pow_mul]
 
 end ByteList
 

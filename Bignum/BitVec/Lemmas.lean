@@ -14,6 +14,10 @@ public import Bignum.BitVec.Basic
 
 namespace BitVec
 
+theorem toNat_lt_twoPow_length {w : Nat} (x : BitVec w) :
+    x.toNat < 2^w := by
+  apply x.toNat_lt_twoPow_of_le (Nat.le_refl _)
+
 theorem ofNat_mod_cancel {w : Nat} (n : Nat) :
     BitVec.ofNat w (n % 2^w) = BitVec.ofNat w n := by
   apply BitVec.eq_of_toNat_eq; simp [BitVec.toNat_ofNat]

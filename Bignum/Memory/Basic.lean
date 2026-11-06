@@ -19,13 +19,13 @@ abbrev ByteList := List (BitVec 8)
 namespace ByteList
 
 /--
-Converts a little-endian byte list `bs` to a natural number.
+Converts little-endian byte list `bs` to a natural number.
 -/
 def toNatLE (bs : ByteList) : Nat :=
   bs.foldr (fun b n ↦ b.toNat + n <<< 8) 0
 
 /--
-Converts a natural number `n` to a little-endian byte list of `len` bytes.
+Converts natural number `n` to a little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `n` is too large.
 -/
 def ofNatLE (len n : Nat) : ByteList :=
@@ -34,11 +34,40 @@ def ofNatLE (len n : Nat) : ByteList :=
   | k + 1 => .ofNat 8 n :: ofNatLE k (n >>> 8)
 
 /--
-Converts an integer `i` to a little-endian byte list of `len` bytes.
+Converts integer `i` to a little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `i` is too small or too large.
 -/
 def ofIntLE (len : Nat) (i : Int) : ByteList :=
   ofNatLE len $ Int.natAbs (i % 256^len)
+
+/--
+Converts little-endian byte list `bs` to a bitvector.
+-/
+def toBitVecLE (bs : ByteList) : BitVec (bs.length * 8) :=
+  match bs with
+  | [] => 0#0
+  | b :: bs => (toBitVecLE bs ++ b).cast (by simp [Nat.succ_mul])
+
+/--
+Converts a bitvector `bs` to a little-endian byte list of `len` bytes.
+Truncates the list to `len` bytes if `bs` is too small or too large.
+-/
+def ofBitVecLE (len : Nat) {w : Nat} (bv : BitVec w) : ByteList :=
+  match len with
+  | 0 => []
+  | k + 1 => bv.extractLsb' 0 8 :: ofBitVecLE k (bv.extractLsb' 8 w)
+
+/--
+Pops `n` bytes as a bitvector from little-endian byte list `bs`.
+-/
+def popLE (bs : ByteList) (n : Nat) :
+    Option ((BitVec (8 * n)) × ByteList) :=
+  if h : n ≤ bs.length then
+    some ((ByteList.toBitVecLE (bs.take n)).cast (by
+      rw [List.length_take, Nat.min_eq_left, Nat.mul_comm];
+      assumption), bs.drop n)
+  else
+    none
 
 end ByteList
 

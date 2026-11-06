@@ -16,24 +16,35 @@ public import Bignum.BitVec
 namespace Bignum.Arm
 
 /--
-Asserts that the 32-bit data corresponding to instruction `instr` is
-loaded 4-byte-aligned into state's `s` memory at address `addr`.
+Fetches and decodes the 4-byte, little-endian instruction a at `addr`.
 -/
-structure State.decode (s : State) (addr : BitVec 64) : Type where
-  /-- Instruction. -/
-  instr : Rel State State
-  /-- Encoded instruction. -/
-  data : BitVec 32
-  /-- `data` is 4-byte-aligned and loaded at address `addr`. -/
-  loaded : s.AlignedBytesLoaded addr (.ofNatLE 4 data.toNat)
-  /-- When decoded, `data` produces instruction `instr`. -/
-  decode : Decode.decode data = .some instr
+def State.decode (s : State) (addr : BitVec 64) : Option (Rel State State) :=
+  if (4 ∣ addr.toNat) then
+    Decode.decode (s._memory.readBytesLE addr 4).toBitVecLE
+  else
+    none
 
 /--
-The basic fetch-decode-execute cycle.  Fetching, decoding, and executing the
+The fetch-decode-execute cycle.  Fetching, decoding, and executing the
 current instruction in state `s` leads to state `s'`.
 -/
 def arm : Rel State State := fun s s' ↦
-  ∃ d : s.decode (s.read PC), (PC ≔ (s.read PC + 4#64) ,, d.instr) s s'
+  match s.decode (s.read PC) with
+  | .none => False
+  | .some instr => (PC ≔ (s.read PC + 4#64) ,, instr) s s'
+
+-- theorem State.decode_cons
+--     (s : State) (addr : BitVec 64) (bs bs' : ByteList)
+--     (data : BitVec 32) (instr : Rel State State) :
+--     s.AlignedBytesLoaded addr bs →
+--     (bs.popLE 4) = .some (data, bs') →
+--     Decode.decode data = .some instr →
+--     s.decode addr = instr ∧ s.AlignedBytesLoaded (addr + 4) bs' := by
+--   intro hA hpop hD;
+--   constructor
+--   · simp [State.decode, hA.aligned, ← hD]; congr
+--     have X := hA.bytes_loaded
+--     sorry
+--   · sorry
 
 end Bignum.Arm

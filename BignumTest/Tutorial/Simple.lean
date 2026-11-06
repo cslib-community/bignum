@@ -14,7 +14,7 @@ def simple : ByteList :=
   [0x22, 0x00, 0x00, 0x8b,      -- add x2, x1, x0
    0x42, 0x00, 0x01, 0xcb]      -- sub x2, x2, x1
 
-theorem simple_spec : forall pc a b,
+theorem simple_spec (pc a b : BitVec 64) :
     arm.Ensures
     (fun s ↦                    -- precondition
       s.AlignedBytesLoaded pc simple ∧
@@ -25,4 +25,6 @@ theorem simple_spec : forall pc a b,
       s.read PC = pc + 8 ∧
       s.read X2 = a)
     (MayChange [PC, X2]) := by  -- frame
+  simp [Rel.Ensures]; intro s hl hPC hX0 hX1
+  -- ARM_CONV (proofs/arm.ml:367)
   sorry
