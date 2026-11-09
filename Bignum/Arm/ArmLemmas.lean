@@ -33,6 +33,13 @@ theorem decode_eq_some_iff (instr : Rel State State) :
     Decode.decode (s.read $ bytes addr 4).toBitVecLE = some instr := by
   simp [decode]
 
+-- theorem decode_cons' (bs bs' : ByteList)
+--     (data : BitVec 32) (instr : Rel State State)
+--     (ha : s.AlignedBytesLoaded addr bs)
+--     (hpop : Decode.pop bs = some (instr, bs')) :
+--     s.decode addr = some instr ∧ s.AlignedBytesLoaded (addr + 4#64) bs' := by
+--   sorry
+
 /-
 TODO: Cleanup the proof below. A lemma relating bs.pop and decode might help.
 For example, Decode.pop which applies decode to the first component of pop.
