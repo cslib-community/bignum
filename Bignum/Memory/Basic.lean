@@ -92,7 +92,7 @@ def popBitVecLE (bs : ByteList) (n : Nat) :
   | none => none
   | some (l, r) => some (
       l.toBitVecLE.cast (by
-        rcases (bs.popLE_eq_some_iff _ _ _).mp h with ⟨hn, rfl, rfl⟩
+        rcases (bs.popLE_eq_some_iff _ _ _).mp h with ⟨_, rfl, rfl⟩
         rw [List.length_take, Nat.min_eq_left, Nat.mul_comm]
         assumption),
       r)
