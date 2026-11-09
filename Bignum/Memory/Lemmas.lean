@@ -179,6 +179,27 @@ theorem toBitVecLE_ofBitVecLE (k : Nat) {w : Nat} (bv : BitVec w) :
   rw [toBitVecLE_toNat, BitVec.toNat_cast, BitVec.toNat_setWidth,
     ← ofNatLE_toNat, toNatLE_ofNatLE, Nat.mul_comm, Nat.pow_mul]
 
+theorem popNatLE_eq_none_iff (bs : ByteList) (n : Nat) :
+    ByteList.popNatLE bs n = none ↔ n > bs.length := by
+  grind [popNatLE, popLE_eq_none_iff]
+
+theorem popNatLE_eq_some_iff (bs bs' : ByteList) (n n' : Nat) :
+    ByteList.popNatLE bs n = some (n', bs') ↔
+    n ≤ bs.length ∧ ByteList.toNatLE (bs.take n) = n' ∧ bs.drop n = bs' := by
+  grind [popNatLE, popLE_eq_none_iff, popLE_eq_some_iff]
+
+theorem popBitVecLE_eq_none_iff (bs : ByteList) (n : Nat) :
+    ByteList.popBitVecLE bs n = none ↔ n > bs.length := by
+  grind [popBitVecLE, popLE_eq_none_iff]
+
+theorem popBitVecLE_eq_some_iff
+    (bs bs' : ByteList) (n : Nat) (bv : BitVec (8 * n)) :
+    ByteList.popBitVecLE bs n = some (bv, bs') ↔
+    ∃ _ : n ≤ bs.length, ByteList.toBitVecLE (bs.take n) = bv.cast (by
+      rw [List.length_take, Nat.min_eq_left, Nat.mul_comm]; assumption) ∧
+    bs.drop n = bs' := by
+  grind [popBitVecLE, popLE_eq_none_iff, popLE_eq_some_iff]
+
 end ByteList
 
 /-! ## Memory -/

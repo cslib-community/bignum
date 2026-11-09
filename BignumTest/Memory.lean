@@ -13,10 +13,27 @@ open Bignum
 /-! ## Byte list -/
 
 def bs : ByteList := [0xef, 0xcd, 0xab, 0x00]
+
 example : ByteList.ofNatLE 4 bs.toNatLE = bs := by rfl
 example : ByteList.ofNatLE 6 bs.toNatLE = bs ++ [0, 0] := by rfl
+
 example : ByteList.ofIntLE 2 (-129) = [0x7f, 0xff] := by rfl
 example : ByteList.ofIntLE 1 (-129) = [0x7f] := by rfl
+
+example : ByteList.ofBitVecLE 4 bs.toBitVecLE = bs := by rfl
+example : ByteList.ofBitVecLE 6 bs.toBitVecLE = bs ++ [0, 0] := by rfl
+
+example : ByteList.popLE bs 0 = some ([], bs) := by rfl
+example : ByteList.popLE bs 2 = some ([0xef, 0xcd], [0xab, 0x00]) := by rfl
+example : ByteList.popLE bs 8 = none := by rfl
+
+example : ByteList.popNatLE bs 0 = some (0, bs) := by rfl
+example : ByteList.popNatLE bs 2 = some (0xcdef, bs.drop 2) := by rfl
+example : ByteList.popNatLE bs 4 = some (0x00abcdef, bs.drop 4) := by rfl
+
+example : ByteList.popBitVecLE bs 0 = some (0, bs) := by rfl
+example : ByteList.popBitVecLE bs 2 = some (0xcdef#16, bs.drop 2) := by rfl
+example : ByteList.popBitVecLE bs 4 = some (bs.toBitVecLE, []) := by rfl
 
 /-! ## Memory -/
 

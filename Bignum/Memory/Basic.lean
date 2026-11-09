@@ -19,13 +19,13 @@ abbrev ByteList := List (BitVec 8)
 namespace ByteList
 
 /--
-Converts little-endian byte list `bs` to a natural number.
+Converts little-endian byte list `bs` to natural number.
 -/
 def toNatLE (bs : ByteList) : Nat :=
   bs.foldr (fun b n ↦ b.toNat + n <<< 8) 0
 
 /--
-Converts natural number `n` to a little-endian byte list of `len` bytes.
+Converts natural number `n` to little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `n` is too large.
 -/
 def ofNatLE (len n : Nat) : ByteList :=
@@ -34,14 +34,14 @@ def ofNatLE (len n : Nat) : ByteList :=
   | k + 1 => .ofNat 8 n :: ofNatLE k (n >>> 8)
 
 /--
-Converts integer `i` to a little-endian byte list of `len` bytes.
+Converts integer `i` to little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `i` is too small or too large.
 -/
 def ofIntLE (len : Nat) (i : Int) : ByteList :=
   ofNatLE len $ Int.natAbs (i % 256^len)
 
 /--
-Converts little-endian byte list `bs` to a bitvector.
+Converts little-endian byte list `bs` to bitvector.
 -/
 def toBitVecLE (bs : ByteList) : BitVec (bs.length * 8) :=
   match bs with
@@ -49,7 +49,7 @@ def toBitVecLE (bs : ByteList) : BitVec (bs.length * 8) :=
   | b :: bs => (toBitVecLE bs ++ b).cast (by simp [Nat.succ_mul])
 
 /--
-Converts a bitvector `bs` to a little-endian byte list of `len` bytes.
+Converts a bitvector `bs` to little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `bs` is too small or too large.
 -/
 def ofBitVecLE (len : Nat) {w : Nat} (bv : BitVec w) : ByteList :=
@@ -58,16 +58,44 @@ def ofBitVecLE (len : Nat) {w : Nat} (bv : BitVec w) : ByteList :=
   | k + 1 => bv.extractLsb' 0 8 :: ofBitVecLE k (bv.extractLsb' 8 w)
 
 /--
-Pops `n` bytes as a bitvector from little-endian byte list `bs`.
+Pops `n` bytes from little-endian byte list `bs`.
 -/
-def popLE (bs : ByteList) (n : Nat) :
-    Option ((BitVec (8 * n)) × ByteList) :=
-  if h : n ≤ bs.length then
-    some ((ByteList.toBitVecLE (bs.take n)).cast (by
-      rw [List.length_take, Nat.min_eq_left, Nat.mul_comm];
-      assumption), bs.drop n)
+def popLE (bs : ByteList) (n : Nat) : Option (ByteList × ByteList) :=
+  if n ≤ bs.length then
+    (bs.take n, bs.drop n)
   else
     none
+
+theorem popLE_eq_none_iff (bs : ByteList) (n : Nat) :
+    ByteList.popLE bs n = none ↔ n > bs.length := by
+  refine ⟨?_, fun hn ↦ ?_⟩ <;> simp [popLE]; exact gt_iff_lt.mp hn
+
+theorem popLE_eq_some_iff (bs bs₁ bs₂ : ByteList) (n : Nat) :
+    ByteList.popLE bs n = some (bs₁, bs₂) ↔
+    n ≤ bs.length ∧ bs.take n = bs₁ ∧ bs.drop n = bs₂ := by
+  refine ⟨?_, fun _ ↦ ?_⟩ <;> simp [popLE]; assumption
+
+/--
+Pops `n` bytes as a natural number from little-endian byte list `bs`.
+-/
+def popNatLE (bs : ByteList) (n : Nat) : Option (Nat × ByteList) :=
+  match bs.popLE n with
+  | none => none
+  | some (l, r) => some (l.toNatLE, r)
+
+/--
+Pops `n` bytes as a bitvector from little-endian byte list `bs`.
+-/
+def popBitVecLE (bs : ByteList) (n : Nat) :
+    Option ((BitVec (8 * n)) × ByteList) :=
+  match h : bs.popLE n with
+  | none => none
+  | some (l, r) => some (
+      l.toBitVecLE.cast (by
+        rcases (bs.popLE_eq_some_iff _ _ _).mp h with ⟨hn, hl, hr⟩
+        rw [← hl, List.length_take, Nat.min_eq_left, Nat.mul_comm]
+        assumption),
+      r)
 
 end ByteList
 
