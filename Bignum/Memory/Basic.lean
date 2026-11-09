@@ -92,8 +92,8 @@ def popBitVecLE (bs : ByteList) (n : Nat) :
   | none => none
   | some (l, r) => some (
       l.toBitVecLE.cast (by
-        rcases (bs.popLE_eq_some_iff _ _ _).mp h with ⟨hn, hl, hr⟩
-        rw [← hl, List.length_take, Nat.min_eq_left, Nat.mul_comm]
+        rcases (bs.popLE_eq_some_iff _ _ _).mp h with ⟨hn, rfl, rfl⟩
+        rw [List.length_take, Nat.min_eq_left, Nat.mul_comm]
         assumption),
       r)
 
@@ -223,7 +223,7 @@ structure AlignedBytesLoadedLE {w : Nat}
   /-- Address `addr` is 4-byte aligned. -/
   aligned : (4 ∣ addr.toNat)
   /-- Byte list `bs` is loaded at address `addr`. -/
-  bytes_loaded : mem.BytesLoadedLE addr bs
+  bytesLoadedLE : mem.BytesLoadedLE addr bs
 
 /--
 Tests whether byte list `bs` is loaded at 4-byte aligned address `addr`.

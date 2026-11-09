@@ -16,35 +16,34 @@ public import Bignum.BitVec
 namespace Bignum.Arm
 
 /--
-Fetches and decodes the 4-byte, little-endian instruction a at `addr`.
+Fetches and decodes the 4-byte, little-endian instruction at aligned `addr`.
 -/
 def State.decode (s : State) (addr : BitVec 64) : Option (Rel State State) :=
-  if (4 ∣ addr.toNat) then
-    Decode.decode (s._memory.readBytesLE addr 4).toBitVecLE
+  if 4 ∣ addr.toNat then
+    Decode.decode ((s.read memory).readBytesLE addr 4).toBitVecLE
   else
     none
-
-/--
-The fetch-decode-execute cycle.  Fetching, decoding, and executing the
-current instruction in state `s` leads to state `s'`.
--/
-def arm : Rel State State := fun s s' ↦
-  match s.decode (s.read PC) with
-  | .none => False
-  | .some instr => (PC ≔ (s.read PC + 4#64) ,, instr) s s'
 
 -- theorem State.decode_cons
 --     (s : State) (addr : BitVec 64) (bs bs' : ByteList)
 --     (data : BitVec 32) (instr : Rel State State) :
 --     s.AlignedBytesLoaded addr bs →
---     (bs.popLE 4) = .some (data, bs') →
+--     (bs.popBitVecLE 4) = .some (data, bs') →
 --     Decode.decode data = .some instr →
---     s.decode addr = instr ∧ s.AlignedBytesLoaded (addr + 4) bs' := by
+--     s.decode addr = .some instr ∧ s.AlignedBytesLoaded (addr + 4) bs' := by
 --   intro hA hpop hD;
 --   constructor
---   · simp [State.decode, hA.aligned, ← hD]; congr
---     have X := hA.bytes_loaded
---     sorry
 --   · sorry
+--   · rcases (bs.popBitVecLE_eq_some_iff _ _ _).mp hpop with ⟨hn, hl, hr⟩
+--     sorry
+
+/--
+The fetch-decode-execute relation asserting that fetching, decoding, and
+executing the current instruction in state `s` leads to state `s'`.
+-/
+def arm : Rel State State := fun s s' ↦
+  match s.decode (s.read PC) with
+  | .none => False
+  | .some instr => (PC ≔ (s.read PC + 4#64) ,, instr) s s'
 
 end Bignum.Arm

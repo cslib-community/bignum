@@ -221,12 +221,12 @@ namespace State
 /-- Tests whether `bs` is loaded on memory at 4-byte aligned `addr`. -/
 def alignedBytesLoaded
     (s : State) (addr : BitVec 64) (bs : ByteList) : Bool :=
-  s._memory.alignedBytesLoadedLE addr bs
+  (s.read memory).alignedBytesLoadedLE addr bs
 
 /-- Asserts that `bs` is loaded on memory at 4-byte aligned `addr`. -/
 def AlignedBytesLoaded
     (s : State) (addr : BitVec 64) (bs : ByteList) : Prop :=
-  s._memory.AlignedBytesLoadedLE addr bs
+  (s.read memory).AlignedBytesLoadedLE addr bs
 
 theorem alignedBytesLoaded_iff
     (s : State) (addr : BitVec 64) (bs : ByteList) :

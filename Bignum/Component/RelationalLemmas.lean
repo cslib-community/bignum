@@ -90,17 +90,6 @@ theorem subset_assigns_compose_left
     (cp₁ :> cp₂).Assigns ⊆ cp₁.Assigns := by
   simp [Subset, assigns_def, compose]
 
--- theorem assings_tophalf_bottomhalf
---     {w : Nat} (cp : Component α (BitVec w)) [hv : cp.Valid] :
---     (cp :> tophalf).Assigns ,, (cp :> bottomhalf).Assigns = cp.Assigns := by
---   funext a₁ a₂; simp [assigns_def, Rel.Seq, compose]
---   constructor
---   · intro ⟨a₃, ⟨b, hl⟩, ⟨b', hr⟩⟩
---     exists tophalf.write b (bottomhalf.write b' (cp.read a₃))
---     sorry
---   · intro h
---     sorry
-
 /-! ## MayChange -/
 
 theorem mayChange_nil (a : α) :

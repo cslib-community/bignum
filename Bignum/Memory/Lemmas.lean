@@ -359,26 +359,6 @@ theorem writeBytesLE_take (k : Nat) (bs : ByteList) :
       rw [writeBytesLE_cons, writeBytesLE_cons, writeBytesLE_succ_cons]
       simp [writeBytesLE_zero]; rw [← ih, ← writeBytesLE_succ_cons]
 
--- theorem writeBytesLE_take_padright (k : Nat) (bs : ByteList) :
---     mem.writeBytesLE addr k ((bs.take k).rightpad (k - bs.length) 0#8) =
---     mem.writeBytesLE addr k bs := by
---   unfold List.rightpad; simp
---   induction bs generalizing mem addr k with
---   | nil => simp [writeBytesLE_nil]
---   | cons b bs' ih =>
---     cases k with
---     | zero => simp [writeBytesLE_zero]
---     | succ k' =>
---       simp
---       conv => lhs; rw [writeBytesLE_succ_cons]
---       conv => rhs; rw [writeBytesLE_succ_cons, ← ih]
---       simp [Nat.min_def]
---       by_cases h : k' ≤ bs'.length
---       · simp [h]
---       · conv => lhs; arg 4; rw [ite_eq_right h, Nat.sub_add_eq]
---         conv => rhs; arg 4; rw [ite_eq_right h]
---         sorry
-
 theorem writeBytesLE_add (k₁ k₂ : Nat) (bs : ByteList) :
     mem.writeBytesLE addr (k₁ + k₂) bs =
     (mem.writeBytesLE addr k₁ bs).writeBytesLE
@@ -516,23 +496,59 @@ theorem writeBytesLE_ofNatLE_eq' (k n : Nat) (hk : k ≤ 2^w) :
   rw [writeBytesNatLE'_eq _ _ _ _ hk]
   apply writeBytesLE_ofNatLE_eq
 
--- theorem readBytesLE_writeBytesLE
---     (addr : BitVec w) (k : Nat) (bs : ByteList) :
---     (mem.writeBytesLE addr k bs).readBytesLE addr k =
---     (bs.take k).rightpad (k - bs.length) 0#8 := by
---   sorry
-
 /-! ### BytesLoadedLE -/
 
-theorem BytesLoadedLE_nil :
-    mem.BytesLoadedLE addr [] := by
+theorem BytesLoadedLE_nil : mem.BytesLoadedLE addr [] := by
   simp [BytesLoadedLE, readBytesLE_zero]
+
+theorem BytesLoadedLE_cons (b : BitVec 8) (bs : ByteList) :
+    mem.BytesLoadedLE addr (b :: bs) ↔
+    mem.BytesLoadedLE addr [b] ∧ mem.BytesLoadedLE (addr + 1#w) bs := by
+  rw [show b :: bs = [b] ++ bs from by rfl]
+  apply readBytesLE_length_append_eq_append_iff
 
 theorem BytesLoadedLE_append (bs₁ bs₂ : ByteList) :
     mem.BytesLoadedLE addr (bs₁ ++ bs₂) ↔
     mem.BytesLoadedLE addr bs₁ ∧
     mem.BytesLoadedLE (addr + .ofNat w bs₁.length) bs₂ := by
   apply readBytesLE_length_append_eq_append_iff
+
+/-! ### AlignedBytesLoadedLE -/
+
+theorem AlignedBytesLoadedLE_nil (ha : 4 ∣ addr.toNat) :
+    mem.AlignedBytesLoadedLE addr [] :=
+  ⟨ha, mem.BytesLoadedLE_nil addr⟩
+
+theorem AlignedBytesLoadedLE_append (bs₁ bs₂ : ByteList) :
+    mem.AlignedBytesLoadedLE addr (bs₁ ++ bs₂) ↔
+    mem.AlignedBytesLoadedLE addr bs₁ ∧
+    mem.BytesLoadedLE (addr + .ofNat w bs₁.length) bs₂ := by
+  constructor
+  · intro h; have ha := (BytesLoadedLE_append _ _ _ _).mp h.bytesLoadedLE
+    exact ⟨⟨h.aligned, ha.left⟩, ha.right⟩
+  · intro ⟨hl, hr⟩
+    exact ⟨hl.aligned, (mem.BytesLoadedLE_append addr bs₁ bs₂).mpr
+      ⟨hl.bytesLoadedLE, hr⟩⟩
+
+theorem AlignedBytesLoadedLE_append'
+    (bs₁ bs₂ : ByteList) (h : 4 ∣ bs₁.length) :
+    mem.AlignedBytesLoadedLE addr (bs₁ ++ bs₂) ↔
+    mem.AlignedBytesLoadedLE addr bs₁ ∧
+    mem.AlignedBytesLoadedLE (addr + .ofNat w bs₁.length) bs₂ := by
+  constructor
+  · rw [AlignedBytesLoadedLE_append]; intro ⟨hl, hr⟩
+    refine ⟨hl, ⟨?_, hr⟩⟩; have ha := hl.aligned
+    rw [BitVec.toNat_add, BitVec.toNat_ofNat]
+    by_cases 2 ≤ w
+    · have h4 : 4 ∣ 2^w := by
+        rw [show w = 2 + (w - 2) by lia, Nat.pow_add]
+        apply Nat.dvd_mul_right
+      rw [Nat.dvd_mod_iff h4]; apply Nat.dvd_add ha
+      rw [Nat.dvd_mod_iff h4]; assumption
+    · have hw : w = 0 ∨ w = 1 := by omega
+      rcases hw with rfl | rfl <;> omega
+  · intro ⟨hl, hr⟩; rw [AlignedBytesLoadedLE_append]
+    exact ⟨hl, hr.bytesLoadedLE⟩
 
 end Memory
 end Bignum
