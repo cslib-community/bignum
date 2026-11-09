@@ -5,7 +5,8 @@ Author(s): Guilherme Lima
 -/
 module
 
+public import Bignum.Arm.Arm
+public import Bignum.Arm.ArmLemmas
 public import Bignum.Arm.Instruction
-public import Bignum.Arm.Semantics
 public import Bignum.Arm.State
 public import Bignum.Arm.StateLemmas
