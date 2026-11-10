@@ -49,7 +49,7 @@ def toBitVecLE (bs : ByteList) : BitVec (bs.length * 8) :=
   | b :: bs => (toBitVecLE bs ++ b).cast (by simp [Nat.succ_mul])
 
 /--
-Converts a bitvector `bs` to little-endian byte list of `len` bytes.
+Converts bitvector `bs` to little-endian byte list of `len` bytes.
 Truncates the list to `len` bytes if `bs` is too small or too large.
 -/
 def ofBitVecLE (len : Nat) {w : Nat} (bv : BitVec w) : ByteList :=
@@ -58,7 +58,7 @@ def ofBitVecLE (len : Nat) {w : Nat} (bv : BitVec w) : ByteList :=
   | k + 1 => bv.extractLsb' 0 8 :: ofBitVecLE k (bv.extractLsb' 8 w)
 
 /--
-Pops `n` bytes from little-endian byte list `bs`.
+Pops `n` least-significant bytes from little-endian byte list `bs`.
 -/
 def popLE (bs : ByteList) (n : Nat) : Option (ByteList × ByteList) :=
   if n ≤ bs.length then
@@ -76,7 +76,8 @@ theorem popLE_eq_some_iff (bs bs₁ bs₂ : ByteList) (n : Nat) :
   refine ⟨?_, fun _ ↦ ?_⟩ <;> simp [popLE]; assumption
 
 /--
-Pops `n` bytes as a natural number from little-endian byte list `bs`.
+Pops `n` least-significant bytes as natural number from
+little-endian byte list `bs`.
 -/
 def popNatLE (bs : ByteList) (n : Nat) : Option (Nat × ByteList) :=
   match bs.popLE n with
@@ -84,7 +85,8 @@ def popNatLE (bs : ByteList) (n : Nat) : Option (Nat × ByteList) :=
   | some (l, r) => some (l.toNatLE, r)
 
 /--
-Pops `n` bytes as a bitvector from little-endian byte list `bs`.
+Pops `n` least-significant bytes as bitvector from
+little-endian byte list `bs`.
 -/
 def popBitVecLE (bs : ByteList) (n : Nat) :
     Option ((BitVec (8 * n)) × ByteList) :=
@@ -135,8 +137,7 @@ def readBytesNatLE
   match len with
   | 0 => 0
   | k + 1 =>
-    mem.readBytesNatLE addr k +
-      (mem (addr + .ofNat _ k)).toNat * 2^(8 * k)
+    mem.readBytesNatLE addr k + (mem (addr + .ofNat _ k)).toNat * 2^(8 * k)
 
 /--
 Writes `len` bytes from `bs` to memory starting at offset `addr`.
@@ -148,8 +149,7 @@ def writeBytesLE
   match len with
   | 0 => mem
   | k + 1 =>
-    writeBytesLE
-      (fun x ↦ if x == addr then bs.headD 0#8 else mem x)
+    writeBytesLE (fun x ↦ if x == addr then bs.headD 0#8 else mem x)
       (addr + 1#w) k bs.tail
 
 /--
@@ -157,10 +157,10 @@ Writes `len` bytes from `n` to memory starting at offset `addr`.
 Assumes that `n` is little-endian encoded.  Returns the updated memory.
 
 This definition corresponds to the write method of s2n-bignum's `bytes`.
-Notice that the writing is done in reverse order, i.e., from the end to the
-beginning of the address space (from `addr+k` to `addr`).  We cannot prove
-that this function is equivalent to `writeBytesLE` or `writeBytesNatLE`,
-unless we assume `len ≤ 2^w`.  See `writeBytesNatLE'_eq`.
+The writing is done in reverse order, i.e., from the end to the beginning of
+the address space (from `addr+k` to `addr`).  We cannot prove that this
+function is equivalent to `writeBytesLE` or `writeBytesNatLE`, unless we
+assume `len ≤ 2^w`.  See `writeBytesNatLE'_eq`.
 -/
 def writeBytesNatLE' {w : Nat}
     (mem : Memory w) (addr : BitVec w) (len : Nat) (n : Nat) :
