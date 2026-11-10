@@ -16,11 +16,18 @@ public import Bignum.BitVec
 namespace Bignum.Arm
 
 /--
-Fetches and decodes the 4-byte, little-endian instruction at aligned `addr`.
+Attempts to decode 4-byte encoded instruction at 4-byte aligned `addr`.
+-/
+def State.decodeAligned (s : State) (addr : BitVec 64) :
+    4 ∣ addr.toNat → Option (Rel State State) :=
+  fun _ ↦ Decode.decode (s.read $ bytes addr 4).toBitVecLE
+
+/--
+Attempts to decode 4-byte encoded instruction at arbitrary `addr`.
 -/
 def State.decode (s : State) (addr : BitVec 64) : Option (Rel State State) :=
-  if 4 ∣ addr.toNat then
-    Decode.decode (s.read $ bytes addr 4).toBitVecLE
+  if ha : 4 ∣ addr.toNat then
+    s.decodeAligned addr ha
   else
     none
 

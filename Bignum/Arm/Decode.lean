@@ -53,8 +53,8 @@ def addOp (op : Bool) (S : Bool) {w : Nat} :
         else if S then ADDS else ADD
 
 /--
-Decodes the 4-byte encoded instruction `data`.
-Returns there resulting instruction if successful, or `none` otherwise.
+Interprets `data` as 4-byte encoded instruction and attempts to decode it.
+Returns there resulting instruction if successful.
 -/
 def decode (data : BitVec 32) : Option (Rel State State) :=
   match_bv data with
@@ -83,18 +83,5 @@ def decode (data : BitVec 32) : Option (Rel State State) :=
     else
       none
   | _ => none
-
-/--
-Pops and decodes a 4-byte encoded instruction from byte list `bs`.
-Returns the resulting instruction and the rest of the byte list if
-successful, or `none` otherwise
--/
-def pop (bs : ByteList) : Option (Rel State State × ByteList) :=
-  match bs.popBitVecLE 4 with
-  | none => none
-  | some (data, bs') =>
-    match decode data with
-    | none => none
-    | some instr => (instr, bs')
 
 end Bignum.Arm.Decode

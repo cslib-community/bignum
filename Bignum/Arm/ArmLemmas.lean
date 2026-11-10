@@ -15,7 +15,7 @@ public import Bignum.Arm.Decode
 namespace Bignum.Arm
 namespace State
 
-variable (s : State) (addr : BitVec 64)
+variable (s : State) (addr : BitVec 64) (bs bs' : ByteList)
 
 theorem decode_eq_none_iff : s.decode addr = none ↔ ¬ 4 ∣ addr.toNat ∨
     Decode.decode (s.read $ bytes addr 4).toBitVecLE = none := by
@@ -24,21 +24,14 @@ theorem decode_eq_none_iff : s.decode addr = none ↔ ¬ 4 ∣ addr.toNat ∨
   · intro h; by_cases h4 : 4 ∣ addr.toNat
     · right; apply h h4
     · left; assumption
-  · rintro (hl | hr) <;> intro
+  · rintro (_ | _) <;> intro
     · contradiction
     · assumption
 
 theorem decode_eq_some_iff (instr : Rel State State) :
     s.decode addr = some instr ↔ 4 ∣ addr.toNat ∧
     Decode.decode (s.read $ bytes addr 4).toBitVecLE = some instr := by
-  simp [decode]
-
--- theorem decode_cons' (bs bs' : ByteList)
---     (data : BitVec 32) (instr : Rel State State)
---     (ha : s.AlignedBytesLoaded addr bs)
---     (hpop : Decode.pop bs = some (instr, bs')) :
---     s.decode addr = some instr ∧ s.AlignedBytesLoaded (addr + 4#64) bs' := by
---   sorry
+  simp [decode, decodeAligned]
 
 /-
 TODO: Cleanup the proof below. A lemma relating bs.pop and decode might help.
