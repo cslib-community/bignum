@@ -6,8 +6,6 @@ Author(s): Shilpi Goel, Siddharth Bhat, Alex Keizer
 
 module
 
-import Lean
-
 set_option linter.missingDocs false
 
 public section
