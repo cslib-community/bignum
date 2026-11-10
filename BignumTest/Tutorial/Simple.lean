@@ -26,5 +26,27 @@ theorem simple_spec (pc a b : BitVec 64) :
       s.read X2 = a)
     (MayChange [PC, X2]) := by  -- frame
   simp [Rel.Ensures]; intro s hl hPC hX0 hX1
-  -- ARM_CONV (proofs/arm.ml:367)
   sorry
+  --
+  -- have HH := s.decode_cons (ha := hl)
+  -- simp [simple, ByteList.popBitVecLE, ByteList.popLE,
+  -- ByteList.toBitVecLE] at HH
+  -- have HH' := HH [66#8, 0#8, 1#8, 203#8] 2332033058#32
+  -- simp [Decode.decode, Decode.addOp] at HH'
+  -- rcases HH' with ⟨HH'₀, HH'₁⟩
+  -- --
+  -- apply Rel.Eventually.step
+  -- · simp [arm, hPC, HH'₀, Rel.Seq, Component.Assign, ADD]
+  -- · intro s' hss'
+  --   --
+  --   have II := State.decode_cons (ha := HH'₁)
+  --   simp [ByteList.popBitVecLE, ByteList.popLE,
+  --   ByteList.toBitVecLE] at II
+  --   have II' := II [] 3405840450#32
+  --   simp [Decode.decode, Decode.addOp] at II'
+  --   rcases II' with ⟨II'₀, _⟩
+  --   --
+  --   apply Rel.Eventually.step
+  --   · simp [arm]
+  --     sorry
+  --   · sorry
