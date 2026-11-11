@@ -53,7 +53,7 @@ def addOp (op : Bool) (S : Bool) {w : Nat} :
         else if S then ADDS else ADD
 
 /--
-Interprets `data` as 4-byte encoded instruction and attempts to decode it.
+Interprets `data` as a 4-byte encoded instruction and attempts to decode it.
 Returns there resulting instruction if successful.
 -/
 def decode (data : BitVec 32) : Option (Rel State State) :=

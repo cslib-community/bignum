@@ -7,6 +7,7 @@ module
 
 public import Bignum.Arm.Decode
 public import Bignum.Arm.State
+public import Bignum.Arm.StateLemmas
 public import Bignum.BitVec
 
 @[expose] public section
@@ -15,21 +16,34 @@ public import Bignum.BitVec
 
 namespace Bignum.Arm
 
-/--
-Attempts to decode 4-byte encoded instruction at 4-byte aligned `addr`.
--/
-def State.decodeAligned (s : State) (addr : BitVec 64) :
-    4 ∣ addr.toNat → Option (Rel State State) :=
-  fun _ ↦ Decode.decode (s.read $ bytes addr 4).toBitVecLE
+namespace State
+
+/-- Reads the 4-byte little-endian word at address `addr` as a bitvector. -/
+def fetch (s : State) (addr : BitVec 64) : BitVec 32 :=
+  (s.read $ bytes addr 4).toBitVecLE.cast (by rw [length_read_bytes])
 
 /--
-Attempts to decode 4-byte encoded instruction at arbitrary `addr`.
+Decodes the 4-byte instruction loaded on memory at address `addr`.
+Ensures that the address is 4-byte aligned.  Returns the encoded bitvector
+and the resulting instruction if successful.
 -/
-def State.decode (s : State) (addr : BitVec 64) : Option (Rel State State) :=
-  if ha : 4 ∣ addr.toNat then
-    s.decodeAligned addr ha
+def decode (s : State) (addr : BitVec 64) :
+    Option (BitVec 32 × Rel State State) :=
+  if 4 ∣ addr.toNat then
+    let data := s.fetch addr
+    match Decode.decode data with
+    | none => none
+    | some instr => some (data, instr)
   else
     none
+
+/--
+Asserts that decoding the instruction at address `addr` results in `instr`.
+-/
+def Decode (s : State) (addr : BitVec 64) (instr : Rel State State) : Prop :=
+  ∃ data, s.decode addr = some (data, instr)
+
+end State
 
 /--
 The fetch-decode-execute relation asserting that fetching, decoding, and
@@ -38,6 +52,6 @@ executing the current instruction in state `s` leads to state `s'`.
 def arm : Rel State State := fun s s' ↦
   match s.decode (s.read PC) with
   | none => False
-  | some instr => (PC ≔ (s.read PC + 4#64) ,, instr) s s'
+  | some (_, instr) => (PC ≔ (s.read PC + 4#64) ,, instr) s s'
 
 end Bignum.Arm

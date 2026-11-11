@@ -91,7 +91,7 @@ theorem read_write_through (f : α → β) (g : β → α) (a : α) (b : β) :
     (through f g).read ((through f g).write b a) = (f ∘ g) b := by
   rfl
 
-/-! ## BitVector -/
+/-! ## BitVec -/
 
 theorem read_subword (start len : Nat) {n : Nat} (x : BitVec n) :
     (subword start len).read x = x.extractLsb' start len := by

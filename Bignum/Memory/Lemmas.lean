@@ -172,12 +172,24 @@ theorem ofBitVecLE_toBitVecLE (bs : ByteList) :
     .ofBitVecLE bs.length bs.toBitVecLE = bs := by
   rw [← ofNatLE_toNat, toBitVecLE_toNat, ofNatLE_toNatLE]
 
+theorem ofBitVecLE_toBitVecLE_of_length_eq (bs : ByteList) {k n : Nat}
+    (hk : bs.length = k) (hn : bs.length * 8 = n) :
+    .ofBitVecLE k (bs.toBitVecLE.cast hn) = bs := by
+  subst hk hn; exact ofBitVecLE_toBitVecLE bs
+
 theorem toBitVecLE_ofBitVecLE (k : Nat) {w : Nat} (bv : BitVec w) :
     ByteList.toBitVecLE (.ofBitVecLE k bv) = (bv.setWidth (k * 8)).cast (by
       rw [length_ofBitVecLE]) := by
   apply BitVec.eq_of_toNat_eq
   rw [toBitVecLE_toNat, BitVec.toNat_cast, BitVec.toNat_setWidth,
     ← ofNatLE_toNat, toNatLE_ofNatLE, Nat.mul_comm, Nat.pow_mul]
+
+theorem ofBitVecLE_inj {k w : Nat} (bv₁ : BitVec (k * 8)) (bv₂ : BitVec w)
+    (hw : k * 8 = w) :
+    ByteList.ofBitVecLE k bv₁ = ByteList.ofBitVecLE k bv₂ →
+    bv₁ = bv₂.cast hw.symm := by
+  subst w; intro h; apply BitVec.eq_of_toNat_eq
+  simpa [toBitVecLE_ofBitVecLE] using congrArg (·.toBitVecLE.toNat) h
 
 theorem popNatLE_eq_none_iff (bs : ByteList) (n : Nat) :
     ByteList.popNatLE bs n = none ↔ n > bs.length := by
@@ -513,6 +525,11 @@ theorem BytesLoadedLE_append (bs₁ bs₂ : ByteList) :
     mem.BytesLoadedLE (addr + .ofNat w bs₁.length) bs₂ := by
   apply readBytesLE_length_append_eq_append_iff
 
+theorem BytesLoadedLE_ofBitVecLE_iff (len : Nat) {w : Nat} (bv : BitVec w) :
+    mem.BytesLoadedLE addr (.ofBitVecLE len bv) ↔
+    mem.readBytesLE addr len = .ofBitVecLE len bv := by
+  simp [BytesLoadedLE, ByteList.length_ofBitVecLE]
+
 /-! ### AlignedBytesLoadedLE -/
 
 theorem AlignedBytesLoadedLE_nil (ha : 4 ∣ addr.toNat) :
@@ -549,6 +566,19 @@ theorem AlignedBytesLoadedLE_append'
       rcases hw with rfl | rfl <;> omega
   · intro ⟨hl, hr⟩; rw [AlignedBytesLoadedLE_append]
     exact ⟨hl, hr.bytesLoadedLE⟩
+
+theorem AlignedBytesLoadedLE_ofBitVecLE_iff
+    (len : Nat) {w : Nat} (bv : BitVec w) :
+    mem.AlignedBytesLoadedLE addr (.ofBitVecLE len bv) ↔
+    4 ∣ addr.toNat ∧ mem.readBytesLE addr len = .ofBitVecLE len bv := by
+  constructor
+  · intro ha; constructor
+    · exact ha.aligned
+    · apply (BytesLoadedLE_ofBitVecLE_iff _ _ _ _).mp ha.bytesLoadedLE
+  · intro ⟨ha, hb⟩; constructor
+    · exact ha
+    · apply (BytesLoadedLE_ofBitVecLE_iff _ _ _ _).mpr hb
+
 
 end Memory
 end Bignum

@@ -155,4 +155,30 @@ theorem condition_invert (s : State) (c : Condition) :
     condition_VS_not_VC, condition_HI_not_LS, condition_GE_not_LT,
     condition_GT_not_LE, condition_AL_NV]
 
+/-! ## Memory components -/
+
+section
+variable (s : State) (addr : BitVec 64)
+
+theorem read_bytes (len : Nat) :
+    s.read (bytes addr len) = (s.read memory).readBytesLE addr len := by
+  rfl
+
+theorem write_bytes (len : Nat) (bs : ByteList) :
+    s.write (bytes addr len) bs =
+    s.write memory ((s.read memory).writeBytesLE addr len bs) := by
+  rfl
+
+theorem length_read_bytes (len : Nat) :
+    (s.read (bytes addr len)).length = len := by
+  rw [read_bytes, Memory.length_readBytesLE]
+
+theorem ofBitVecLE_toBitVecLE_read_bytes (len : Nat) :
+    .ofBitVecLE len (s.read (bytes addr len)).toBitVecLE =
+    s.read (bytes addr len) := by
+  conv => lhs; arg 1; rw [← length_read_bytes s addr len]
+  apply ByteList.ofBitVecLE_toBitVecLE
+
+end
+
 end Bignum.Arm

@@ -212,8 +212,7 @@ def LANE_B (i : Nat) : Component (BitVec 128) (BitVec 128) :=
 /-! ## Memory -/
 
 /-- Multi-byte chunk of memory (little-endian). -/
-def bytes (addr : BitVec 64) (len : Nat) :
-    Component State ByteList :=
+def bytes (addr : BitVec 64) (len : Nat) : Component State ByteList :=
   memory :> .bytesLE addr len
 
 namespace State
