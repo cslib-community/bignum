@@ -43,13 +43,13 @@ theorem decode_eq_some_iff (data : BitVec 32) (instr : Rel State State) :
       ((ByteList.ofBitVecLE_toBitVecLE_of_length_eq _
         (length_read_bytes s addr 4) (by rw [length_read_bytes])).trans h)
 
--- theorem decode_def (s : State) (addr: BitVec 64) (instr : Rel State State) :
---     s.Decode addr instr ↔
---     ∃ data, s.decode addr = some (data, instr) ∧
---       s.AlignedBytesLoaded addr (.ofBitVecLE 4 data) := by
---   constructor
---   · sorry
---   · sorry
+theorem decode_def (s : State) (addr: BitVec 64) (instr : Rel State State) :
+    s.Decode addr instr ↔ ∃ data,
+      s.AlignedBytesLoaded addr (.ofBitVecLE 4 data) ∧
+      s.decode addr = some (data, instr) := by
+  unfold Decode; constructor
+  · simp [decode_eq_some_iff]
+  · intro ⟨data, _, _⟩; exists data
 
 -- theorem decode_cons (bs bs' : ByteList)
 --     (data : BitVec 32) (instr : Rel State State)
