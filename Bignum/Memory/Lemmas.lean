@@ -217,6 +217,7 @@ end ByteList
 /-! ## Memory -/
 
 namespace Memory
+
 variable {w : Nat} (mem : Memory w) (addr : BitVec w)
 
 /-! ### readBytesLE -/

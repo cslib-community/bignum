@@ -15,7 +15,7 @@ public import Bignum.Arm.StateLemmas
 namespace Bignum.Arm
 namespace State
 
-variable (s : State) (addr : BitVec 64) (bs bs' : ByteList)
+variable (s : State) (addr : BitVec 64) (instr : Rel State State)
 
 /-! ## Instruction decoding -/
 
@@ -43,55 +43,30 @@ theorem decode_eq_some_iff (data : BitVec 32) (instr : Rel State State) :
       ((ByteList.ofBitVecLE_toBitVecLE_of_length_eq _
         (length_read_bytes s addr 4) (by rw [length_read_bytes])).trans h)
 
-theorem decode_def (s : State) (addr: BitVec 64) (instr : Rel State State) :
-    s.Decode addr instr ↔ ∃ data,
-      s.AlignedBytesLoaded addr (.ofBitVecLE 4 data) ∧
-      s.decode addr = some (data, instr) := by
+theorem decode_def : s.Decode addr instr ↔ ∃ data,
+    s.AlignedBytesLoaded addr (.ofBitVecLE 4 data) ∧
+    s.decode addr = some (data, instr) := by
   unfold Decode; constructor
   · simp [decode_eq_some_iff]
   · intro ⟨data, _, _⟩; exists data
 
--- theorem decode_cons (bs bs' : ByteList)
---     (data : BitVec 32) (instr : Rel State State)
---     (ha : s.AlignedBytesLoaded addr bs)
---     (hpop : bs.popBitVecLE 4 = some (data, bs'))
---     (hdec : Decode.decode data = .some instr) :
---     s.decode addr = some instr ∧ s.AlignedBytesLoaded (addr + 4#64) bs' := by
---   rcases (bs.popBitVecLE_eq_some_iff _ _ _).mp hpop with ⟨hn, hl, hr⟩
---   have h4 : (bs.take 4).length = 4 := by
---     rw [List.length_take, Nat.min_eq_left]; assumption
---   have h4dvd : 4 ∣ (bs.take 4).length := by
---     rw [h4]; apply Nat.dvd_refl
---   constructor
---   · simp [ha.aligned, decode_eq_some_iff]
---     have hb := (((s.read memory).BytesLoadedLE_append addr (bs.take 4)
---       (bs.drop 4)).mp (by
---       rw [bs.take_append_drop]; exact ha.bytesLoadedLE)).left
---     unfold Memory.BytesLoadedLE at hb
---     rw [h4] at hb
---     have hx : s.read (bytes addr 4) = bs.take 4 := hb
---     have e : (s.read (bytes addr 4)).toBitVecLE = data := by
---       apply BitVec.eq_of_toNat_eq
---       have h1 : ByteList.toNatLE (bs.take 4) = data.toNat := by
---         have := congrArg BitVec.toNat hl
---         rw [ByteList.toBitVecLE_toNat, BitVec.toNat_cast] at this
---         exact this
---       have h2 : ByteList.toNatLE (s.read (bytes addr 4)) =
---           ByteList.toNatLE (bs.take 4) :=
---         congrArg ByteList.toNatLE hx
---       rw [ByteList.toBitVecLE_toNat]
---       exact h2.trans h1
---     rw [e]; exact hdec
---   · constructor
---     · grind [ha.aligned]
---     · have X := (s.read memory).AlignedBytesLoadedLE_append'
---         addr (bs.take 4) (bs.drop 4) h4dvd
---       rw [bs.take_append_drop] at X
---       have Y := (X.mp ha).right
---       rw [h4] at Y
---       rw [← hr]
---       apply Y.bytesLoadedLE
-
+theorem decode_cons (bs bs' : ByteList) (data : BitVec 32)
+    (ha : s.AlignedBytesLoaded addr bs)
+    (hpop : bs.popBitVecLE 4 = some (data, bs'))
+    (hdec : s.decode addr = some (data, instr)) :
+    s.Decode addr instr ∧ s.AlignedBytesLoaded (addr + 4#64) bs' := by
+  constructor
+  · apply (s.decode_def _ _).mpr; exists data; constructor
+    · exact ((s.decode_eq_some_iff _ _ _).mp hdec).1
+    · exact hdec
+  · rcases (ByteList.popBitVecLE_eq_some_iff _ _ _ _).mp hpop with ⟨hn, -, rfl⟩
+    have h4 : (bs.take 4).length = 4 := by
+      rw [List.length_take, Nat.min_eq_left hn]
+    have := (Memory.AlignedBytesLoadedLE_append' (s.read memory) addr
+      (bs.take 4) (bs.drop 4) (by rw [h4]; exact Nat.dvd_refl 4)).mp
+      (by rw [List.take_append_drop]; exact ha)
+    rw [h4] at this
+    exact this.2
 
 end State
 end Bignum.Arm

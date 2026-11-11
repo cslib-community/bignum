@@ -18,7 +18,6 @@ open Std
 namespace Bignum.Set
 
 universe u
-
 variable {α : Type u}
 
 theorem empty_subset (p : Set α) : ∅ ⊆ p := by
@@ -119,8 +118,7 @@ theorem subset_seq_refl_left (r s : Rel α β) (ra : Rel α α) [Refl ra] :
 
 /-! ### Eventually -/
 
-variable {step : Rel α α}
-variable {P P' Q Q' R : Set α} {C C' : Rel α α}
+variable {step : Rel α α} {P P' Q Q' R : Set α} {C C' : Rel α α}
 
 theorem eventually_mono : P ⊆ Q → step.Eventually P ⊆ step.Eventually Q := by
   intros PQ _ h
